@@ -1,16 +1,17 @@
 <?php
 
 /*
- * This file is part of the Symfony package.
+ * This file is part of the `src-run/vermicious-console-io-library` project.
  *
- * (c) Fabien Potencier <fabien@symfony.com>
+ * (c) 2016 Rob Frawley 2nd(rmf) <rmf AT src DOT run>
  *
- * For the full copyright and license information, please view the LICENSE
+ * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
  */
 
 namespace SR\Console\Tests\Style;
 
+use SR\Console\Style\Style;
 use SR\Console\Style\StyleInterface;
 use SR\Reflection\Inspect;
 use Symfony\Component\Console\Command\Command;
@@ -59,6 +60,14 @@ class StyleTester
     }
 
     /**
+     * @return mixed|StyleInterface|StyleAwareFixture
+     */
+    public function getStyle()
+    {
+        return $this->style;
+    }
+
+    /**
      * @param string $what
      * @param mixed  ...$parameters
      *
@@ -66,12 +75,27 @@ class StyleTester
      */
     public function execute($what, ...$parameters)
     {
-        ob_start();
+        if ($this->style instanceof Style) {
+            ob_start();
+        }
 
         $method = $this->inspect->getMethod($what);
-        $method->invoke($this->style, ...$parameters);
+        $return = $method->invoke($this->style, ...$parameters);
 
-        $this->display = ob_get_flush();
+        if (count($parameters) === 0) {
+            if ($this->style instanceof Style) {
+                ob_end_clean();
+            }
+            return $return;
+        }
+
+        if ($this->style instanceof StyleAwareFixture) {
+            $this->display = $this->style->getOutput()->output;
+            $this->style->getOutput()->clear();
+        } elseif ($this->style instanceof Style) {
+            $this->display = ob_get_flush();
+            ob_end_clean();
+        }
 
         return $this->display;
     }

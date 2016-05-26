@@ -14,7 +14,9 @@ namespace SR\Console\Tests\Style;
 use SR\Console\Style\Style;
 use SR\Console\Style\StyleInterface;
 use SR\Console\Tests\Output\TestOutput;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -68,6 +70,26 @@ class StyleAwareTest extends \PHPUnit_Framework_TestCase
         return $fixture;
     }
 
+    /**
+     * @param int $verbosity
+     *
+     * @return StyleTester
+     */
+    private function getTester($verbosity = OutputInterface::VERBOSITY_NORMAL)
+    {
+        $input = new ArrayInput([]);
+        $output = new TestOutput();
+        $output->setVerbosity($verbosity);
+        $style = new Style($input, $output);
+        $aware = new StyleAwareFixture();
+        $aware->setStyle($style);
+        $aware->setInput($input);
+        $aware->setOutput($output);
+        $tester = new StyleTester($aware);
+
+        return $tester;
+    }
+
     public function testSetterAndGetter()
     {
         $input = $this->mockInput();
@@ -96,21 +118,188 @@ class StyleAwareTest extends \PHPUnit_Framework_TestCase
 
     public function testStyleIo()
     {
-        $input = $this->mockInput();
+        $input = new ArrayInput([]);
         $output = new TestOutput();
         $style = new Style($input, $output);
-        $fixture = new StyleAwareFixture();
-        $fixture->setStyle($style);
-        $tester = new StyleTester($fixture);
+        $aware = new StyleAwareFixture();
+        $aware->setStyle($style);
+        $aware->setInput($input);
+        $aware->setOutput($output);
+        $tester = new StyleTester($aware);
+
+        $this->assertSame($style, $tester->execute('io'));
+
+        $tester->execute('io', function (StyleInterface $style) {
+            $style->getOutput()->doWrite('testStyleIo');
+        });
+        $this->assertRegExp('{testStyleIo}', $tester->getDisplay());
+    }
+
+    public function testStyleIoQuiet()
+    {
+        $method = 'ioQuiet';
+        $tester = $this->getTester();
 
         $tester->execute(
-            'io',
+            $method,
             function (StyleInterface $style) {
-                $style->text('testStyleIo');
+                $style->getOutput()->doWrite('testStyleIo');
             }
         );
+        $this->assertNotRegExp('{testStyleIo}', $tester->getDisplay());
 
-        $this->assertSame('testStyleIo', $tester->getDisplay());
+        $tester = $this->getTester(OutputInterface::VERBOSITY_QUIET);
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertRegExp('{testStyleIo}', $tester->getDisplay());
+    }
+
+    public function testStyleIoNormal()
+    {
+        $method = 'ioNormal';
+        $tester = $this->getTester(OutputInterface::VERBOSITY_QUIET);
+
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertNotRegExp('{testStyleIo}', $tester->getDisplay());
+
+        $tester = $this->getTester(OutputInterface::VERBOSITY_NORMAL);
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertRegExp('{testStyleIo}', $tester->getDisplay());
+    }
+
+    public function testStyleIoNotVerbose()
+    {
+        $method = 'ioNotVerbose';
+        $tester = $this->getTester(OutputInterface::VERBOSITY_QUIET);
+
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertRegExp('{testStyleIo}', $tester->getDisplay());
+
+        $tester = $this->getTester(OutputInterface::VERBOSITY_NORMAL);
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertRegExp('{testStyleIo}', $tester->getDisplay());
+
+        $tester = $this->getTester(OutputInterface::VERBOSITY_VERBOSE);
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertNotRegExp('{testStyleIo}', $tester->getDisplay());
+    }
+
+    public function testStyleIoVerbose()
+    {
+        $method = 'ioVerbose';
+        $tester = $this->getTester(OutputInterface::VERBOSITY_NORMAL);
+
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertNotRegExp('{testStyleIo}', $tester->getDisplay());
+
+        $tester = $this->getTester(OutputInterface::VERBOSITY_VERBOSE);
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertRegExp('{testStyleIo}', $tester->getDisplay());
+    }
+
+    public function testStyleIoVeryVerbose()
+    {
+        $method = 'ioVeryVerbose';
+        $tester = $this->getTester(OutputInterface::VERBOSITY_NORMAL);
+
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertNotRegExp('{testStyleIo}', $tester->getDisplay());
+
+        $tester = $this->getTester(OutputInterface::VERBOSITY_VERY_VERBOSE);
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertRegExp('{testStyleIo}', $tester->getDisplay());
+    }
+
+    public function testStyleIoDebug()
+    {
+        $method = 'ioDebug';
+        $tester = $this->getTester(OutputInterface::VERBOSITY_NORMAL);
+
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertNotRegExp('{testStyleIo}', $tester->getDisplay());
+
+        $tester = $this->getTester(OutputInterface::VERBOSITY_DEBUG);
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $style->getOutput()->doWrite('testStyleIo');
+            }
+        );
+        $this->assertRegExp('{testStyleIo}', $tester->getDisplay());
+    }
+
+    public function testStyleIoInvoke()
+    {
+        $method = 'ioInvoke';
+        $tester = $this->getTester(OutputInterface::VERBOSITY_NORMAL);
+
+        $tester->execute(
+            $method,
+            function (StyleInterface $style) {
+                $this->invokeBoundMethod($style);
+            },
+            $this
+        );
+        $this->assertRegExp('{testStyleIoBound}', $tester->getDisplay());
+    }
+
+    public function invokeBoundMethod(StyleInterface $style)
+    {
+        return $style->getOutput()->doWrite('testStyleIoBound');
     }
 }
 

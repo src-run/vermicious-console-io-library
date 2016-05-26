@@ -1,0 +1,29 @@
+
+ [WARNING] Warning                                                                                                      
+
+ ! [CAUTION] Caution                                                                                                    
+
+ [ERROR] Error                                                                                                          
+
+ [OK] Success                                                                                                           
+
+ [Title] Success                                                                                                        
+
+ ! [NOTE] Note                                                                                                          
+
+X [CUSTOM] Custom block                                                                                                 
+
+
+ Name (version 0.1.0) 
+ Author First Last 
+ License MIT 
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+ [Section]                                                                                                              
+
+                                                     [ Sub-section ]                                                    
+
+ # [ 1 of 10 ] PRE
+ # Message
+

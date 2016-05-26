@@ -11,60 +11,117 @@
 
 namespace SR\Console\Tests\Style;
 
-use SR\Console\Style\StyleInterface;
+use SR\Console\Style\Style;
+use SR\Console\Tests\Output\TestOutput;
+use SR\Reflection\Inspect;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * Class StyleTest.
- */
 class StyleTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|InputInterface
+     * @var Command
      */
-    private function mockInput()
+    protected $command;
+
+    /**
+     * @var CommandTester
+     */
+    protected $tester;
+
+    /**
+     * @param int $verbosity
+     *
+     * @return Style
+     */
+    private function getStyle($verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
-        return $this
-            ->getMockBuilder('Symfony\Component\Console\Input\Input')
-            ->getMockForAbstractClass();
+        $input = new ArrayInput([]);
+        $output = new TestOutput();
+        $output->setVerbosity($verbosity);
+        $style = new Style($input, $output);
+
+        return $style;
+    }
+
+    protected function setUp()
+    {
+        $this->command = new Command('sfstyle');
+        $this->tester = new CommandTester($this->command);
+    }
+
+    protected function tearDown()
+    {
+        $this->command = null;
+        $this->tester = null;
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|OutputInterface
+     * @dataProvider inputCommandToOutputFilesProvider
      */
-    private function mockOutput()
+    public function testOutputs()
     {
-        return $this
-            ->getMockBuilder('Symfony\Component\Console\Output\Output')
-            ->getMockForAbstractClass();
+        $base = __DIR__.'/../Fixtures/Style';
+        $data = array_map(null, glob($base.'/command/command_*.php'), glob($base.'/output/output_*.txt'));
+
+        for ($i = 0; $i < count($data); $i++) {
+            $this->handleOutputs($data[$i][0], $data[$i][1]);
+        }
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|StyleInterface
-     */
-    private function mockStyle($input, $output)
+    private function handleOutputs($inputCommandFilepath, $outputFilepath)
     {
-        return $this
-            ->getMockBuilder('SR\Console\Style\Style')
-            ->setConstructorArgs([$input, $output])
-            ->getMockForAbstractClass();
+        $code = require $inputCommandFilepath;
+        $this->command->setCode($code);
+        $this->tester->execute(array(), array('interactive' => false, 'decorated' => false));
+        $file = file_get_contents($outputFilepath);
+        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true), $inputCommandFilepath);
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|StyleAwareFixture
-     */
-    private function mockFixture()
+    public function inputCommandToOutputFilesProvider()
     {
-        $input = $this->mockInput();
-        $output = $this->mockOutput();
-        $style = $this->mockStyle($input, $output);
+        $baseDir = __DIR__.'/../Fixtures/Style/SymfonyStyle';
 
-        $fixture = new StyleAwareFixture();
-        $fixture->setStyle($style);
+        return array_map(null, glob($baseDir.'/command/command_*.php'), glob($baseDir.'/output/output_*.txt'));
+    }
 
-        return $fixture;
+    public function testLongWordsBlockWrapping()
+    {
+        $word = 'Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon';
+        $wordLength = strlen($word);
+        $style = $this->getStyle();
+        $inspect = Inspect::this($style);
+        $property = $inspect->getProperty('lineLengthMax');
+        $maxLineLength = $property->value($style) - 3;
+
+        $this->command->setCode(
+            function (InputInterface $input, OutputInterface $output) use ($word) {
+                $sfStyle = new StyleWithForcedLineLength($input, $output);
+                $sfStyle->block($word, 'CUSTOM', 'fg=white;bg=blue', ' § ', false);
+            }
+        );
+
+        $this->tester->execute(array(), array('interactive' => false, 'decorated' => false));
+        $expectedCount = (int)ceil($wordLength / ($maxLineLength)) + (int)($wordLength > $maxLineLength - 5);
+        $this->assertSame($expectedCount, substr_count($this->tester->getDisplay(true), ' § '));
     }
 }
 
-/* EOF */
+/**
+ * Use this class in tests to force the line length
+ * and ensure a consistent output for expectations.
+ */
+class StyleWithForcedLineLength extends Style
+{
+    public function __construct(InputInterface $input, OutputInterface $output)
+    {
+        parent::__construct($input, $output);
+
+        $ref = new \ReflectionProperty(get_parent_class($this), 'lineLength');
+        $ref->setAccessible(true);
+        $ref->setValue($this, 120);
+    }
+}

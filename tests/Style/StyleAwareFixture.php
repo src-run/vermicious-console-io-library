@@ -22,6 +22,16 @@ class StyleAwareFixture
     use StyleAwareTrait;
 
     /**
+     * @return int
+     */
+    public function getVerbosity()
+    {
+        return $this->style->getOutput()->getVerbosity();
+    }
+    
+    
+
+    /**
      * @param \Closure|null $closure
      * @param mixed ...$parameters
      *

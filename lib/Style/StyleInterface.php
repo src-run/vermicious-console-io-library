@@ -28,9 +28,34 @@ interface StyleInterface extends BaseStyleInterface, OutputInterface, InputAware
     public function setVerbosity($level);
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
     public function getVerbosity();
+
+    /**
+     * @return bool
+     */
+    public function isQuiet();
+
+    /**
+     * @return bool
+     */
+    public function isNormal();
+
+    /**
+     * @return bool
+     */
+    public function isVerbose();
+
+    /**
+     * @return bool
+     */
+    public function isVeryVerbose();
+
+    /**
+     * @return bool
+     */
+    public function isDebug();
 
     /**
      * {@inheritdoc}
@@ -53,34 +78,6 @@ interface StyleInterface extends BaseStyleInterface, OutputInterface, InputAware
     public function isDecorated();
 
     /**
-     * Returns whether verbosity is quiet (-q).
-     *
-     * @return bool true if verbosity is set to VERBOSITY_QUIET, false otherwise
-     */
-    public function isQuiet();
-
-    /**
-     * Returns whether verbosity is verbose (-v).
-     *
-     * @return bool true if verbosity is set to VERBOSITY_VERBOSE, false otherwise
-     */
-    public function isVerbose();
-
-    /**
-     * Returns whether verbosity is very verbose (-vv).
-     *
-     * @return bool true if verbosity is set to VERBOSITY_VERY_VERBOSE, false otherwise
-     */
-    public function isVeryVerbose();
-
-    /**
-     * Returns whether verbosity is debug (-vvv).
-     *
-     * @return bool true if verbosity is set to VERBOSITY_DEBUG, false otherwise
-     */
-    public function isDebug();
-
-    /**
      * Formats a message as a block of text.
      *
      * @param string|array $messages The message to write in the block
@@ -92,9 +89,42 @@ interface StyleInterface extends BaseStyleInterface, OutputInterface, InputAware
     public function block($messages, $type = null, $style = null, $prefix = ' ', $padding = false);
 
     /**
+     * @param string $separator
+     *
+     * @return string
+     */
+    public function getSeparatorFullWidth($separator = '▬');
+
+    /**
+     * @param string          $name
+     * @param null|string|int $version
+     * @param mixed           ...$more
+     */
+    public function applicationTitle($name, $version = null, ...$more);
+
+    /**
+     * @param string $message
+     */
+    public function subSection($message);
+
+    /**
+     * @param int    $i
+     * @param int    $count
+     * @param string $pre
+     * @param string $message
+     */
+    public function numberedSection($i, $count, $pre, $message);
+
+    /**
      * {@inheritdoc}
      */
-    public function comment($message, $newLine = true);
+    public function comment($message);
+
+    /**
+     * @param string $title
+     * @param string $message
+     */
+    public function smallSuccess($title, $message);
 
     /**
      * {@inheritdoc}

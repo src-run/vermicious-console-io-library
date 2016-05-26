@@ -14,7 +14,6 @@ namespace SR\Console\Style;
 use SR\Console\Input\InputAwareTrait;
 use SR\Console\Output\OutputAwareTrait;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Helper;
@@ -86,6 +85,54 @@ class Style extends OutputStyle implements StyleInterface
     }
 
     /**
+     * @return int
+     */
+    public function getVerbosity()
+    {
+        return $this->output->getVerbosity();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isQuiet()
+    {
+        return $this->getVerbosity() === OutputInterface::VERBOSITY_QUIET;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNormal()
+    {
+        return $this->getVerbosity() === OutputInterface::VERBOSITY_NORMAL;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVerbose()
+    {
+        return $this->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVeryVerbose()
+    {
+        return $this->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebug()
+    {
+        return $this->getVerbosity() === OutputInterface::VERBOSITY_DEBUG;
+    }
+
+    /**
      * Formats a message as a block of text.
      *
      * @param string|array $msgLines The message to write in the block
@@ -136,32 +183,34 @@ class Style extends OutputStyle implements StyleInterface
     }
 
     /**
+     * @param string $separator
+     *
      * @return string
      */
-    public function getSeparatorFullWidth()
+    public function getSeparatorFullWidth($separator = '▬')
     {
-        return sprintf('<fg=white>%s</>', str_repeat('▬', $this->lineLength));
+        return sprintf('<fg=white>%s</>', str_repeat($separator, $this->lineLength));
     }
 
     /**
      * @param string          $name
      * @param null|string|int $version
-     * @param mixed ...$additionals
+     * @param mixed           ...$more
      */
-    public function applicationTitle($name, $version = null, ...$additionals)
+    public function applicationTitle($name, $version = null, ...$more)
     {
-        $msgLines = [null, sprintf(' <em>%s (version %s)</em> ', $name, $version ?: 'dev')];
+        $msgLines = [null, sprintf(' <em>%s (version %s)</em> ', $name, (string) $version ?: 'dev')];
 
-        foreach ($additionals as $additionalParts) {
-            $msgLines[] = sprintf(' %s %s ', ...$additionalParts);
+        foreach ($more as $m) {
+            $msgLines[] = sprintf(' %s %s ', ...$m);
         }
 
         $msgLines[] = null;
         $msgLines[] = $this->getSeparatorFullWidth();
-        $msgLines[] = '';
 
         $this->autoPrependBlock();
         $this->writeln($msgLines);
+        $this->newLine();
     }
 
     /**
@@ -170,7 +219,6 @@ class Style extends OutputStyle implements StyleInterface
     public function title($message)
     {
         $this->autoPrependBlock();
-
         $this->writeln(
             array(
                 sprintf('<comment>%s</>', $message),
@@ -192,7 +240,6 @@ class Style extends OutputStyle implements StyleInterface
         $padLength = $this->lineLength - Helper::strlenWithoutDecoration($this->getFormatter(), $message) - 4;
 
         $this->autoPrependBlock();
-
         $this->writeln(
             [
                 sprintf(
@@ -216,7 +263,6 @@ class Style extends OutputStyle implements StyleInterface
         $padRight = $padLength - $padLeft;
 
         $this->autoPrependBlock();
-
         $this->writeln(
             [
                 sprintf(
@@ -239,13 +285,11 @@ class Style extends OutputStyle implements StyleInterface
      */
     public function numberedSection($i, $count, $pre, $message)
     {
-        $messagePre = sprintf(' # <em>[ %d of %d ]</em> %s', $i, $count, strtoupper($pre));
-
         $this->autoPrependBlock();
-
         $this->writeln(
             [
-                sprintf('%s'.PHP_EOL.' # %s', $messagePre, $message),
+                sprintf(' # <em>[ %d of %d ]</em> %s', $i, $count, strtoupper($pre)),
+                sprintf(' # %s', $message),
             ]
         );
 
@@ -257,15 +301,11 @@ class Style extends OutputStyle implements StyleInterface
      */
     public function listing(array $list)
     {
+        $list = array_map(function ($element) {
+            return sprintf(' * %s', $element);
+        }, $list);
+
         $this->autoPrependText();
-
-        $list = array_map(
-            function ($element) {
-                return sprintf(' * %s', $element);
-            },
-            $list
-        );
-
         $this->writeln($list);
         $this->newLine();
     }
@@ -275,28 +315,29 @@ class Style extends OutputStyle implements StyleInterface
      */
     public function text($msgLines)
     {
-        $this->autoPrependText();
+        $lines = array_map(function ($l) {
+            return sprintf(' %s', $l);
+        }, (array) $msgLines);
 
-        foreach ((array) $msgLines as $line) {
-            $this->writeln(sprintf(' %s', $line));
-        }
+        $this->autoPrependText();
+        $this->writeln($lines);
     }
 
     /**
      * @param string|string[] $msgLines
      * @param bool            $newLine
      */
-    public function comment($msgLines, $newLine = true)
+    public function comment($msgLines)
     {
+        $lines = array_map(
+            function ($l) {
+                return sprintf(' // %s', $l);
+            },
+            (array) $msgLines
+        );
+
         $this->autoPrependText();
-
-        foreach ((array) $msgLines as $line) {
-            $this->writeln(sprintf(' // %s', $line));
-        }
-
-        if ($newLine === true) {
-            $this->newLine();
-        }
+        $this->writeln($lines);
     }
 
     /**
@@ -305,7 +346,7 @@ class Style extends OutputStyle implements StyleInterface
      */
     public function smallSuccess($title, $message)
     {
-        $this->writeln(sprintf(' <bg=green;fg=black> %s: %s </>'.PHP_EOL, $title, $message));
+        $this->block($message, $title, 'bg=green;fg=black', ' ', false);
     }
 
     /**
@@ -349,10 +390,10 @@ class Style extends OutputStyle implements StyleInterface
     }
 
     /**
-     * @param string[] $hdrs
      * @param string[] $rows
+     * @param string[] $headers
      */
-    public function table(array $hdrs, array $rows)
+    public function table(array $rows, array $headers = null)
     {
         $rows = array_map(
             function ($value) {
@@ -377,9 +418,10 @@ class Style extends OutputStyle implements StyleInterface
         $table = new Table($this);
         $table->setStyle($style);
 
-        $table->setHeaders($hdrs);
+        if ($headers) {
+            $table->setHeaders($headers);
+        }
         $table->setRows($rows);
-
         $table->render();
 
         $this->newLine();
@@ -391,14 +433,15 @@ class Style extends OutputStyle implements StyleInterface
     public function ask($question, $default = null, $validator = null, $sanitizer = null)
     {
         $question = new Question($question, $default);
-
         $question->setValidator($validator);
 
+        $return = $this->askQuestion($question);
+
         if ($sanitizer instanceof \Closure) {
-            return $sanitizer($this->askQuestion($question));
+            return $sanitizer($return);
         }
 
-        return $this->askQuestion($question);
+        return $return;
     }
 
     /**
@@ -407,7 +450,6 @@ class Style extends OutputStyle implements StyleInterface
     public function askHidden($question, $validator = null)
     {
         $question = new Question($question);
-
         $question->setHidden(true);
         $question->setValidator($validator);
 
@@ -448,7 +490,7 @@ class Style extends OutputStyle implements StyleInterface
      */
     public function progressAdvance($step = 1)
     {
-        $this->getProgressBar()->advance($step);
+        $this->progress->advance($step);
     }
 
     /**
@@ -456,7 +498,7 @@ class Style extends OutputStyle implements StyleInterface
      */
     public function progressFinish()
     {
-        $this->getProgressBar()->finish();
+        $this->progress->finish();
         $this->newLine(2);
 
         $this->progress = null;
@@ -534,18 +576,6 @@ class Style extends OutputStyle implements StyleInterface
     }
 
     /**
-     * @return ProgressBar
-     */
-    private function getProgressBar()
-    {
-        if (!$this->progress) {
-            throw new RuntimeException('The ProgressBar is not started.');
-        }
-
-        return $this->progress;
-    }
-
-    /**
      * @return int
      */
     private function getTerminalWidth()
@@ -556,8 +586,7 @@ class Style extends OutputStyle implements StyleInterface
     }
 
     /**
-     * Start new line on empty history or prepend new line for each non LF chars (meaning no blank
-     * line was output prior).
+     * @return $this
      */
     private function autoPrependBlock()
     {
@@ -568,20 +597,28 @@ class Style extends OutputStyle implements StyleInterface
         }
 
         $this->newLine(2 - substr_count($chars, "\n"));
+
+        return $this;
     }
 
     /**
-     * Output new line if that wasn't the previous output.
+     * @return $this
      */
     private function autoPrependText()
     {
-        if ("\n" !== substr($this->outputBuffered->fetch(), -1)) {
+        $fetched = $this->outputBuffered->fetch();
+
+        if ("\n" !== substr($fetched, -1)) {
             $this->newLine();
         }
+
+        return $this;
     }
 
     /**
-     * @param string[] $messages
+     * @param string[] $lines
+     *
+     * @return string[]
      */
     private function reduceBuffer($lines)
     {

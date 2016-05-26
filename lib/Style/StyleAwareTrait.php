@@ -65,9 +65,11 @@ trait StyleAwareTrait // implements StyleAwareInterface
      */
     protected function ioQuiet(\Closure $closure)
     {
-        if (!$this->io()->isQuiet()) {
-            return $this->ioInvoke($closure);
+        if (!$this->style->isQuiet()) {
+            return null;
         }
+
+        return $this->ioInvoke($closure);
     }
 
     /**
@@ -75,11 +77,27 @@ trait StyleAwareTrait // implements StyleAwareInterface
      *
      * @return mixed
      */
-    protected function ioNoVerbose(\Closure $closure)
+    protected function ioNormal(\Closure $closure)
     {
-        if (!$this->io()->isVerbose() && !$this->io()->isVeryVerbose()) {
-            return $this->ioInvoke($closure);
+        if (!$this->style->isNormal()) {
+            return null;
         }
+
+        return $this->ioInvoke($closure);
+    }
+
+    /**
+     * @param \Closure $closure
+     *
+     * @return mixed
+     */
+    protected function ioNotVerbose(\Closure $closure)
+    {
+        if (!$this->style->isNormal() && !$this->style->isQuiet()) {
+            return null;
+        }
+
+        return $this->ioInvoke($closure);
     }
 
     /**
@@ -89,9 +107,11 @@ trait StyleAwareTrait // implements StyleAwareInterface
      */
     protected function ioVerbose(\Closure $closure)
     {
-        if ($this->io()->isVerbose()) {
-            return $this->ioInvoke($closure);
+        if (!$this->style->isVerbose()) {
+            return null;
         }
+
+        return $this->ioInvoke($closure);
     }
 
     /**
@@ -101,9 +121,11 @@ trait StyleAwareTrait // implements StyleAwareInterface
      */
     protected function ioVeryVerbose(\Closure $closure)
     {
-        if ($this->io()->isVeryVerbose()) {
-            return $this->ioInvoke($closure);
+        if (!$this->style->isVeryVerbose()) {
+            return null;
         }
+
+        return $this->ioInvoke($closure);
     }
 
     /**
@@ -113,9 +135,11 @@ trait StyleAwareTrait // implements StyleAwareInterface
      */
     protected function ioDebug(\Closure $closure)
     {
-        if ($this->io()->isDebug()) {
-            return $this->ioInvoke($closure);
+        if (!$this->style->isDebug()) {
+            return null;
         }
+
+        return $this->ioInvoke($closure);
     }
 
     /**
