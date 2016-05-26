@@ -187,7 +187,7 @@ class Style extends OutputStyle implements StyleInterface
      *
      * @return string
      */
-    public function getSeparatorFullWidth($separator = '▬')
+    public function getSeparatorFullWidth($separator = '-')
     {
         return sprintf('<fg=white>%s</>', str_repeat($separator, $this->lineLength));
     }
@@ -199,13 +199,17 @@ class Style extends OutputStyle implements StyleInterface
      */
     public function applicationTitle($name, $version = null, ...$more)
     {
-        $msgLines = [null, sprintf(' <em>%s (version %s)</em> ', $name, (string) $version ?: 'dev')];
+        $msgLines = [
+            $this->getSeparatorFullWidth(),
+            '-',
+            sprintf('- <em>%s (version %s)</em> ', $name, (string)$version ?: 'dev')
+        ];
 
         foreach ($more as $m) {
-            $msgLines[] = sprintf(' %s %s ', ...$m);
+            $msgLines[] = sprintf('- %s %s ', ...$m);
         }
 
-        $msgLines[] = null;
+        $msgLines[] = '-';
         $msgLines[] = $this->getSeparatorFullWidth();
 
         $this->autoPrependBlock();
