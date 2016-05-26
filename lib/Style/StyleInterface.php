@@ -98,9 +98,10 @@ interface StyleInterface extends BaseStyleInterface, OutputInterface, InputAware
     /**
      * @param string          $name
      * @param null|string|int $version
+     * @param null|string     $commit
      * @param mixed           ...$more
      */
-    public function applicationTitle($name, $version = null, ...$more);
+    public function applicationTitle($name, $version = null, $commit = null, ...$more);
 
     /**
      * @param string $message

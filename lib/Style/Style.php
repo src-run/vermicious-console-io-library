@@ -193,16 +193,22 @@ class Style extends OutputStyle implements StyleInterface
     }
 
     /**
-     * @param string $name
+     * @param string          $name
      * @param null|string|int $version
-     * @param mixed ...$more
+     * @param null|string     $commit
+     * @param mixed           ...$more
      */
-    public function applicationTitle($name, $version = null, ...$more)
+    public function applicationTitle($name, $version = null, $commit = null, ...$more)
     {
         $msgLines = [
             $this->getSeparatorFullWidth(),
             '<fg=black;options=bold>-</>',
-            sprintf('<fg=black;options=bold>-</> <em>%s (v%s)</em> ', $name, (string)$version ?: ' master')
+            sprintf(
+                '<fg=black;options=bold>-</> <em>%s (v%s) <fg=black;options=bold>%s</></em>',
+                $name,
+                (string)$version ?: ' master',
+                $commit !== null ? '['.$commit.']' : null
+            )
         ];
 
         $msgLines = array_merge($msgLines, $this->applicationTitleMore($more));
