@@ -73,6 +73,7 @@ class Style extends OutputStyle implements StyleInterface
     public function __construct(InputInterface $input, OutputInterface $output, $lineLengthMax = 160)
     {
         $this->input = $input;
+        $this->output = $output;
         $this->outputBuffered = new BufferedOutput($output->getVerbosity(), false, clone $output->getFormatter());
         $this->lineLengthMax = $lineLengthMax;
         $this->lineLength = $this->lineLength();
@@ -82,6 +83,38 @@ class Style extends OutputStyle implements StyleInterface
         $this->getFormatter()->setStyle('highlight', new OutputFormatterStyle('magenta'));
         $this->getFormatter()->setStyle('em', new OutputFormatterStyle(null, null, ['bold']));
         $this->getFormatter()->setStyle('success', new OutputFormatterStyle('black', 'green'));
+    }
+
+    /**
+     * @return bool
+     */
+    public function isQuiet()
+    {
+        return $this->output->getVerbosity() === OutputInterface::VERBOSITY_QUIET;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVerbose()
+    {
+        return $this->output->getVerbosity() === OutputInterface::VERBOSITY_VERBOSE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVeryVerbose()
+    {
+        return $this->output->getVerbosity() === OutputInterface::VERBOSITY_VERY_VERBOSE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDebug()
+    {
+        return $this->output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG;
     }
 
     /**

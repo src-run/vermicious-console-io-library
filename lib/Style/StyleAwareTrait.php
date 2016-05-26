@@ -54,7 +54,7 @@ trait StyleAwareTrait // implements StyleAwareInterface
     protected function io(\Closure $closure = null, ...$parameters)
     {
         if ($closure !== null) {
-            return $this->ioInvoke($closure, ...$parameters);
+            return $this->ioInvoke($closure, null, ...$parameters);
         }
 
         return $this->getStyle();
@@ -65,7 +65,7 @@ trait StyleAwareTrait // implements StyleAwareInterface
      *
      * @return mixed
      */
-    protected function ioQ(\Closure $closure)
+    protected function ioQuiet(\Closure $closure)
     {
         if (!$this->io()->isQuiet()) {
             return $this->ioInvoke($closure);
@@ -77,7 +77,7 @@ trait StyleAwareTrait // implements StyleAwareInterface
      *
      * @return mixed
      */
-    protected function ioN(\Closure $closure)
+    protected function ioNoVerbose(\Closure $closure)
     {
         if (!$this->io()->isVerbose() && !$this->io()->isVeryVerbose()) {
             return $this->ioInvoke($closure);
@@ -89,7 +89,7 @@ trait StyleAwareTrait // implements StyleAwareInterface
      *
      * @return mixed
      */
-    protected function ioV(\Closure $closure)
+    protected function ioVerbose(\Closure $closure)
     {
         if ($this->io()->isVerbose()) {
             return $this->ioInvoke($closure);
@@ -101,7 +101,7 @@ trait StyleAwareTrait // implements StyleAwareInterface
      *
      * @return mixed
      */
-    protected function ioVV(\Closure $closure)
+    protected function ioVeryVerbose(\Closure $closure)
     {
         if ($this->io()->isVeryVerbose()) {
             return $this->ioInvoke($closure);
@@ -113,7 +113,7 @@ trait StyleAwareTrait // implements StyleAwareInterface
      *
      * @return mixed
      */
-    protected function ioVVV(\Closure $closure)
+    protected function ioDebug(\Closure $closure)
     {
         if ($this->io()->isDebug()) {
             return $this->ioInvoke($closure);
@@ -121,22 +121,13 @@ trait StyleAwareTrait // implements StyleAwareInterface
     }
 
     /**
-     * @param \Closure $closure
+     * @param \Closure    $closure
+     * @param null|object $bindTo
+     * @param mixed       ...$parameters
      *
      * @return mixed
      */
-    protected function ioClosure(\Closure $closure, ...$parameters)
-    {
-        return $this->ioInvoke($closure, null, ...$parameters);
-    }
-
-    /**
-     * @param \Closure $closure
-     * @param mixed    ...$parameters
-     *
-     * @return mixed
-     */
-    private function ioInvoke(\Closure $closure, $bindTo = null, ...$parameters)
+    protected function ioInvoke(\Closure $closure, $bindTo = null, ...$parameters)
     {
         if ($bindTo !== null) {
             $closure = $closure->bindTo($bindTo);
