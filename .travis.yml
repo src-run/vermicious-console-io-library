@@ -1,0 +1,34 @@
+---
+
+##
+# This file is part of the `src-run/vermicious-console-io-library` project.
+#
+# (c) Rob Frawley 2nd <rmf@src.run>
+#
+# For the full copyright and license information, view the LICENSE.md
+# file distributed with this source code.
+##
+
+sudo     : false
+language : php
+php      : [ 5.6, 7.0 ]
+
+git:
+  depth : 3
+
+env:
+  global:
+    - secure: tJVaRyV4DszTi/fIw1ViiDkx45X2DYSmm8u642qmQF2gMMgJT17fUzVdAtBG5HUYgbYmYd1IYGOX+oE/5hTTR0jEAirQE9IMfd94+YIT+e/d4CuDRHD4bWtUYdVHV/C4aoQonWMKDsY9z+wSccurz4BLy6Fm/V9M7HGEWm5thj3iM3Tp4I1s/vXTOrWeBC1WAukxSagcOl3GYZLPQbUThtJm+v9GJQVsiIkh2wRmFq/IMdbIrh0dZYCZjbTZ81Dj282R+m28vHYzpI6ymEpReGkdOgsgFPCWpUHWXscb/yjlSVHVUoFZdA4rwO8X1SdvTk0Bd4GJFlKE4HErG1Qq9lu99Q36SxDqr1h7yzB7FINYH3cxkkqTNgI54i/EF+LnHGBPM2GG6j0OKtTP/wLPJQBAEL33OXpwv4vYX7xzu1zmngeADKqM3GMkybkElb6WkPo1ZM7tsuToHgdfBTrYBFAqHv8Zz3FzY+oSX85MBxhmes+AmJ2x6KpEZMg60aSujh0h0JjuEnxeXTYhcpeJzyktklbcV6SpUZN1IManqcasgmx2WmNEtHaQGbqiUpdtufE5kdrL8pe2r1WG6VXTO89rkGWkUpxPx/xYO9GKaXDBJjU6VY9X92XZ+HDcIP75Xv0g+NK2JYlE9i6zC5XNMNoytX/ewCGFxnaQ2BjeXWA=
+
+install :
+  - bash .bldr/bldr -b up-env -q
+  - bash .bldr/bldr -b up-app -q
+
+script :
+  - bin/phpunit -vvv
+
+after_script :
+  - bash .bldr/bldr -b down-app -q
+  - bash .bldr/bldr -b down-env -q
+
+...
