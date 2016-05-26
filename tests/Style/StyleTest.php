@@ -11,9 +11,7 @@
 
 namespace SR\Console\Tests\Style;
 
-use SR\Console\Style\Style;
 use SR\Console\Style\StyleInterface;
-use SR\Console\Tests\Output\TestOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

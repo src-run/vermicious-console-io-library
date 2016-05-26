@@ -38,8 +38,8 @@ use Symfony\Component\Console\Style\OutputStyle;
  */
 class Style extends OutputStyle implements StyleInterface
 {
-	use InputAwareTrait;
-	use OutputAwareTrait;
+    use InputAwareTrait;
+    use OutputAwareTrait;
 
     /**
      * @var SymfonyQuestionHelper
@@ -86,38 +86,6 @@ class Style extends OutputStyle implements StyleInterface
     }
 
     /**
-     * @return bool
-     */
-    public function isQuiet()
-    {
-        return $this->output->getVerbosity() === OutputInterface::VERBOSITY_QUIET;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isVerbose()
-    {
-        return $this->output->getVerbosity() === OutputInterface::VERBOSITY_VERBOSE;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isVeryVerbose()
-    {
-        return $this->output->getVerbosity() === OutputInterface::VERBOSITY_VERY_VERBOSE;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDebug()
-    {
-        return $this->output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG;
-    }
-
-    /**
      * Formats a message as a block of text.
      *
      * @param string|array $msgLines The message to write in the block
@@ -139,7 +107,10 @@ class Style extends OutputStyle implements StyleInterface
 
         foreach ((array) $msgLines as $key => $m) {
             $m = OutputFormatter::escape($m);
-            $lines = array_merge($lines, explode(PHP_EOL, wordwrap($m, $this->lineLength - Helper::strlen($prefix), PHP_EOL, true)));
+            $lines = array_merge(
+                $lines,
+                explode(PHP_EOL, wordwrap($m, $this->lineLength - Helper::strlen($prefix), PHP_EOL, true))
+            );
 
             if (count($msgLines) > 1 && $key < count($msgLines) - 1) {
                 $lines[] = '';
@@ -175,7 +146,7 @@ class Style extends OutputStyle implements StyleInterface
     /**
      * @param string          $name
      * @param null|string|int $version
-     * @param mixed           ...$additionals
+     * @param mixed ...$additionals
      */
     public function applicationTitle($name, $version = null, ...$additionals)
     {
@@ -200,10 +171,15 @@ class Style extends OutputStyle implements StyleInterface
     {
         $this->autoPrependBlock();
 
-        $this->writeln(array(
-            sprintf('<comment>%s</>', $message),
-            sprintf('<comment>%s</>', str_repeat('=', Helper::strlenWithoutDecoration($this->getFormatter(), $message))),
-        ));
+        $this->writeln(
+            array(
+                sprintf('<comment>%s</>', $message),
+                sprintf(
+                    '<comment>%s</>',
+                    str_repeat('=', Helper::strlenWithoutDecoration($this->getFormatter(), $message))
+                ),
+            )
+        );
 
         $this->newLine();
     }
@@ -217,9 +193,15 @@ class Style extends OutputStyle implements StyleInterface
 
         $this->autoPrependBlock();
 
-        $this->writeln([
-            sprintf('<bg=magenta;fg=white> [<bg=magenta;fg=white;options=bold>%s</><bg=magenta;fg=white>]%s </>', $message, str_repeat(' ', $padLength))
-        ]);
+        $this->writeln(
+            [
+                sprintf(
+                    '<bg=magenta;fg=white> [<bg=magenta;fg=white;options=bold>%s</><bg=magenta;fg=white>]%s </>',
+                    $message,
+                    str_repeat(' ', $padLength)
+                ),
+            ]
+        );
 
         $this->newLine();
     }
@@ -235,14 +217,16 @@ class Style extends OutputStyle implements StyleInterface
 
         $this->autoPrependBlock();
 
-        $this->writeln([
-            sprintf(
-                '<bg=yellow;fg=black> %s[ %s ]%s </>',
-                str_repeat(' ', $padLeft),
-                $message,
-                str_repeat(' ', $padRight)
-            )
-        ]);
+        $this->writeln(
+            [
+                sprintf(
+                    '<bg=yellow;fg=black> %s[ %s ]%s </>',
+                    str_repeat(' ', $padLeft),
+                    $message,
+                    str_repeat(' ', $padRight)
+                ),
+            ]
+        );
 
         $this->newLine();
     }
@@ -259,9 +243,11 @@ class Style extends OutputStyle implements StyleInterface
 
         $this->autoPrependBlock();
 
-        $this->writeln([
-            sprintf('%s'.PHP_EOL.' # %s', $messagePre, $message),
-        ]);
+        $this->writeln(
+            [
+                sprintf('%s'.PHP_EOL.' # %s', $messagePre, $message),
+            ]
+        );
 
         $this->newLine();
     }
@@ -273,9 +259,12 @@ class Style extends OutputStyle implements StyleInterface
     {
         $this->autoPrependText();
 
-        $list = array_map(function ($element) {
-            return sprintf(' * %s', $element);
-        }, $list);
+        $list = array_map(
+            function ($element) {
+                return sprintf(' * %s', $element);
+            },
+            $list
+        );
 
         $this->writeln($list);
         $this->newLine();
@@ -365,16 +354,19 @@ class Style extends OutputStyle implements StyleInterface
      */
     public function table(array $hdrs, array $rows)
     {
-        $rows = array_map(function ($value) {
-        	if (!is_array($value)) {
-        	    return $value;
-        	}
+        $rows = array_map(
+            function ($value) {
+                if (!is_array($value)) {
+                    return $value;
+                }
 
-        	$header = array_shift($value);
-        	array_unshift($value, sprintf('<fg=blue>%s</>', $header));
+                $header = array_shift($value);
+                array_unshift($value, sprintf('<fg=blue>%s</>', $header));
 
-        	return $value;
-    	}, $rows);
+                return $value;
+            },
+            $rows
+        );
 
         $style = new TableStyle();
         $style->setVerticalBorderChar('<fg=blue>|</>');
@@ -593,9 +585,12 @@ class Style extends OutputStyle implements StyleInterface
      */
     private function reduceBuffer($lines)
     {
-    	return array_map(function ($value) {
-            return substr($value, -4);
-        }, array_merge((array) $this->outputBuffered->fetch(), (array) $lines));
+        return array_map(
+            function ($value) {
+                return substr($value, -4);
+            },
+            array_merge((array) $this->outputBuffered->fetch(), (array) $lines)
+        );
     }
 
     /**
@@ -603,7 +598,7 @@ class Style extends OutputStyle implements StyleInterface
      */
     private function lineLength()
     {
-    	return min($this->getTerminalWidth() - (int) (DIRECTORY_SEPARATOR === '\\'), $this->lineLengthMax);
+        return min($this->getTerminalWidth() - (int) (DIRECTORY_SEPARATOR === '\\'), $this->lineLengthMax);
     }
 }
 

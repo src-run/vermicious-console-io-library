@@ -33,8 +33,6 @@ trait StyleAwareTrait // implements StyleAwareInterface
     public function setStyle(StyleInterface $style)
     {
         $this->style = $style;
-        $this->input = $style->getInput();
-        $this->output = $style->getOutput();
     }
 
     /**
@@ -47,7 +45,7 @@ trait StyleAwareTrait // implements StyleAwareInterface
 
     /**
      * @param \Closure|null $closure
-     * @param mixed         ...$parameters
+     * @param mixed ...$parameters
      *
      * @return mixed|StyleInterface
      */
@@ -123,7 +121,7 @@ trait StyleAwareTrait // implements StyleAwareInterface
     /**
      * @param \Closure    $closure
      * @param null|object $bindTo
-     * @param mixed       ...$parameters
+     * @param mixed ...$parameters
      *
      * @return mixed
      */
