@@ -189,32 +189,67 @@ class Style extends OutputStyle implements StyleInterface
      */
     public function getSeparatorFullWidth($separator = '-')
     {
-        return sprintf('<fg=white>%s</>', str_repeat($separator, $this->lineLength));
+        return sprintf('<fg=black;options=bold>%s</>', str_repeat($separator, $this->lineLength));
     }
 
     /**
-     * @param string          $name
+     * @param string $name
      * @param null|string|int $version
-     * @param mixed           ...$more
+     * @param mixed ...$more
      */
     public function applicationTitle($name, $version = null, ...$more)
     {
         $msgLines = [
             $this->getSeparatorFullWidth(),
-            '-',
-            sprintf('- <em>%s (version %s)</em> ', $name, (string)$version ?: 'dev')
+            '<fg=black;options=bold>-</>',
+            sprintf('<fg=black;options=bold>-</> <em>%s (v%s)</em> ', $name, (string)$version ?: ' master')
         ];
 
-        foreach ($more as $m) {
-            $msgLines[] = sprintf('- %s %s ', ...$m);
-        }
+        $msgLines = array_merge($msgLines, $this->applicationTitleMore($more));
 
-        $msgLines[] = '-';
+        $msgLines[] = '<fg=black;options=bold>-</>';
         $msgLines[] = $this->getSeparatorFullWidth();
 
         $this->autoPrependBlock();
         $this->writeln($msgLines);
         $this->newLine();
+    }
+
+    /**
+     * @param array $more
+     *
+     * @return string[]
+     */
+    private function applicationTitleMore(array $more)
+    {
+        $msgLines = [];
+        $length = 0;
+
+        foreach ($more as $m) {
+            if (strlen($m[0]) > $length) {
+                $length = strlen($m[0]);
+            }
+        }
+
+        $more = array_map(
+            function ($m) use ($length) {
+                $m[0] = sprintf('<fg=white>@%s</>', str_pad(strtolower($m[0]), $length, ' ', STR_PAD_RIGHT));
+                $m[1] = sprintf('<fg=white>%s</>', $m[1]);
+
+                return $m;
+            },
+            $more
+        );
+
+        if (count($more) > 0) {
+            $msgLines[] = '<fg=black;options=bold>-</>';
+        }
+
+        foreach ($more as $m) {
+            $msgLines[] = sprintf('<fg=black;options=bold>-</> %s %s ', ...$m);
+        }
+
+        return $msgLines;
     }
 
     /**
