@@ -28,8 +28,6 @@ class StyleAwareFixture
     {
         return $this->style->getOutput()->getVerbosity();
     }
-    
-    
 
     /**
      * @param \Closure|null $closure

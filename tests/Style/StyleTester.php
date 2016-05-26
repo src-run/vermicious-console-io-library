@@ -86,6 +86,7 @@ class StyleTester
             if ($this->style instanceof Style) {
                 ob_end_clean();
             }
+
             return $return;
         }
 

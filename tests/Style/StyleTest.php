@@ -67,7 +67,7 @@ class StyleTest extends \PHPUnit_Framework_TestCase
         $base = __DIR__.'/../Fixtures/Style';
         $data = array_map(null, glob($base.'/command/command_*.php'), glob($base.'/output/output_*.txt'));
 
-        for ($i = 0; $i < count($data); $i++) {
+        for ($i = 0; $i < count($data); ++$i) {
             $this->handleOutputs($data[$i][0], $data[$i][1]);
         }
     }
@@ -105,7 +105,7 @@ class StyleTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->tester->execute(array(), array('interactive' => false, 'decorated' => false));
-        $expectedCount = (int)ceil($wordLength / ($maxLineLength)) + (int)($wordLength > $maxLineLength - 5);
+        $expectedCount = (int) ceil($wordLength / ($maxLineLength)) + (int) ($wordLength > $maxLineLength - 5);
         $this->assertSame($expectedCount, substr_count($this->tester->getDisplay(true), ' § '));
     }
 }

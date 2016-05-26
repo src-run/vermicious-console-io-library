@@ -8,7 +8,7 @@ use SR\Console\Tests\Style\StyleWithForcedLineLength;
 return function (InputInterface $input, OutputInterface $output) {
     $output = new StyleWithForcedLineLength($input, $output);
     $output->progressStart(10);
-    for($i = 0; $i < 10; $i++) {
+    for ($i = 0; $i < 10; ++$i) {
         $output->progressAdvance(1);
     }
     $output->progressFinish();
