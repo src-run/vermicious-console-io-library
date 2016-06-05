@@ -206,9 +206,9 @@ class Style extends OutputStyle implements StyleInterface
             sprintf(
                 '<fg=black;options=bold>-</> <em>%s (v%s) <fg=black;options=bold>%s</></em>',
                 $name,
-                (string)$version ?: ' master',
+                (string) $version ?: ' master',
                 $commit !== null ? '['.$commit.']' : null
-            )
+            ),
         ];
 
         $msgLines = array_merge($msgLines, $this->applicationTitleMore($more));

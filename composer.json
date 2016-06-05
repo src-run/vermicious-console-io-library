@@ -35,7 +35,8 @@
     "psr-4" : {
       "SR\\Console\\Style\\"  : "lib/Style/",
       "SR\\Console\\Input\\"  : "lib/Input/",
-      "SR\\Console\\Output\\" : "lib/Output/"
+      "SR\\Console\\Output\\" : "lib/Output/",
+      "SR\\Console\\Std\\"    : "lib/Std/"
     }
   },
   "autoload-dev" : {

@@ -8,7 +8,9 @@ use SR\Console\Tests\Style\StyleWithForcedLineLength;
 return function (InputInterface $input, OutputInterface $output) {
     $output = new StyleWithForcedLineLength($input, $output);
     $output->title('Title');
-    $output->ask('Asking a question', ' answer ', null, function ($result) { return trim($result); });
+    $output->ask('Asking a question', ' answer ', null, function ($result) {
+        return trim($result);
+    });
     $output->ask('Asking a question 2', ' answer 2 ');
     $output->askHidden('Hidden question');
     $output->choice('Choice question with default', array('choice1', 'choice2'), 'choice1');
