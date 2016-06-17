@@ -48,7 +48,7 @@ Alternatively, to add this project to your "composer.json" file, add the followi
 
 ```json
 require: {
-	'src-run/vermicious-console-io-library': 'dev-master'
+	"src-run/vermicious-console-io-library": "dev-master"
 }
 ```
 
