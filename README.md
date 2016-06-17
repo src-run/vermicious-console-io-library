@@ -29,7 +29,7 @@ released under the "SR" namespace, comprised of many framework-agnostic librarie
 well as some one-off releases. This project is authored and maintained by:
 
 - [Rob Frawley 2nd](https://src.run/rmf)
-- [Collaborators](https://src.run/vermicious-console-io-library/github_collaborators).
+- [Collaborators](https://src.run/vermicious-console-io-library/github_collaborators)
 
 
 ## Quick Start
