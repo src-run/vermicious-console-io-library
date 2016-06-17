@@ -16,7 +16,7 @@ The `src-run/vermicious-console-io-library` package provides the following
 ### Grouping
 
 We use a Willy Wonka-inspired naming schema for our package group names. This package is part of the
-[vermicious group](https://src.run/vermicious-console-io-library/group) which is a collection of packages with a focus
+[vermicious group](https://src.run/vermicious-console-io-library/group), which is a collection of packages with a focus
 on "core reflection base classes" and related functionality.
 
 You are welcome to research some ([useless details](https://src.run/vermicious-console-io-library/group_explanation))
