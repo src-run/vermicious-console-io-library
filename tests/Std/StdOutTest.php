@@ -46,7 +46,7 @@ class StdOutTest extends \PHPUnit_Framework_TestCase
         $instance = new $class($output);
         $instance->{$method}(...$params);
 
-        $this->assertStringEqualsFile($outputFile, $output->getOutput(), sprintf('%s->%s(%s)', $class, $method, (string) $params[0]));
+        $this->assertStringEqualsFile($outputFile, $output->output, sprintf('%s->%s(%s)', $class, $method, (string) $params[0]));
     }
 
     public function testStdOutStream()

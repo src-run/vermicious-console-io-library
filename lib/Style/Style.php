@@ -196,9 +196,9 @@ class Style extends OutputStyle implements StyleInterface
      * @param string          $name
      * @param null|string|int $version
      * @param null|string     $commit
-     * @param mixed           ...$more
+     * @param string[]        $more
      */
-    public function applicationTitle($name, $version = null, $commit = null, ...$more)
+    public function applicationTitle($name, $version = null, $commit = null, array $more = [])
     {
         $msgLines = [
             $this->getSeparatorFullWidth(),
@@ -231,29 +231,27 @@ class Style extends OutputStyle implements StyleInterface
         $msgLines = [];
         $length = 0;
 
-        foreach ($more as $m) {
-            if (strlen($m[0]) > $length) {
-                $length = strlen($m[0]);
+        foreach ($more as $key => $value) {
+            if (strlen($key) > $length) {
+                $length = strlen($key);
             }
         }
 
-        $more = array_map(
-            function ($m) use ($length) {
-                $m[0] = sprintf('<fg=white>@%s</>', str_pad(strtolower($m[0]), $length, ' ', STR_PAD_RIGHT));
-                $m[1] = sprintf('<fg=white>%s</>', $m[1]);
-
-                return $m;
-            },
-            $more
-        );
+        foreach ($more as $key => $value) {
+            $msgLines[] = sprintf('<fg=white>@%s</> <fg=white>%s</>', str_pad(strtolower($key), $length, ' ', STR_PAD_RIGHT), $value);
+        }
 
         if (count($more) > 0) {
-            $msgLines[] = '<fg=black;options=bold>-</>';
+            array_unshift($msgLines, '');
+            $msgLines[] = '';
         }
 
-        foreach ($more as $m) {
-            $msgLines[] = sprintf('<fg=black;options=bold>-</> %s %s ', ...$m);
-        }
+        $msgLines = array_map(
+            function ($m) {
+                return sprintf('<fg=black;options=bold>-</> %s ', $m);
+            },
+            $msgLines
+        );
 
         return $msgLines;
     }

@@ -29,11 +29,6 @@ class TestOutput extends Output
     {
         $this->output .= $message.($newline ? "\n" : '');
     }
-
-    public function getOutput()
-    {
-        return $this->output;
-    }
 }
 
 /* EOF */
