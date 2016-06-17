@@ -69,8 +69,8 @@ has matured and reached the version 1 milestone*.
 > The API reference websites detailed above are auto-generated using a reliable and well-developed CLI tool called
 > [Sami](https://src.run/go/sami). It is rigorously and regularly tested and is used for some large-scale projects, such
 > as the [Symfony Full-Stack Framework](https://src.run/go/symfony) <see: https://src.run/go/symfony-api>, as well some
-> smaller projects, such as [Twig](https://src.run/go/sami-twig) <see: https://src.run/go/twig-api>. *Refer to Sami's
-> [repository page](https://src.run/go/sami) to research usage in your own project.*
+> smaller projects, such as [Twig](https://src.run/go/sami-twig) <see: https://src.run/go/twig-api>. Refer to Sami's
+> [repository page](https://src.run/go/sami) to research usage in your own project.
 
 ### Examples/Tutorials
 
