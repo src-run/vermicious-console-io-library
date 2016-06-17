@@ -63,8 +63,10 @@ enter an explicit requirement. For example, to require version 1.0 you would use
 
 This package's API reference is available on our documentation website (see the "Reference" row of the table found in
 the "Additional Links" section below). All API documentation is automatically compiled against the master branch
-whenever a git push event occurs. *Static API reference for releases is planned and will be posted once this package
-has matured and reached the version 1 milestone*.
+whenever a git push event occurs.
+
+*Static API reference for releases is planned and will be posted once this package has matured and reached
+the version 1 milestone*.
 
 > The API reference websites detailed above are auto-generated using a reliable and well-developed CLI tool called
 > [Sami](https://src.run/go/sami). It is rigorously and regularly tested and is used for some large-scale projects, such
