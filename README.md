@@ -11,7 +11,7 @@
 [Welcome](https://src.run/go/readme_welcome)!
 The `src-run/vermicious-console-io-library` package provides the following
 
-> a basic set of Symfony console Input/Output/Style implementations
+> basic set of Symfony console Input/Output/Style implementations
 
 ### Grouping
 
