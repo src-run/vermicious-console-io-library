@@ -3,7 +3,7 @@
 
 |       Travis-CI        |      Codacy Rating      |      Code Coverage      |        Style-CI         |
 |:----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
-| [![Travis](https://src.run/console-io-library/travis.svg)](https://src.run/console-io-library/travis) | [![Codacy](https://src.run/console-io-library/codacy.svg)](https://src.run/console-io-library/codacy) | [![Coveralls](https://src.run/console-io-library/coveralls.svg)](https://src.run/console-io-library/coveralls) | [![Coveralls](https://src.run/console-io-library/styleci.svg)](https://src.run/console-io-library/styleci) |
+| [![Travis](https://src.run/vermicious-console-io-library/travis.svg)](https://src.run/vermicious-console-io-library/travis) | [![Codacy](https://src.run/vermicious-console-io-library/codacy.svg)](https://src.run/vermicious-console-io-library/codacy) | [![Coveralls](https://src.run/vermicious-console-io-library/coveralls.svg)](https://src.run/vermicious-console-io-library/coveralls) | [![Coveralls](https://src.run/vermicious-console-io-library/styleci.svg)](https://src.run/vermicious-console-io-library/styleci) |
 
 
 ## Overview
@@ -15,8 +15,11 @@ a basic set of Symfony console Input/Output/Style implementations.
 ### Grouping
 
 We use a odd, Willy Wonka--inspired naming convention for our package group names. This package is part of the
-[vermicious group](https://src.run/console-io-library/group) ([more on that](https://src.run/console-io-library/group_explanation)),
-which is a collection of packages with a focus on "core reflection base classes" and related functionality.
+[vermicious group](https://src.run/vermicious-console-io-library/group) which is a collection of packages with a focus
+on "core reflection base classes" and related functionality.
+
+You are welcome to research some ([useless details](https://src.run/vermicious-console-io-library/group_explanation))
+about this specific group.
 
 ### JTT
 
@@ -25,7 +28,7 @@ released under the "SR" namespace, comprised of many framework-agnostic librarie
 well as some one--off releases. This project is authored and maintained by:
 
 - [Rob Frawley 2nd](https://src.run/rmf)
-- [Collaborators](https://src.run/console-io-library/github_collaborators).
+- [Collaborators](https://src.run/vermicious-console-io-library/github_collaborators).
 
 
 ## Quick Start
@@ -72,7 +75,7 @@ discuss language-level ideas, possible new directions for a project, emerging te
 
 ### Issues
 
-To report issues or request a new feature, use the [project issue tracker](https://src.run/console-io-library/github_issues).
+To report issues or request a new feature, use the [project issue tracker](https://src.run/vermicious-console-io-library/github_issues).
 Include as much information as possible in any bug reports. Feel free to "ping" the topic if you don't get a response
 within a few days (sometimes Github notification e-mails fall through the cracks).
 
@@ -80,14 +83,14 @@ within a few days (sometimes Github notification e-mails fall through the cracks
 
 You created additional functionality while utilizing this package? Wonderful: send it back upstream! *Don't hesitate to
 submit a pull request!* Your [imagination](https://src.run/go/readme_imagination) and the requirements outlined within
-our [CONTRIBUTING.md](https://src.run/console-io-library/contributing) file are the only limitations.
+our [CONTRIBUTING.md](https://src.run/vermicious-console-io-library/contributing) file are the only limitations.
 
 
 ## License
 
 This project is licensed under the [MIT License](https://src.run/go/mit), an [FSF](https://src.run/go/fsf)- and 
 [OSI](https://src.run/go/osi)-approved, [GPL](https://src.run/go/gpl)-compatible, permissive free software license.
-Review the [LICENSE](https://src.run/console-io-library/license) file distributed with this source code for additional
+Review the [LICENSE](https://src.run/vermicious-console-io-library/license) file distributed with this source code for additional
 information.
 
 
@@ -95,8 +98,8 @@ information.
 
 | Item               | Result/Status                                                                                                      |
 |-------------------:|:-------------------------------------------------------------------------------------------------------------------|
-| __Stable Release__ | [![Packagist](https://src.run/console-io-library/packagist.svg)](https://src.run/console-io-library/packagist)     |
-| __Dev Release__    | [![Packagist](https://src.run/console-io-library/packagist_pre.svg)](https://src.run/console-io-library/packagist) |
-| __License__        | [![License](https://src.run/console-io-library/license.svg)](https://src.run/console-io-library/license)           |
-| __Reference__      | [![License](https://src.run/console-io-library/api.svg)](https://src.run/console-io-library/api)                   |
+| __Stable Release__ | [![Packagist](https://src.run/vermicious-console-io-library/packagist.svg)](https://src.run/vermicious-console-io-library/packagist)     |
+| __Dev Release__    | [![Packagist](https://src.run/vermicious-console-io-library/packagist_pre.svg)](https://src.run/vermicious-console-io-library/packagist) |
+| __License__        | [![License](https://src.run/vermicious-console-io-library/license.svg)](https://src.run/vermicious-console-io-library/license)           |
+| __Reference__      | [![License](https://src.run/vermicious-console-io-library/api.svg)](https://src.run/vermicious-console-io-library/api)                   |
 
