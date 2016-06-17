@@ -20,7 +20,7 @@ We use a Willy Wonka-inspired naming schema for our package group names. This pa
 on "core reflection base classes" and related functionality.
 
 You are welcome to research some [useless details](https://src.run/vermicious-console-io-library/group_explanation)
-about this specific group, for those that are bored or with too much time on their hands.
+about this specific group if you have too much time on your hands.
 
 ### JTT
 
