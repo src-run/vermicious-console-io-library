@@ -44,6 +44,18 @@ this project using the CLI, use the following command.
 $ composer require src-run/vermicious-console-io-library
 ```
 
+Alternatively, to add this project to your "composer.json" file, add the following to the "require" hash:
+
+```json
+require: {
+	'src-run/vermicious-console-io-library': 'dev-master'
+}
+```
+
+*Note: Is is not recommended to use the "dev-master" release unless you know what you are doing and realize this can break
+your code when updating dependencies. Instead, it is good practive to use semantic versioning and enter an explicit
+requirement. For example, to pull in version 1.0 you would use `^1.0`.*
+
 
 ## Reference
 
