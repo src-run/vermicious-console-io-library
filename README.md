@@ -15,7 +15,7 @@ The `src-run/vermicious-console-io-library` package provides the following
 
 ### Grouping
 
-We use a Willy Wonka--inspired naming schema for our package group names. This package is part of the
+We use a Willy Wonka-inspired naming schema for our package group names. This package is part of the
 [vermicious group](https://src.run/vermicious-console-io-library/group) which is a collection of packages with a focus
 on "core reflection base classes" and related functionality.
 
@@ -26,7 +26,7 @@ about this specific group.
 
 This package represents a single project within a [large collection](https://src.run/go/explore) of open-source code
 released under the "SR" namespace, comprised of many framework-agnostic libraries, a collection of Symfony bundles, as
-well as some one--off releases. This project is authored and maintained by:
+well as some one-off releases. This project is authored and maintained by:
 
 - [Rob Frawley 2nd](https://src.run/rmf)
 - [Collaborators](https://src.run/vermicious-console-io-library/github_collaborators).
