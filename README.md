@@ -52,8 +52,8 @@ require: {
 }
 ```
 
-*Note: Is is not recommended to use the "dev-master" constraint---realize that doing so could allow your code to break
-at any time due to a new major-version being pulled in. Instead, it is good practive to use semantic versioning and
+*Note: Is is not recommended to use the "dev-master" constraint. Realize that doing so could allow a release with
+backwards-incompatable, breaking changes to be pulled in. Instead, it is good practive to use semantic versioning and
 enter an explicit requirement. For example, to pull in version 1.0 you would use `^1.0`.*
 
 
