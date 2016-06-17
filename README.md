@@ -65,7 +65,7 @@ This package's API reference is available on our documentation website (see the 
 the "Additional Links" section below). All API documentation is automatically compiled against the master branch
 whenever a git push event occurs.
 
-*Static API reference for releases is planned and will be posted once this package has matured and reached
+*Static API reference for specific releases is planned and will be posted once this package has matured and reached
 the version 1 milestone*.
 
 > The API reference websites detailed above are auto-generated using a reliable and well-developed CLI tool called
@@ -76,8 +76,8 @@ the version 1 milestone*.
 
 ### Examples/Tutorials
 
-Currently, there is no "human-written" documentation---outside of this README (which, itself, is generated from a
-template too). Pending package stability, available man-hours, and an actual demand from external users, we may publish
+Currently, there is no "human-written" documentation, outside of this README (which is itself generated from a
+template). Pending package stability, available man-hours, and an actual demand from external users, we may publish
 a ([Read the Docs](https://src.run/go/rtd)) page with official documentation, tutorials, and additional resources.
 
 
