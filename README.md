@@ -19,8 +19,8 @@ We use a Willy Wonka-inspired naming schema for our package group names. This pa
 [vermicious group](https://src.run/vermicious-console-io-library/group), which is a collection of packages with a focus
 on "core reflection base classes" and related functionality.
 
-You are welcome to research some ([useless details](https://src.run/vermicious-console-io-library/group_explanation))
-about this specific group.
+You are welcome to research some [useless details](https://src.run/vermicious-console-io-library/group_explanation)
+about this specific group, for those that are bored or with too much time on their hands.
 
 ### JTT
 
