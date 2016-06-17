@@ -1,7 +1,7 @@
 
 # [src-run] vermicious-console-io-library
 
-|       Travis--CI       |      Codacy Rating      |      Code Coverage      |        Style--CI        |
+|       Travis-CI        |      Codacy Rating      |      Code Coverage      |        Style-CI         |
 |:----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
 | [![Travis](https://src.run/console-io-library/travis.svg)](https://src.run/console-io-library/travis) | [![Codacy](https://src.run/console-io-library/codacy.svg)](https://src.run/console-io-library/codacy) | [![Coveralls](https://src.run/console-io-library/coveralls.svg)](https://src.run/console-io-library/coveralls) | [![Coveralls](https://src.run/console-io-library/styleci.svg)](https://src.run/console-io-library/styleci) |
 
@@ -93,10 +93,10 @@ information.
 
 ## Additional Links
 
-| Item             | Result/Status                                                                                                      |
-|-----------------:|:-------------------------------------------------------------------------------------------------------------------|
-| *Stable Release* | [![Packagist](https://src.run/console-io-library/packagist.svg)](https://src.run/console-io-library/packagist)     |
-| *Dev Release*    | [![Packagist](https://src.run/console-io-library/packagist_pre.svg)](https://src.run/console-io-library/packagist) |
-| *License*        | [![License](https://src.run/console-io-library/license.svg)](https://src.run/console-io-library/license)           |
-| *Reference*      | [![License](https://src.run/console-io-library/api.svg)](https://src.run/console-io-library/api)                   |
+| Item               | Result/Status                                                                                                      |
+|-------------------:|:-------------------------------------------------------------------------------------------------------------------|
+| __Stable Release__ | [![Packagist](https://src.run/console-io-library/packagist.svg)](https://src.run/console-io-library/packagist)     |
+| __Dev Release__    | [![Packagist](https://src.run/console-io-library/packagist_pre.svg)](https://src.run/console-io-library/packagist) |
+| __License__        | [![License](https://src.run/console-io-library/license.svg)](https://src.run/console-io-library/license)           |
+| __Reference__      | [![License](https://src.run/console-io-library/api.svg)](https://src.run/console-io-library/api)                   |
 
