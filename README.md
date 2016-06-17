@@ -78,7 +78,7 @@ the version 1 milestone*.
 
 Currently, there is no "human-written" documentation, outside of this README (which is itself generated from a
 template). Pending package stability, available man-hours, and an actual demand from external users, we may publish
-a ([Read the Docs](https://src.run/go/rtd)) page with official documentation, tutorials, and additional resources.
+a [Read the Docs](https://src.run/go/rtd) page with official documentation, tutorials, and additional resources.
 
 
 ## Contributing
