@@ -52,9 +52,9 @@ require: {
 }
 ```
 
-*Note: Is is not recommended to use the "dev-master" release unless you know what you are doing and realize this can break
-your code when updating dependencies. Instead, it is good practive to use semantic versioning and enter an explicit
-requirement. For example, to pull in version 1.0 you would use `^1.0`.*
+*Note: Is is not recommended to use the "dev-master" constraint---realize that doing so could allow your code to break
+at any time due to a new major-version being pulled in. Instead, it is good practive to use semantic versioning and
+enter an explicit requirement. For example, to pull in version 1.0 you would use `^1.0`.*
 
 
 ## Reference
