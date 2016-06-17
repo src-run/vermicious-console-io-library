@@ -44,7 +44,7 @@ this project using the CLI, use the following command.
 $ composer require src-run/vermicious-console-io-library
 ```
 
-Alternatively, to add this project to your "composer.json" file, add the following to the "require" hash:
+Alternatively, to add this project to your "composer.json" file, add the following to the "require" section.
 
 ```json
 require: {
