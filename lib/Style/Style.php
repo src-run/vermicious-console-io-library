@@ -243,7 +243,6 @@ class Style extends OutputStyle implements StyleInterface
 
         if (count($more) > 0) {
             array_unshift($msgLines, '');
-            $msgLines[] = '';
         }
 
         $msgLines = array_map(
@@ -422,6 +421,14 @@ class Style extends OutputStyle implements StyleInterface
     public function note($message)
     {
         $this->block($message, 'NOTE', 'fg=yellow', ' ! ');
+    }
+
+    /**
+     * @param string $message
+     */
+    public function info($message)
+    {
+        $this->block($message, 'INFO', 'fg=white;bg=blue', ' ', true);
     }
 
     /**

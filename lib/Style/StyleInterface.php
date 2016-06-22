@@ -128,6 +128,11 @@ interface StyleInterface extends BaseStyleInterface, OutputInterface, InputAware
     public function smallSuccess($title, $message);
 
     /**
+     * @param string $message
+     */
+    public function info($message);
+
+    /**
      * {@inheritdoc}
      */
     public function writeln($messages, $type = self::OUTPUT_NORMAL);

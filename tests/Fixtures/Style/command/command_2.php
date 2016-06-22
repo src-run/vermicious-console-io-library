@@ -13,6 +13,7 @@ return function (InputInterface $input, OutputInterface $output) {
     $output->success('Success');
     $output->smallSuccess('Title', 'Success');
     $output->note('Note');
+    $output->info('Info');
     $output->block('Custom block', 'CUSTOM', 'fg=white;bg=green', 'X ', true);
     $output->applicationTitle('Name', '0.1.0', null, ['Author' => 'First Last', 'License' => 'MIT']);
     $output->applicationTitle('Name', '0.1.0', 'abcdefg', ['Author' => 'First Last', 'License' => 'MIT']);
