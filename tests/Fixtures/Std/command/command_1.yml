@@ -1,5 +1,0 @@
-callable :
-  class  : "SR\\Console\\Std\\StdOut"
-  method : "write"
-  params :
-    - "Test to output."

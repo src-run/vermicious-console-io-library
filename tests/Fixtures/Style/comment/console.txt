@@ -1,0 +1,5 @@
+
+ // a single line comment string
+ // a multi-line comment string
+ // with a second line
+ // and a final, third line

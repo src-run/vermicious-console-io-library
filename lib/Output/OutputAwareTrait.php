@@ -13,10 +13,7 @@ namespace SR\Console\Output;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Trait OutputAwareTrait.
- */
-trait OutputAwareTrait // implements OutputAwareInterface
+trait OutputAwareTrait
 {
     /**
      * @var OutputInterface
@@ -29,14 +26,6 @@ trait OutputAwareTrait // implements OutputAwareInterface
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
-    }
-
-    /**
-     * @return OutputInterface
-     */
-    public function getOutput()
-    {
-        return $this->output;
     }
 }
 

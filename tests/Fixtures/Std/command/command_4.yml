@@ -1,5 +1,0 @@
-callable :
-  class  : "SR\\Console\\Std\\StdErr"
-  method : "writeLine"
-  params :
-    - "Test to output."

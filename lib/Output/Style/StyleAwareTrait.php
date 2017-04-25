@@ -9,23 +9,24 @@
  * file that was distributed with this source code.
  */
 
-namespace SR\Console\Input;
+namespace SR\Console\Output\Style;
 
-use Symfony\Component\Console\Input\InputInterface;
-
-trait InputAwareTrait
+/**
+ * Trait StyleAwareTrait.
+ */
+trait StyleAwareTrait
 {
     /**
-     * @var InputInterface
+     * @var StyleInterface
      */
-    protected $input;
+    protected $io;
 
     /**
-     * @param InputInterface $input
+     * @param StyleInterface $io
      */
-    public function setInput(InputInterface $input)
+    public function setStyle(StyleInterface $io)
     {
-        $this->input = $input;
+        $this->io = $io;
     }
 }
 

@@ -1,0 +1,32 @@
+
+                                                  [ A SECTION STRING ]                                                  
+
+                                                [ A SUB SECTION STRING ]                                                
+
+ # [ 1 of 9 ] file-01.ext
+ # An enumerated section string
+
+ # [ 2 of 9 ] file-02.ext
+ # An enumerated section string
+
+ # [ 3 of 9 ] file-03.ext
+ # An enumerated section string
+
+ # [ 4 of 9 ] file-04.ext
+ # An enumerated section string
+
+ # [ 5 of 9 ] file-05.ext
+ # An enumerated section string
+
+ # [ 6 of 9 ] file-06.ext
+ # An enumerated section string
+
+ # [ 7 of 9 ] file-07.ext
+ # An enumerated section string
+
+ # [ 8 of 9 ] file-08.ext
+ # An enumerated section string
+
+ # [ 9 of 9 ] file-09.ext
+ # An enumerated section string
+

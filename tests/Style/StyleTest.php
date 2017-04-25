@@ -11,11 +11,14 @@
 
 namespace SR\Console\Tests\Style;
 
-use SR\Console\Style\Style;
+use SR\Console\Output\Helper\BlockHelper;
+use SR\Console\Output\Helper\DecorationHelper;
+use SR\Console\Output\Style\Style;
+use SR\Console\Output\Style\StyleInterface;
+use SR\Console\Tests\Input\TestInput;
 use SR\Console\Tests\Output\TestOutput;
-use SR\Reflection\Inspect;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -23,105 +26,255 @@ use Symfony\Component\Console\Tester\CommandTester;
 class StyleTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Command
+     * @var string
      */
-    protected $command;
+    private static $fixtureRootPath = __DIR__.'/../Fixtures/Style/';
 
-    /**
-     * @var CommandTester
-     */
-    protected $tester;
+    public function testInputOutputAccessorMethods()
+    {
+        $s = static::createStyleInstance($i = static::createInputInstance(), $o = static::createOutputInstance());
+
+        $this->assertSame($i, $s->getInput());
+        $this->assertSame($o, $s->getOutput());
+    }
+
+    public static function dataVerbosityAccessorMethodProvider()
+    {
+        return [
+            [StyleInterface::VERBOSITY_QUIET],
+            [StyleInterface::VERBOSITY_NORMAL],
+            [StyleInterface::VERBOSITY_VERBOSE],
+            [StyleInterface::VERBOSITY_VERY_VERBOSE],
+            [StyleInterface::VERBOSITY_DEBUG],
+        ];
+    }
 
     /**
      * @param int $verbosity
      *
-     * @return Style
+     * @dataProvider dataVerbosityAccessorMethodProvider
      */
-    private function getStyle($verbosity = OutputInterface::VERBOSITY_NORMAL)
+    public function testVerbosityAccessorMethods(int $verbosity)
     {
-        $input = new ArrayInput([]);
-        $output = new TestOutput();
-        $output->setVerbosity($verbosity);
-        $style = new Style($input, $output);
+        $s = static::createStyleInstance(null, $o = new TestOutput());
 
-        return $style;
-    }
+        $this->assertSame(StyleInterface::VERBOSITY_NORMAL, $s->getVerbosity());
+        $o->setVerbosity($verbosity);
+        $this->assertSame($verbosity, $s->getVerbosity());
 
-    protected function setUp()
-    {
-        $this->command = new Command('sfstyle');
-        $this->tester = new CommandTester($this->command);
-    }
+        if ($verbosity >= StyleInterface::VERBOSITY_DEBUG) {
+            $this->assertTrue($s->isDebug());
+        } else {
+            $this->assertFalse($s->isDebug());
+        }
 
-    protected function tearDown()
-    {
-        $this->command = null;
-        $this->tester = null;
-    }
+        if ($verbosity >= StyleInterface::VERBOSITY_VERY_VERBOSE) {
+            $this->assertTrue($s->isVeryVerbose());
+        } else {
+            $this->assertFalse($s->isVeryVerbose());
+        }
 
-    /**
-     * @dataProvider inputCommandToOutputFilesProvider
-     */
-    public function testOutputs()
-    {
-        $base = __DIR__.'/../Fixtures/Style';
-        $data = array_map(null, glob($base.'/command/command_*.php'), glob($base.'/output/output_*.txt'));
+        if ($verbosity >= StyleInterface::VERBOSITY_VERBOSE) {
+            $this->assertTrue($s->isVerbose());
+        } else {
+            $this->assertFalse($s->isVerbose());
+        }
 
-        for ($i = 0; $i < count($data); ++$i) {
-            $this->handleOutputs($data[$i][0], $data[$i][1]);
+        if ($verbosity === StyleInterface::VERBOSITY_QUIET) {
+            $this->assertTrue($s->isQuiet());
+        } else {
+            $this->assertFalse($s->isQuiet());
         }
     }
 
-    private function handleOutputs($inputCommandFilepath, $outputFilepath)
+    public function testDecorationAccessorMethods()
     {
-        $code = require $inputCommandFilepath;
-        $this->command->setCode($code);
-        $this->tester->execute(array(), array('interactive' => false, 'decorated' => false));
-        $file = file_get_contents($outputFilepath);
-        $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true), $inputCommandFilepath);
+        $s = static::createStyleInstance();
+
+        $this->assertFalse($s->getOutput()->isDecorated());
+        $s->setDecorated(true);
+        $this->assertTrue($s->getOutput()->isDecorated());
     }
 
-    public function inputCommandToOutputFilesProvider()
+    public function testFormatterAccessorMethods()
     {
-        $baseDir = __DIR__.'/../Fixtures/Style/SymfonyStyle';
+        $s = static::createStyleInstance();
+        $f = new OutputFormatter();
+        $s->setFormatter($f);
 
-        return array_map(null, glob($baseDir.'/command/command_*.php'), glob($baseDir.'/output/output_*.txt'));
+        $this->assertSame($f, $s->getFormatter());
     }
 
-    public function testLongWordsBlockWrapping()
+    public function testTermDimensionsAccessorMethods()
     {
-        $word = 'Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon';
-        $wordLength = strlen($word);
-        $style = $this->getStyle();
-        $inspect = Inspect::this($style);
-        $property = $inspect->getProperty('lineLengthMax');
-        $maxLineLength = $property->value($style) - 3;
+        $s = static::createStyleInstance();
 
-        $this->command->setCode(
-            function (InputInterface $input, OutputInterface $output) use ($word) {
-                $sfStyle = new StyleWithForcedLineLength($input, $output);
-                $sfStyle->block($word, 'CUSTOM', 'fg=white;bg=blue', ' § ', false);
+        $this->assertInternalType('int', $s->termHeight());
+        $this->assertGreaterThan(0, $s->termHeight());
+        $this->assertInternalType('int', $s->termWidth());
+        $this->assertGreaterThan(0, $s->termWidth());
+    }
+
+    public function testDecorationHelper()
+    {
+        $d = new DecorationHelper();
+        $d->setForeground('white');
+        $d->setBackground('magenta');
+        $d->setOptions('bold', 'reverse');
+
+        $this->assertSame('<fg=white;bg=magenta;options=bold,reverse>A string to decorate</>', $d->decorate('A string to decorate'));
+    }
+
+    /**
+     * @expectedException \SR\Exception\Logic\InvalidArgumentException
+     * @expectedExceptionMessage Header count does not match row count!
+     */
+    public function testThrowsOnInvalidTableHeaderRowsCount()
+    {
+        $s = static::createStyleInstance();
+        $s->tableVertical([
+            'header 1',
+        ], [
+            'row 1a',
+        ], [
+            'row 1b',
+        ]);
+    }
+
+    public function testQuestionDefaults()
+    {
+        $s = static::createStyleInstance($i = static::createInputInstance());
+        $i->setInteractive(false);
+
+        $this->assertSame('A default answer', $s->ask('A question', 'A default answer'));
+        $this->assertSame('A default answer', $s->askHidden('A hidden question', 'A default answer'));
+        $this->assertFalse($s->confirm('A confirmation', false));
+        $this->assertTrue($s->confirm('A confirmation', true));
+
+        $choices = ['a' => 'Apple', 'p' => 'Pear', 'b' => 'Banana'];
+        foreach ($choices as $index => $value) {
+            $this->assertSame($index, $s->choice('A choice', $choices, $value));
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public static function dataCommandOutputBufferProvider(): array
+    {
+        $closurePaths = glob(static::$fixtureRootPath.'/*/closure.php');
+        $consolePaths = glob(static::$fixtureRootPath.'/*/console.txt');
+
+        return array_map(null, $closurePaths, $consolePaths);
+    }
+
+    /**
+     * @param string $commandFile
+     * @param string $outputFile
+     *
+     * @dataProvider dataCommandOutputBufferProvider
+     */
+    public function testCommandOutputBuffer(string $commandFile, string $outputFile)
+    {
+        $this->assertStringEqualsFile($outputFile, $this->setAndExecuteCommandTest(require $commandFile), $commandFile);
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function dataBlockWordWrappingProvider(): array
+    {
+        $return = [];
+        $string = [];
+        $blocks = [
+            [BlockHelper::TYPE_SM, 0],
+            [BlockHelper::TYPE_MD, 0],
+            [BlockHelper::TYPE_LG, 1],
+        ];
+
+        foreach (range(2, 12, 2) as $repeat) {
+            $string[] = str_repeat('Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichl', $repeat);
+        }
+
+        foreach ($string as $s) {
+            foreach ($blocks as $b) {
+                $return[] = array_merge((array) $s, $b);
             }
-        );
+        }
 
-        $this->tester->execute(array(), array('interactive' => false, 'decorated' => false));
-        $expectedCount = (int) ceil($wordLength / ($maxLineLength)) + (int) ($wordLength > $maxLineLength - 5);
-        $this->assertSame($expectedCount, substr_count($this->tester->getDisplay(true), ' § '));
+        return $return;
     }
-}
 
-/**
- * Use this class in tests to force the line length
- * and ensure a consistent output for expectations.
- */
-class StyleWithForcedLineLength extends Style
-{
-    public function __construct(InputInterface $input, OutputInterface $output)
+    /**
+     * @param string $inputString
+     * @param int    $blockType
+     * @param int    $lineAdjustment
+     *
+     * @dataProvider dataBlockWordWrappingProvider
+     */
+    public function testBlockWordWrapping(string $inputString, int $blockType, int $lineAdjustment)
     {
-        parent::__construct($input, $output);
+        return;
+        $inputLength = strlen($inputString);
+        $needleChars = ' § ';
+        $needleLines = (int) (ceil($inputLength / 120) + ($inputLength > 120 - 5) + $lineAdjustment);
 
-        $ref = new \ReflectionProperty(get_parent_class($this), 'lineLength');
-        $ref->setAccessible(true);
-        $ref->setValue($this, 120);
+        $result = $this->setAndExecuteCommandTest(function (InputInterface $input, OutputInterface $output) use ($inputString, $blockType, $needleChars) {
+            (new Style($input, $output, 120))->block($inputString, 'TEST', $blockType, $needleChars);
+        });
+
+        $this->assertSame($needleLines, substr_count($result, $needleChars));
+    }
+
+    /**
+     * @param \Closure $code
+     * @param bool     $normalize
+     * @param array    $options
+     *
+     * @return string
+     */
+    private function setAndExecuteCommandTest(\Closure $code, bool $normalize = true, array $options = null): string
+    {
+        if (null === $options) {
+            $options = [
+                'interactive' => false,
+                'decorated'   => false
+            ];
+        }
+
+        $command = new Command(sprintf('src-run-style-%s', spl_object_hash($code)));
+        $command->setCode($code);
+
+        $tester = new CommandTester($command);
+        $tester->execute([], $options);
+
+        return $tester->getDisplay($normalize);
+    }
+
+    /**
+     * @param InputInterface|null  $i
+     * @param OutputInterface|null $o
+     *
+     * @return StyleInterface
+     */
+    private static function createStyleInstance(InputInterface $i = null, OutputInterface $o = null): StyleInterface
+    {
+        return new Style($i ?: static::createInputInstance(), $o ?: static::createOutputInstance());
+    }
+
+    /**
+     * @return InputInterface
+     */
+    private static function createInputInstance(): InputInterface
+    {
+        return new TestInput();
+    }
+
+    /**
+     * @return OutputInterface
+     */
+    private static function createOutputInstance(): OutputInterface
+    {
+        return new TestOutput();
     }
 }

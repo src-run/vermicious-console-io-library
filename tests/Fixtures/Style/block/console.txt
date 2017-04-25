@@ -1,0 +1,93 @@
+
+ [Truman Capote (Breakfast at Tiffany's)] You call yourself a free spirit, a 'wild thing,' and you're terrified         
+ somebody's gonna stick you in a cage. Well baby, you're already in that cage. You built it yourself. And it's not      
+ bounded in the west by Tulip, Texas, or in the east by Somali-land. It's wherever you go. Because no matter where you  
+ run, you just end up running into yourself.                                                                            
+
+ [Tom Robbins (Still Life with Woodpecker)] If this typewriter can’t do it, then f@#$ it, it can’t be done.             
+
+ -- [INFO] Info block                                                                                                   
+
+ || [OK] Success block                                                                                                  
+
+ ## [WARN] Warning block                                                                                                
+
+ !! [ERR] Error block                                                                                                   
+
+ ** [CRITICAL] Critical block                                                                                           
+
+                                                                                                                        
+ [ Truman Capote (Breakfast at Tiffany's) ] You call yourself a free spirit, a 'wild thing,' and you're terrified       
+ somebody's gonna stick you in a cage. Well baby, you're already in that cage. You built it yourself. And it's not      
+ bounded in the west by Tulip, Texas, or in the east by Somali-land. It's wherever you go. Because no matter where you  
+ run, you just end up running into yourself.                                                                            
+                                                                                                                        
+
+                                                                                                                        
+ [ Tom Robbins (Still Life with Woodpecker) ] If this typewriter can’t do it, then f@#$ it, it can’t be done.           
+                                                                                                                        
+
+                                                                                                                        
+ -- [ INFO ] Info block                                                                                                 
+                                                                                                                        
+
+                                                                                                                        
+ || [ OK ] Success block                                                                                                
+                                                                                                                        
+
+                                                                                                                        
+ ## [ WARN ] Warning block                                                                                              
+                                                                                                                        
+
+                                                                                                                        
+ !! [ ERR ] Error block                                                                                                 
+                                                                                                                        
+
+                                                                                                                        
+ ** [ CRITICAL ] Critical block                                                                                         
+                                                                                                                        
+
+                                                                                                                        
+ [ TRUMAN CAPOTE (BREAKFAST AT TIFFANY'S) ]                                                                             
+ ------------------------------------------                                                                             
+ You call yourself a free spirit, a 'wild thing,' and you're terrified somebody's gonna stick you in a cage. Well       
+ baby, you're already in that cage. You built it yourself. And it's not bounded in the west by Tulip, Texas, or in the  
+ east by Somali-land. It's wherever you go. Because no matter where you run, you just end up running into yourself.     
+                                                                                                                        
+
+                                                                                                                        
+ [ TOM ROBBINS (STILL LIFE WITH WOODPECKER) ]                                                                           
+ --------------------------------------------                                                                           
+ If this typewriter can’t do it, then f@#$ it, it can’t be done.                                                        
+                                                                                                                        
+
+                                                                                                                        
+ -- [ INFO ]                                                                                                            
+ -- --------                                                                                                            
+ -- Info block                                                                                                          
+                                                                                                                        
+
+                                                                                                                        
+ || [ OK ]                                                                                                              
+ || ------                                                                                                              
+ || Success block                                                                                                       
+                                                                                                                        
+
+                                                                                                                        
+ ## [ WARN ]                                                                                                            
+ ## --------                                                                                                            
+ ## Warning block                                                                                                       
+                                                                                                                        
+
+                                                                                                                        
+ !! [ ERR ]                                                                                                             
+ !! -------                                                                                                             
+ !! Error block                                                                                                         
+                                                                                                                        
+
+                                                                                                                        
+ ** [ CRITICAL ]                                                                                                        
+ ** ------------                                                                                                        
+ ** Critical block                                                                                                      
+                                                                                                                        
+

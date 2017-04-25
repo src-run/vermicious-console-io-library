@@ -1,0 +1,5 @@
+
+ a single line text string
+ a multi-line text string
+ with a second line
+ and a final, third line

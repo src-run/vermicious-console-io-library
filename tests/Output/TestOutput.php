@@ -13,21 +13,20 @@ namespace SR\Console\Tests\Output;
 
 use Symfony\Component\Console\Output\Output;
 
-/**
- * Class TestOutput.
- */
 class TestOutput extends Output
 {
-    public $output = '';
+    /**
+     * @var string
+     */
+    public $buffer = '';
 
-    public function clear()
-    {
-        $this->output = '';
-    }
-
+    /**
+     * @param string $message
+     * @param bool   $newline
+     */
     public function doWrite($message, $newline = false)
     {
-        $this->output .= $message.($newline ? "\n" : '');
+        $this->buffer .= $message.($newline ? "\n" : '');
     }
 }
 
