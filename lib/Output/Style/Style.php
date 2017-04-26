@@ -56,7 +56,7 @@ class Style implements StyleInterface
      * @param OutputInterface $output
      * @param int             $lineLength
      */
-    public function __construct(InputInterface $input, OutputInterface $output, int $lineLength = 80)
+    public function __construct(InputInterface $input, OutputInterface $output, int $lineLength = 320)
     {
         $this->maxLength = $lineLength;
         $this->verbosity = self::VERBOSITY_NORMAL;
@@ -230,7 +230,6 @@ class Style implements StyleInterface
     {
         $this->output->write($lines, $newLine, $options | $this->verbosity);
         $this->buffer->write($this->reduceBuffer([$lines]), $newLine, $options | $this->verbosity);
-        $this->writeLog($lines);
 
         return $this;
     }
@@ -245,7 +244,6 @@ class Style implements StyleInterface
     {
         $this->output->writeln($lines, $options | $this->verbosity);
         $this->buffer->writeln($this->reduceBuffer($lines), $options | $this->verbosity);
-        $this->writeLog($lines);
 
         return $this;
     }
@@ -259,18 +257,6 @@ class Style implements StyleInterface
     {
         $this->output->write($output = str_repeat(PHP_EOL, $count), false, $this->verbosity);
         $this->buffer->write($output, false, $this->verbosity);
-        $this->writeLog($output);
-
-        return $this;
-    }
-
-    private function writeLog($lines): self
-    {
-        $lines = array_map(function (string $line) {
-            return Helper::removeDecoration($this->getFormatter(), $line);
-        }, (array) $lines);
-        $output = implode(PHP_EOL, $lines).PHP_EOL;
-        file_put_contents('/tmp/style.out', $output, FILE_APPEND);
 
         return $this;
     }

@@ -192,7 +192,7 @@ class StyleTest extends \PHPUnit_Framework_TestCase
             [BlockHelper::TYPE_LG, 1],
         ];
 
-        foreach (range(2, 12, 2) as $repeat) {
+        foreach (range(2, 4, 2) as $repeat) {
             $string[] = str_repeat('Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichl', $repeat);
         }
 
@@ -214,7 +214,6 @@ class StyleTest extends \PHPUnit_Framework_TestCase
      */
     public function testBlockWordWrapping(string $inputString, int $blockType, int $lineAdjustment)
     {
-        return;
         $inputLength = strlen($inputString);
         $needleChars = ' § ';
         $needleLines = (int) (ceil($inputLength / 80) + ($inputLength > 80 - 5) + $lineAdjustment);
