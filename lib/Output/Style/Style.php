@@ -13,6 +13,7 @@ namespace SR\Console\Output\Style;
 
 use SR\Console\Input\Helper\QuestionHelper;
 use SR\Console\Input\InputAwareTrait;
+use SR\Console\Output\Helper\ActionHelper;
 use SR\Console\Output\Helper\BlockHelper;
 use SR\Console\Output\Helper\SectionHelper;
 use SR\Console\Output\Helper\TableHorizontalHelper;
@@ -53,11 +54,11 @@ class Style implements StyleInterface
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param int             $maxLineLength
+     * @param int             $lineLength
      */
-    public function __construct(InputInterface $input, OutputInterface $output, int $maxLineLength = 160)
+    public function __construct(InputInterface $input, OutputInterface $output, int $lineLength = 80)
     {
-        $this->maxLength = $maxLineLength;
+        $this->maxLength = $lineLength;
         $this->verbosity = self::VERBOSITY_NORMAL;
 
         $this->setInput($input);
@@ -219,9 +220,9 @@ class Style implements StyleInterface
     }
 
     /**
-     * @param string $lines
-     * @param bool   $newLine
-     * @param int    $options
+     * @param string|string[] $lines
+     * @param bool            $newLine
+     * @param int             $options
      *
      * @return StyleInterface
      */
@@ -235,8 +236,8 @@ class Style implements StyleInterface
     }
 
     /**
-     * @param array $lines
-     * @param int   $options
+     * @param string|string[] $lines
+     * @param int             $options
      *
      * @return StyleInterface
      */
@@ -487,6 +488,73 @@ class Style implements StyleInterface
     public function critical($lines, int $type = BlockHelper::TYPE_LG, string $header = 'CRITICAL'): StyleInterface
     {
         return $this->block((array) $lines, $header, $type,'**', 'white', 'red');
+    }
+
+    /**
+     * @param string $action
+     *
+     * @return StyleInterface
+     */
+    public function action(string $action): StyleInterface
+    {
+        (new ActionHelper($this))->action($action);
+
+        return $this;
+    }
+
+    /**
+     * @param string $result
+     * @param string $fg
+     * @param string $bg
+     * @param array ...$options
+     *
+     * @return StyleInterface
+     */
+    public function actionResult(string $result, string $fg, string $bg, ...$options): StyleInterface
+    {
+        (new ActionHelper($this))->actionResult($result, $fg, $bg, ...$options);
+
+        return $this;
+    }
+
+    /**
+     * @param string $result
+     *
+     * @return StyleInterface
+     */
+    public function actionDone(string $result = 'done'): StyleInterface
+    {
+        return $this->actionResult($result, 'white', 'blue');
+    }
+
+    /**
+     * @param string $result
+     *
+     * @return StyleInterface
+     */
+    public function actionOkay(string $result = 'okay'): StyleInterface
+    {
+        return $this->actionResult($result, 'black', 'green');
+    }
+
+    /**
+     * @param string $result
+     *
+     * @return StyleInterface
+     */
+    public function actionStop(string $result = 'stop'): StyleInterface
+    {
+        return $this->actionResult($result, 'black', 'yellow');
+    }
+
+    /**
+     * @param string $result
+     *
+     * @return StyleInterface
+     */
+    public function actionFail(string $result = 'fail'): StyleInterface
+    {
+        return $this->actionResult($result, 'white', 'red');
     }
 
     /**

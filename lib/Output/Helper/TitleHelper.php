@@ -56,20 +56,18 @@ class TitleHelper
      */
     public function applicationTitle(Application $application, ...$properties): self
     {
-        $lines = [vsprintf('%s <em>%s (%s) %s</em>', [
+        $this->io->prependBlock();
+        $this->io->separator();
+        $this->io->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
+        $this->io->writeln([vsprintf('%s <em>%s (%s) %s</em>', [
             (new DecorationHelper('black', null, 'bold'))->decorate('-'),
             $application->getName(),
             $this->getApplicationVersion($application),
             $this->getApplicationGitHash($application),
-        ])];
-
-        $this->io->prependBlock();
-        $this->io->separator();
-        $this->io->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
-        $this->io->writeln($lines);
+        ])]);
 
         if (0 < count($properties = $this->compileApplicationProps($application, $properties))) {
-            $this->io->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
+            $this->io->separator(1);
             $this->io->writeln($properties);
         }
 

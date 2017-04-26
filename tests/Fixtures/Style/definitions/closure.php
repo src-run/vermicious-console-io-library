@@ -5,7 +5,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use SR\Console\Output\Style\Style;
 
 return function (InputInterface $input, OutputInterface $output) {
-    $s = new Style($input, $output, 120);
+    $s = new Style($input, $output, 80);
 
     $s->definitions([
         'definition name 1'           => 'value 1',

@@ -217,10 +217,10 @@ class StyleTest extends \PHPUnit_Framework_TestCase
         return;
         $inputLength = strlen($inputString);
         $needleChars = ' § ';
-        $needleLines = (int) (ceil($inputLength / 120) + ($inputLength > 120 - 5) + $lineAdjustment);
+        $needleLines = (int) (ceil($inputLength / 80) + ($inputLength > 80 - 5) + $lineAdjustment);
 
         $result = $this->setAndExecuteCommandTest(function (InputInterface $input, OutputInterface $output) use ($inputString, $blockType, $needleChars) {
-            (new Style($input, $output, 120))->block($inputString, 'TEST', $blockType, $needleChars);
+            (new Style($input, $output, 80))->block($inputString, 'TEST', $blockType, $needleChars);
         });
 
         $this->assertSame($needleLines, substr_count($result, $needleChars));

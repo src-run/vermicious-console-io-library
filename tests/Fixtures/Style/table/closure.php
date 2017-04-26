@@ -6,7 +6,7 @@ use SR\Console\Output\Helper\BlockHelper;
 use SR\Console\Output\Style\Style;
 
 return function (InputInterface $input, OutputInterface $output) {
-    $s = new Style($input, $output, 120);
+    $s = new Style($input, $output, 80);
 
     $s->table([
         'header 1',

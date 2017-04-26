@@ -8,7 +8,7 @@ use SR\Console\Tests\Fixtures\ApplicationWithProps;
 use SR\Console\Tests\Fixtures\ApplicationWithoutProps;
 
 return function (InputInterface $input, OutputInterface $output) {
-    $s = new Style($input, $output, 120);
+    $s = new Style($input, $output, 80);
 
     $s->title('A title string');
 

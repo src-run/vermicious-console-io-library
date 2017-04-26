@@ -274,6 +274,51 @@ interface StyleInterface extends OutputInterface
     public function critical($lines, int $type = BlockHelper::TYPE_LG, string $header = 'CRITICAL'): self;
 
     /**
+     * @param string $action
+     *
+     * @return self
+     */
+    public function action(string $action): self;
+
+    /**
+     * @param string $result
+     * @param string $fg
+     * @param string $bg
+     * @param array ...$options
+     *
+     * @return self
+     */
+    public function actionResult(string $result, string $fg, string $bg, ...$options): self;
+
+    /**
+     * @param string $result
+     *
+     * @return self
+     */
+    public function actionDone(string $result = 'done'): self;
+
+    /**
+     * @param string $result
+     *
+     * @return self
+     */
+    public function actionOkay(string $result = 'okay'): self;
+
+    /**
+     * @param string $result
+     *
+     * @return self
+     */
+    public function actionStop(string $result = 'stop'): self;
+
+    /**
+     * @param string $result
+     *
+     * @return self
+     */
+    public function actionFail(string $result = 'fail'): self;
+
+    /**
      * @param array $headers
      * @param array $rows
      *
