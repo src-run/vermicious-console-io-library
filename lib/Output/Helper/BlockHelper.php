@@ -93,7 +93,7 @@ class BlockHelper
      *
      * @return array
      */
-    static public function wordwrap(array $lines, string $prefix = null, int $length = 80): array
+    public static function wordwrap(array $lines, string $prefix = null, int $length = 80): array
     {
         $wrapped = [];
         foreach ($lines as $l) {
@@ -128,18 +128,18 @@ class BlockHelper
     private function prependHeader(array $lines, string $header = null): array
     {
         if (null !== $header) {
-            switch($this->type) {
-                case self::TYPE_LG;
+            switch ($this->type) {
+                case self::TYPE_LG:
                     $header = sprintf('[ %s ]', strtoupper($header));
                     array_unshift($lines, str_repeat('-', $this->io->strLength($header)));
                     array_unshift($lines, $header);
                     break;
 
-                case self::TYPE_MD;
+                case self::TYPE_MD:
                     $lines[0] = sprintf('[ %s ] %s', $header, $lines[0]);
                     break;
 
-                case self::TYPE_SM;
+                case self::TYPE_SM:
                 default:
                     $lines[0] = sprintf('[%s] %s', $header, $lines[0]);
                     break;

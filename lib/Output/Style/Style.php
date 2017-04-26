@@ -475,7 +475,7 @@ class Style implements StyleInterface
      */
     public function error($lines, int $type = BlockHelper::TYPE_LG, string $header = 'ERR'): StyleInterface
     {
-        return $this->block((array) $lines, $header, $type,'!!', 'white', 'red');
+        return $this->block((array) $lines, $header, $type, '!!', 'white', 'red');
     }
 
     /**
@@ -487,7 +487,7 @@ class Style implements StyleInterface
      */
     public function critical($lines, int $type = BlockHelper::TYPE_LG, string $header = 'CRITICAL'): StyleInterface
     {
-        return $this->block((array) $lines, $header, $type,'**', 'white', 'red');
+        return $this->block((array) $lines, $header, $type, '**', 'white', 'red');
     }
 
     /**

@@ -11,7 +11,7 @@
 
 sudo     : false
 language : php
-php      : [ 7.0, 7.1 ]
+php      : [ 7.1, nightly ]
 
 git:
   depth : 3
@@ -19,6 +19,11 @@ git:
 env:
   global:
     - secure: ilKjT0aJwv/Uu8FsMJpqgBzGMu2KWiWYA7x8xICjtUHXbALgPBVciYqlBbiWwQmpyamuQ6JUJ5Y9RANJWDyzqP0vscwwuIPhclRlKxQPFsEMF1ffG6D2CaCljrwl99w/tDrqkgxzJ1BdVeGDsOX2FXLOWWGmx/VaM3V+aAEGcUSv7XzoIpbQ7H5P9SBOAdBOaPCXkMu4MKZMnIW4ZmBJiD9Qzr5a1NVpyTBW4u3HG7ukEGwjITtvM/VYGm4Uj/h5+jcdEmYEHdYkzIKqfAnjIgIkuxYQ8QbZrgpATXkUFnT6F/PyRmt5wKSMvv9Y7MaF1/UlMVeWXWiAxbDxuUN67wfIqapwevwXgaMWrEs4ZH7+4eBmKLK7S6WQ7vwAgHzoQRTYOIZ07Y49W3zZFoQGnvmuEOucI95c0kiIU5f+Lp/bwpod5roi6bVszi+Oi/cwKJLBE/02JZy44wdjLehkCEyef5SzyhCU/XXXUZm2F3isW1sFzerK0AcY30D3j4DV+ZlEPY8FrloMV9/JecdFkAym4tZaXsT6qlSo0h94VF1jbwu4LEuqqi1BXLbAJCt/Nwx7M0x3NuZ0au2zsvi2fDBvOsGHu4BLXshysXfnW1eOx/UoPygFiR7+EN3jbfiXQNqcEYkcwGdnNqUHvoTjtQpkVeyug5pUrSOM5Qn4Uzo=
+
+matrix:
+  allow_failures:
+    - php: nightly
+  fast_finish: true
 
 install :
   - bash .bldr/bldr -b up-env -q
