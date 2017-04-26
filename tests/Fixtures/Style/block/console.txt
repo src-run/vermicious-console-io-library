@@ -1,4 +1,28 @@
 
+                                                                                
+ -- [ INFO ] Info block                                                         
+                                                                                
+
+                                                                                
+ || [ OK ] Success block                                                        
+                                                                                
+
+                                                                                
+ ## [ WARN ] Warning block                                                      
+                                                                                
+
+                                                                                
+ !! [ ERR ]                                                                     
+ !! -------                                                                     
+ !! Error block                                                                 
+                                                                                
+
+                                                                                
+ ** [ CRITICAL ]                                                                
+ ** ------------                                                                
+ ** Critical block                                                              
+                                                                                
+
  [Truman Capote (Breakfast at Tiffany's)] You call yourself a free spirit, a    
  'wild thing,' and you're terrified somebody's gonna stick you in a cage. Well  
  baby, you're already in that cage. You built it yourself. And it's not         

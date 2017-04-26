@@ -409,7 +409,7 @@ class Style implements StyleInterface
      *
      * @return StyleInterface
      */
-    public function block($lines, string $header = null, int $type = BlockHelper::TYPE_SM, string $prefix = null, string $fg = null, string $bg = null, ...$options): StyleInterface
+    public function block($lines, string $header = null, int $type = BlockHelper::TYPE_MD, string $prefix = null, string $fg = null, string $bg = null, ...$options): StyleInterface
     {
         (new BlockHelper($this, $type))->write((array) $lines, $header, $prefix, $fg, $bg, ...$options);
 
@@ -423,7 +423,7 @@ class Style implements StyleInterface
      *
      * @return StyleInterface
      */
-    public function info($lines, int $type = BlockHelper::TYPE_SM, string $header = 'INFO'): StyleInterface
+    public function info($lines, int $type = BlockHelper::TYPE_MD, string $header = 'INFO'): StyleInterface
     {
         return $this->block((array) $lines, $header, $type, '--', 'white', 'blue');
     }
@@ -435,7 +435,7 @@ class Style implements StyleInterface
      *
      * @return StyleInterface
      */
-    public function success($lines, int $type = BlockHelper::TYPE_SM, string $header = 'OK'): StyleInterface
+    public function success($lines, int $type = BlockHelper::TYPE_MD, string $header = 'OK'): StyleInterface
     {
         return $this->block((array) $lines, $header, $type, '||', 'black', 'green');
     }
@@ -447,7 +447,7 @@ class Style implements StyleInterface
      *
      * @return StyleInterface
      */
-    public function warning($lines, int $type = BlockHelper::TYPE_SM, string $header = 'WARN'): StyleInterface
+    public function warning($lines, int $type = BlockHelper::TYPE_MD, string $header = 'WARN'): StyleInterface
     {
         return $this->block((array) $lines, $header, $type, '##', 'black', 'yellow');
     }

@@ -44,7 +44,7 @@ class BlockHelper
      * @param StyleInterface $style
      * @param int            $type
      */
-    public function __construct(StyleInterface $style, int $type = self::TYPE_SM)
+    public function __construct(StyleInterface $style, int $type = self::TYPE_MD)
     {
         $this->setStyle($style);
         $this->setType($type);
