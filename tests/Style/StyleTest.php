@@ -11,8 +11,8 @@
 
 namespace SR\Console\Tests\Style;
 
-use SR\Console\Output\Helper\BlockHelper;
-use SR\Console\Output\Helper\DecorationHelper;
+use SR\Console\Output\Helper\Text\BlockHelper;
+use SR\Console\Output\Helper\Style\DecorationHelper;
 use SR\Console\Output\Style\Style;
 use SR\Console\Output\Style\StyleInterface;
 use SR\Console\Tests\Input\TestInput;
@@ -176,7 +176,15 @@ class StyleTest extends \PHPUnit_Framework_TestCase
      */
     public function testCommandOutputBuffer(string $commandFile, string $outputFile)
     {
-        $this->assertStringEqualsFile($outputFile, $this->setAndExecuteCommandTest(require $commandFile), $commandFile);
+        $fuzzy = false;
+
+        foreach (['progress', 'question'] as $type) {
+            if (false !== strpos($outputFile, $type)) {
+                $fuzzy = true;
+            }
+        }
+
+        $this->assertStringFuzzyEqualsFile($outputFile, $this->setAndExecuteCommandTest(require $commandFile), $commandFile, $fuzzy);
     }
 
     /**
@@ -256,7 +264,7 @@ class StyleTest extends \PHPUnit_Framework_TestCase
      *
      * @return StyleInterface
      */
-    private static function createStyleInstance(InputInterface $i = null, OutputInterface $o = null): StyleInterface
+    public static function createStyleInstance(InputInterface $i = null, OutputInterface $o = null): StyleInterface
     {
         return new Style($i ?: static::createInputInstance(), $o ?: static::createOutputInstance());
     }
@@ -275,5 +283,46 @@ class StyleTest extends \PHPUnit_Framework_TestCase
     private static function createOutputInstance(): OutputInterface
     {
         return new TestOutput();
+    }
+
+    /**
+     * @param string $expectedFile
+     * @param string $actualString
+     * @param string $message
+     * @param bool   $fuzzy
+     */
+    private static function assertStringFuzzyEqualsFile($expectedFile, $actualString, $message = '', bool $fuzzy = false)
+    {
+        static::assertFileExists($expectedFile, $message);
+
+        if (false === $fuzzy) {
+            static::assertStringEqualsFile($expectedFile, $actualString, $message);
+
+            return;
+        }
+
+        $expectedLines = explode("\n", file_get_contents($expectedFile));
+        $providedLines = explode("\n", $actualString);
+
+        for ($i = 0; $i < count($expectedLines); $i++) {
+            static::assertLineFuzzyEqualsLine($expectedLines[$i] ?? null, $providedLines[$i] ?? null, $i, $expectedFile);
+        }
+    }
+
+    /**
+     * @param string $expected
+     * @param string $provided
+     * @param int    $line
+     * @param string $expectedFile
+     */
+    private static function assertLineFuzzyEqualsLine($expected, $provided, int $line, string $expectedFile)
+    {
+        if (0 !== strpos($expected, '{') || false === strpos($expected, '}')) {
+            static::assertEquals($expected, $provided, sprintf('Line %d of file "%s" should match "%s"', $line, $expectedFile, $provided));
+
+            return;
+        }
+
+        static::assertRegExp($expected, $provided, sprintf('Line %d of file "%s" (pattern "%s) should match "%s"', $line, $expectedFile, $expected, $provided));
     }
 }

@@ -13,13 +13,16 @@ namespace SR\Console\Output\Style;
 
 use SR\Console\Input\Helper\QuestionHelper;
 use SR\Console\Input\InputAwareTrait;
-use SR\Console\Output\Helper\ActionHelper;
-use SR\Console\Output\Helper\BlockHelper;
-use SR\Console\Output\Helper\SectionHelper;
-use SR\Console\Output\Helper\TableHorizontalHelper;
-use SR\Console\Output\Helper\TableVerticalHelper;
-use SR\Console\Output\Helper\TextHelper;
-use SR\Console\Output\Helper\TitleHelper;
+use SR\Console\Output\Helper\Lists\DefinitionHelper;
+use SR\Console\Output\Helper\Lists\ListingHelper;
+use SR\Console\Output\Helper\Style\DecorationHelper;
+use SR\Console\Output\Helper\Action\ActionHelper;
+use SR\Console\Output\Helper\Text\BlockHelper;
+use SR\Console\Output\Helper\Header\SectionHelper;
+use SR\Console\Output\Helper\Table\TableHorizontalHelper;
+use SR\Console\Output\Helper\Table\TableVerticalHelper;
+use SR\Console\Output\Helper\Text\TextHelper;
+use SR\Console\Output\Helper\Header\TitleHelper;
 use SR\Console\Output\OutputAwareTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
@@ -298,13 +301,14 @@ class Style implements StyleInterface
     }
 
     /**
-     * @param array $listing
+     * @param array         $listing
+     * @param \Closure|null $lineFormatter
      *
      * @return StyleInterface
      */
-    public function listing(array $listing): StyleInterface
+    public function listing(array $listing, \Closure $lineFormatter = null): StyleInterface
     {
-        (new TextHelper($this))->listing($listing);
+        (new ListingHelper($this, $lineFormatter))->listing($listing);
 
         return $this;
     }
@@ -316,7 +320,7 @@ class Style implements StyleInterface
      */
     public function definitions(array $definitions): StyleInterface
     {
-        (new TextHelper($this))->definitions($definitions);
+        (new DefinitionHelper($this))->definitions($definitions);
 
         return $this;
     }
@@ -498,7 +502,7 @@ class Style implements StyleInterface
      */
     public function actionResult(string $result, string $fg, string $bg, ...$options): StyleInterface
     {
-        (new ActionHelper($this))->actionResult($result, $fg, $bg, ...$options);
+        (new ActionHelper($this))->result($result, new DecorationHelper($fg, $bg, ...$options));
 
         return $this;
     }
@@ -623,9 +627,19 @@ class Style implements StyleInterface
      *
      * @return ProgressBar
      */
+    public function progress(int $steps = null): ProgressBar
+    {
+        return new ProgressBar($this, $steps);
+    }
+
+    /**
+     * @param int|null $steps
+     *
+     * @return ProgressBar
+     */
     public function progressStart(int $steps = null): ProgressBar
     {
-        $progress = new ProgressBar($this, $steps);
+        $progress = $this->progress($steps);
         $progress->start();
 
         return $progress;
@@ -755,5 +769,3 @@ class Style implements StyleInterface
         return $this;
     }
 }
-
-/* EOF */

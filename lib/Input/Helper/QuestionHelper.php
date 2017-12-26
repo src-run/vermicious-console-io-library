@@ -11,7 +11,7 @@
 
 namespace SR\Console\Input\Helper;
 
-use SR\Console\Output\Style\StyleAwareTrait;
+use SR\Console\Output\Style\StyleAwareInternalTrait;
 use SR\Console\Output\Style\StyleInterface;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Question\Question;
 
 class QuestionHelper
 {
-    use StyleAwareTrait;
+    use StyleAwareInternalTrait;
 
     /**
      * @var SymfonyQuestionHelper
@@ -107,18 +107,16 @@ class QuestionHelper
      */
     private function askQuestion(Question $question)
     {
-        if ($this->io->getInput()->isInteractive()) {
-            $this->io->prependBlock();
+        if ($this->style->getInput()->isInteractive()) {
+            $this->style->prependBlock();
         }
 
-        $answer = $this->helper->ask($this->io->getInput(), $this->io, $question);
+        $answer = $this->helper->ask($this->style->getInput(), $this->style, $question);
 
-        if ($this->io->getInput()->isInteractive()) {
-            $this->io->newLine();
+        if ($this->style->getInput()->isInteractive()) {
+            $this->style->newLine();
         }
 
         return $answer;
     }
 }
-
-/* EOF */

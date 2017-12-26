@@ -22,6 +22,17 @@ class TestInput extends ArrayInput
     {
         parent::__construct($parameters);
     }
-}
 
-/* EOF */
+    /**
+     * @param array $inputs
+     */
+    public function setInput(array $inputs)
+    {
+        $stream = fopen('php://memory', 'r+', false);
+
+        fwrite($stream, implode(PHP_EOL, $inputs));
+        rewind($stream);
+
+        $this->setStream($stream);
+    }
+}

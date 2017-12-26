@@ -1,11 +1,13 @@
 
- [ Peforming an action ] ...  CUSTOM 
+ Peforming an action ... CUSTOM
 
- [ Performing a second action ] ...  DONE 
+ Performing a second action ... DONE
 
- [ Performing a third action ] ...  OKAY 
+ Performing a third action ... OKAY
 
- [ Performing a fourth action ] ...  STOP 
+ Performing a fourth action ... STOP
 
- [ Performing a fifth action ] ...  FAIL 
+ Performing a fifth action ... FAIL
 
+ [ Doing something ] ...  OK 
+ [ Another something ] ...  ERR 

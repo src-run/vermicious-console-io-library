@@ -12,22 +12,29 @@
 namespace SR\Console\Output\Style;
 
 /**
- * Trait StyleAwareTrait.
+ * @deprecated Deprecated in favor of two new traits that explicitly expose the functionality publicly or internally.
+ *             {@see SR\Console\Output\Style\StyleAwareInternalTrait} and
+ *             {@see SR\Console\Output\Style\StyleAwareExternalTrait}
  */
 trait StyleAwareTrait
 {
+    use StyleAwareExternalTrait {
+        setStyle as private overriddenSetStyle;
+        style as getStyle;
+    }
+
     /**
-     * @var StyleInterface
+     * @var StyleInterface|null
      */
     protected $io;
 
     /**
-     * @param StyleInterface $io
+     * @param StyleInterface|null $style
      */
-    public function setStyle(StyleInterface $io)
+    public function setStyle(StyleInterface $style = null)
     {
-        $this->io = $io;
+        $this->io = $style;
+
+        $this->overriddenSetStyle($style);
     }
 }
-
-/* EOF */

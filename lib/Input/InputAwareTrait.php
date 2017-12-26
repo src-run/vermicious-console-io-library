@@ -28,5 +28,3 @@ trait InputAwareTrait
         $this->input = $input;
     }
 }
-
-/* EOF */

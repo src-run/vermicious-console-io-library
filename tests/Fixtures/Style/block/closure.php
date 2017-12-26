@@ -2,7 +2,7 @@
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use SR\Console\Output\Helper\BlockHelper;
+use SR\Console\Output\Helper\Text\BlockHelper;
 use SR\Console\Output\Style\Style;
 
 return function (InputInterface $input, OutputInterface $output) {

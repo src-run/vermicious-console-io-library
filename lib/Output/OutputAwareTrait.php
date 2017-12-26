@@ -28,5 +28,3 @@ trait OutputAwareTrait
         $this->output = $output;
     }
 }
-
-/* EOF */

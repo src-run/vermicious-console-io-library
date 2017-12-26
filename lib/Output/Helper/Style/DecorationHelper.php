@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace SR\Console\Output\Helper;
+namespace SR\Console\Output\Helper\Style;
 
 class DecorationHelper
 {
@@ -119,8 +119,11 @@ class DecorationHelper
      */
     private function markup(string $line): ?string
     {
-        $markup = $this->applyMarkup('options', implode(',', $this->options),
-            $this->applyMarkup('bg', $this->bg, $this->applyMarkup('fg', $this->fg)));
+        $markup = $this->applyMarkup(
+            'options',
+            implode(',', $this->options),
+            $this->applyMarkup('bg', $this->bg, $this->applyMarkup('fg', $this->fg))
+        );
 
         return '' === $markup ? null : sprintf('<%s>%s</>', $markup, $line);
     }
@@ -145,5 +148,3 @@ class DecorationHelper
         return $markup;
     }
 }
-
-/* EOF */

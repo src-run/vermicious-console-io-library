@@ -9,15 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace SR\Console\Output\Helper;
+namespace SR\Console\Output\Helper\Header;
 
-use SR\Console\Output\Style\StyleAwareTrait;
+use SR\Console\Output\Helper\Style\DecorationHelper;
+use SR\Console\Output\Style\StyleAwareInternalTrait;
 use SR\Console\Output\Style\StyleInterface;
 use Symfony\Component\Console\Application;
 
 class TitleHelper
 {
-    use StyleAwareTrait;
+    use StyleAwareInternalTrait;
 
     /**
      * @param StyleInterface $style
@@ -39,11 +40,11 @@ class TitleHelper
             $title,
         ])];
 
-        $this->io->prependBlock();
-        $this->io->separator();
-        $this->io->writeln($lines);
-        $this->io->separator();
-        $this->io->newline();
+        $this->style->prependBlock();
+        $this->style->separator();
+        $this->style->writeln($lines);
+        $this->style->separator();
+        $this->style->newline();
 
         return $this;
     }
@@ -56,10 +57,10 @@ class TitleHelper
      */
     public function applicationTitle(Application $application, ...$properties): self
     {
-        $this->io->prependBlock();
-        $this->io->separator();
-        $this->io->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
-        $this->io->writeln([vsprintf('%s <em>%s (%s) %s</em>', [
+        $this->style->prependBlock();
+        $this->style->separator();
+        $this->style->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
+        $this->style->writeln([vsprintf('%s <em>%s (%s) %s</em>', [
             (new DecorationHelper('black', null, 'bold'))->decorate('-'),
             $application->getName(),
             $this->getApplicationVersion($application),
@@ -67,13 +68,13 @@ class TitleHelper
         ])]);
 
         if (0 < count($properties = $this->compileApplicationProps($application, $properties))) {
-            $this->io->separator(1);
-            $this->io->writeln($properties);
+            $this->style->separator(1);
+            $this->style->writeln($properties);
         }
 
-        $this->io->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
-        $this->io->separator();
-        $this->io->newline();
+        $this->style->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
+        $this->style->separator();
+        $this->style->newline();
 
         return $this;
     }
@@ -94,7 +95,7 @@ class TitleHelper
             array_walk($properties, function (&$prop, $name) use ($len) {
                 $prop = vsprintf('%s %s %s', [
                     (new DecorationHelper('black', null, 'bold'))->decorate('-'),
-                    $this->io->pad('@'.$name, $len+1, ' ', STR_PAD_RIGHT),
+                    $this->style->pad('@'.$name, $len+1, ' ', STR_PAD_RIGHT),
                     $prop,
                 ]);
             });
@@ -190,5 +191,3 @@ class TitleHelper
         return 'master';
     }
 }
-
-/* EOF */

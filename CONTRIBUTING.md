@@ -71,14 +71,6 @@ template. The placeholder `PACKAGE_NAME` must match the
  */
 ```
 
-An "end of file" comment followed by an empty new line, must be present
-at the end of all files.
-
-```php
-/* EOF */
-
-```
-
 ## C. Attribution
 
 Sometimes completely new classes are written by a contributor. When

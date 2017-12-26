@@ -2,9 +2,8 @@
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use SR\Console\Output\Helper\BlockHelper;
+use SR\Console\Output\Helper\Action\AltActionHelper;
 use SR\Console\Output\Style\Style;
-use SR\Console\Tests\Fixtures\ApplicationWithProps;
 
 return function (InputInterface $input, OutputInterface $output) {
     $s = new Style($input, $output, 80);
@@ -23,4 +22,10 @@ return function (InputInterface $input, OutputInterface $output) {
 
     $s->action('Performing a fifth action');
     $s->actionFail();
+
+    $a = new AltActionHelper($s);
+    $a->setNewlinesAtFinish(0);
+
+    $a->action('Doing something')->result('OK');
+    $a->action('Another something')->result('ERR');
 };

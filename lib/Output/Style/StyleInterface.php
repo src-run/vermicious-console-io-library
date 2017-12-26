@@ -11,16 +11,13 @@
 
 namespace SR\Console\Output\Style;
 
-use SR\Console\Output\Helper\BlockHelper;
+use SR\Console\Output\Helper\Text\BlockHelper;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Interface StyleInterface.
- */
 interface StyleInterface extends OutputInterface
 {
     /**
@@ -156,11 +153,12 @@ interface StyleInterface extends OutputInterface
     public function muted($lines): self;
 
     /**
-     * @param array $listing
+     * @param array         $listing
+     * @param \Closure|null $lineFormatter
      *
      * @return self
      */
-    public function listing(array $listing): self;
+    public function listing(array $listing, \Closure $lineFormatter = null): self;
 
     /**
      * @param array $definitions
@@ -376,6 +374,13 @@ interface StyleInterface extends OutputInterface
      *
      * @return ProgressBar
      */
+    public function progress(int $steps = null): ProgressBar;
+
+    /**
+     * @param int|null $steps
+     *
+     * @return ProgressBar
+     */
     public function progressStart(int $steps = null): ProgressBar;
 
     /**
@@ -436,5 +441,3 @@ interface StyleInterface extends OutputInterface
      */
     public function strLength(string $string): int;
 }
-
-/* EOF */

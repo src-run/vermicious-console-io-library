@@ -25,7 +25,7 @@ Some muted text
  * listing
 
 --------------------------------------------------------------------------------
- definition-name -> definition-value
+ [definition-name] -> definition-value
 
                                [ TITLE HELPERS ]                                
 
@@ -88,16 +88,16 @@ Some muted text
 
                                [ ACTION HELPERS ]                               
 
- [ Action ] ...  DONE 
+ Action ... DONE
 
 --------------------------------------------------------------------------------
- [ Action ] ...  FAIL 
+ Action ... FAIL
 
 --------------------------------------------------------------------------------
- [ Action ] ...  STOP 
+ Action ... STOP
 
 --------------------------------------------------------------------------------
- [ Action ] ...  OKAY 
+ Action ... OKAY
 
                                [ TABLE HELPERS ]                                
 

@@ -9,16 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace SR\Console\Output\Helper;
+namespace SR\Console\Output\Helper\Text;
 
-use SR\Console\Output\Style\StyleAwareTrait;
+use SR\Console\Output\Helper\Style\DecorationHelper;
+use SR\Console\Output\Style\StyleAwareInternalTrait;
 use SR\Console\Output\Style\StyleInterface;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 
 class BlockHelper
 {
-    use StyleAwareTrait;
+    use StyleAwareInternalTrait;
 
     /**
      * @var int
@@ -74,14 +75,14 @@ class BlockHelper
      */
     public function write(array $lines, string $header = null, string $prefix = null, string $fg = null, string $bg = null, ...$options): self
     {
-        $lines = static::wordwrap($this->prependHeader($lines, $header), $prefix, $this->io->getMaxLength());
+        $lines = static::wordwrap($this->prependHeader($lines, $header), $prefix, $this->style->getMaxLength());
         $lines = $this->padLength($this->padHeight($this->prefix($lines, $prefix)));
 
         $decorator = new DecorationHelper($fg, $bg, ...$options);
 
-        $this->io->prependBlock();
-        $this->io->writeln($decorator->decorate($lines));
-        $this->io->newline();
+        $this->style->prependBlock();
+        $this->style->writeln($decorator->decorate($lines));
+        $this->style->newline();
 
         return $this;
     }
@@ -98,7 +99,10 @@ class BlockHelper
         $wrapped = [];
         foreach ($lines as $l) {
             $wrapped = array_merge($wrapped, explode(PHP_EOL, wordwrap(
-                OutputFormatter::escape($l), $length - Helper::strlen($prefix) - 3, PHP_EOL, true
+                OutputFormatter::escape($l),
+                $length - Helper::strlen($prefix) - 3,
+                PHP_EOL,
+                true
             )));
         }
 
@@ -131,7 +135,7 @@ class BlockHelper
             switch ($this->type) {
                 case self::TYPE_LG:
                     $header = sprintf('[ %s ]', strtoupper($header));
-                    array_unshift($lines, str_repeat('-', $this->io->strLength($header)));
+                    array_unshift($lines, str_repeat('-', $this->style->strLength($header)));
                     array_unshift($lines, $header);
                     break;
 
@@ -157,7 +161,7 @@ class BlockHelper
     private function padLength(array $lines): array
     {
         return array_map(function ($line) {
-            return $this->io->padByTermWidth(sprintf('%s%s', ' ', $line), ' ', STR_PAD_RIGHT);
+            return $this->style->padByTermWidth(sprintf('%s%s', ' ', $line), ' ', STR_PAD_RIGHT);
         }, $lines);
     }
 
@@ -178,5 +182,3 @@ class BlockHelper
         return $lines;
     }
 }
-
-/* EOF */

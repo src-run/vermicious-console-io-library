@@ -29,5 +29,3 @@ class TestOutput extends Output
         $this->buffer .= $message.($newline ? "\n" : '');
     }
 }
-
-/* EOF */

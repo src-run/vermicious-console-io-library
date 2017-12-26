@@ -13,5 +13,4 @@ return function (InputInterface $input, OutputInterface $output) {
         'with a second line',
         'and a final, third line',
     ]);
-
 };

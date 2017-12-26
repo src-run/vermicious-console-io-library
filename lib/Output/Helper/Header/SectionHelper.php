@@ -9,14 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace SR\Console\Output\Helper;
+namespace SR\Console\Output\Helper\Header;
 
-use SR\Console\Output\Style\StyleAwareTrait;
+use SR\Console\Output\Helper\Style\DecorationHelper;
+use SR\Console\Output\Style\StyleAwareInternalTrait;
 use SR\Console\Output\Style\StyleInterface;
 
 class SectionHelper
 {
-    use StyleAwareTrait;
+    use StyleAwareInternalTrait;
 
     /**
      * @param StyleInterface $style
@@ -33,11 +34,11 @@ class SectionHelper
      */
     public function section(string $section): self
     {
-        $this->io->prependBlock();
-        $this->io->writeln([
+        $this->style->prependBlock();
+        $this->style->writeln([
             $this->compileSection($section, 'white', 'magenta'),
         ]);
-        $this->io->newline();
+        $this->style->newline();
 
         return $this;
     }
@@ -49,11 +50,11 @@ class SectionHelper
      */
     public function subSection(string $section): self
     {
-        $this->io->prependBlock();
-        $this->io->writeln([
+        $this->style->prependBlock();
+        $this->style->writeln([
             $this->compileSection($section, 'white', 'blue'),
         ]);
-        $this->io->newline();
+        $this->style->newline();
 
         return $this;
     }
@@ -68,12 +69,12 @@ class SectionHelper
      */
     public function enumeratedSection(string $section, int $iteration, int $size = null, string $type = null): self
     {
-        $this->io->prependBlock();
-        $this->io->writeln([
+        $this->style->prependBlock();
+        $this->style->writeln([
             $this->compileEnumeratedString($iteration, $size, $type),
             sprintf(' # %s', $section),
         ]);
-        $this->io->newline();
+        $this->style->newline();
 
         return $this;
     }
@@ -106,8 +107,7 @@ class SectionHelper
     private function compileSection(string $section, string $fg = null, string $bg = null): string
     {
         return (new DecorationHelper($fg, $bg))->decorate(
-            $this->io->padByTermWidth(sprintf('[ %s ]', strtoupper($section))));
+            $this->style->padByTermWidth(sprintf('[ %s ]', strtoupper($section)))
+        );
     }
 }
-
-/* EOF */
