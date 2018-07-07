@@ -1,14 +1,22 @@
 <?php
 
+/*
+ * This file is part of the `src-run/vermicious-console-io-library` project.
+ *
+ * (c) Rob Frawley 2nd <rmf@src.run>
+ *
+ * For the full copyright and license information, please view the LICENSE.md
+ * file that was distributed with this source code.
+ */
+
+use SR\Console\Output\Component\Progress\ConcisePercentageProgress;
+use SR\Console\Output\Component\Progress\ConciseProgress;
+use SR\Console\Output\Component\Progress\DefaultProgress;
+use SR\Console\Output\Component\Progress\VerbosePercentageProgress;
+use SR\Console\Output\Component\Progress\VerboseProgress;
+use SR\Console\Output\Style\Style;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use SR\Console\Output\Helper\Text\BlockHelper;
-use SR\Console\Output\Helper\Progress\ConcisePercentageProgressHelper;
-use SR\Console\Output\Helper\Progress\ConciseProgressHelper;
-use SR\Console\Output\Helper\Progress\DefaultProgressHelper;
-use SR\Console\Output\Helper\Progress\VerbosePercentageProgressHelper;
-use SR\Console\Output\Helper\Progress\VerboseProgressHelper;
-use SR\Console\Output\Style\Style;
 
 return function (InputInterface $input, OutputInterface $output) {
     $s = new Style($input, $output, 80);
@@ -20,11 +28,11 @@ return function (InputInterface $input, OutputInterface $output) {
     $progress->advance(1);
     $s->progressFinish($progress);
 
-    /** @var \SR\Console\Output\Helper\Progress\AbstractProgressHelper[] $helpers */
+    /** @var \SR\Console\Output\Component\Progress\AbstractProgressHelper[] $helpers */
     $helpers = [
-        new DefaultProgressHelper($s),
-        new ConciseProgressHelper($s),
-        new VerboseProgressHelper($s)
+        new DefaultProgress($s),
+        new ConciseProgress($s),
+        new VerboseProgress($s),
     ];
 
     foreach ($helpers as $h) {
@@ -45,11 +53,11 @@ return function (InputInterface $input, OutputInterface $output) {
         $h->finish();
     }
 
-    /** @var \SR\Console\Output\Helper\Progress\AbstractProgressHelper[] $helpers */
+    /** @var \SR\Console\Output\Component\Progress\AbstractProgressHelper[] $helpers */
     $helpers = [
-        new DefaultProgressHelper($s),
-        new ConciseProgressHelper($s),
-        new VerboseProgressHelper($s)
+        new DefaultProgress($s),
+        new ConciseProgress($s),
+        new VerboseProgress($s),
     ];
 
     foreach ($helpers as $h) {
@@ -63,10 +71,10 @@ return function (InputInterface $input, OutputInterface $output) {
         $h->finish();
     }
 
-    /** @var \SR\Console\Output\Helper\Progress\AbstractPercentageProgressHelper[] $helpers */
+    /** @var \SR\Console\Output\Component\Progress\AbstractPercentageProgress[] $helpers */
     $helpers = [
-        new ConcisePercentageProgressHelper($s),
-        new VerbosePercentageProgressHelper($s)
+        new ConcisePercentageProgress($s),
+        new VerbosePercentageProgress($s),
     ];
 
     foreach ($helpers as $h) {
@@ -79,7 +87,7 @@ return function (InputInterface $input, OutputInterface $output) {
         $h->finish();
     }
 
-    $h = new ConciseProgressHelper($s);
+    $h = new ConciseProgress($s);
     $h->create(2, 'Doing Work');
     $h->step();
     $h->messages()->render()->render()->render();

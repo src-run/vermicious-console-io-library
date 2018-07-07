@@ -1,9 +1,9 @@
 
 # [src-run] vermicious-console-io-library
 
-|       Travis-CI        |      Codacy Rating      |      Code Coverage      |        Style-CI         |
-|:----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
-| [![Travis](https://src.run/vermicious-console-io-library/travis.svg)](https://src.run/vermicious-console-io-library/travis) | [![Codacy](https://src.run/vermicious-console-io-library/codacy.svg)](https://src.run/vermicious-console-io-library/codacy) | [![Coveralls](https://src.run/vermicious-console-io-library/coveralls.svg)](https://src.run/vermicious-console-io-library/coveralls) | [![Coveralls](https://src.run/vermicious-console-io-library/styleci.svg)](https://src.run/vermicious-console-io-library/styleci) |
+|       Travis-CI        |      Codacy Rating      |      Code Coverage      |        Style-CI         |         Release         |    API Documentation    |
+|:----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|:-----------------------:|
+| [![Travis](https://src.run/vermicious-console-io-library/travis.svg)](https://src.run/vermicious-console-io-library/travis) | [![Codacy](https://src.run/vermicious-console-io-library/codacy.svg)](https://src.run/vermicious-console-io-library/codacy) | [![Coveralls](https://src.run/vermicious-console-io-library/coveralls.svg)](https://src.run/vermicious-console-io-library/coveralls) | [![Coveralls](https://src.run/vermicious-console-io-library/styleci.svg)](https://src.run/vermicious-console-io-library/styleci) | [![Packagist](https://src.run/vermicious-console-io-library/packagist.svg)](https://src.run/vermicious-console-io-library/packagist) | [![API Docs](https://src.run/vermicious-console-io-library/api.svg)](https://src.run/vermicious-console-io-library/api) |
 
 
 ## Overview
@@ -11,12 +11,12 @@
 [Welcome](https://src.run/go/readme_welcome)!
 The `src-run/vermicious-console-io-library` package provides the following
 
-> basic set of Symfony console Input/Output/Style implementations
+> Enhanced console input/output style implementation with a complete object-oriented API.
 
 ### Grouping
 
 We use a Willy Wonka-inspired naming schema for our package group names. This package is part of the
-[vermicious group](https://src.run/vermicious-console-io-library/group), which is a collection of packages with a focus
+[augustus group](https://src.run/vermicious-console-io-library/group), which is a collection of packages with a focus
 on "core reflection base classes" and related functionality.
 
 You are welcome to research some [useless details](https://src.run/vermicious-console-io-library/group_explanation)
@@ -116,5 +116,4 @@ information.
 | __Stable Release__ | [![Packagist](https://src.run/vermicious-console-io-library/packagist.svg)](https://src.run/vermicious-console-io-library/packagist)     |
 | __Dev Release__    | [![Packagist](https://src.run/vermicious-console-io-library/packagist_pre.svg)](https://src.run/vermicious-console-io-library/packagist) |
 | __License__        | [![License](https://src.run/vermicious-console-io-library/license.svg)](https://src.run/vermicious-console-io-library/license)           |
-| __Reference__      | [![License](https://src.run/vermicious-console-io-library/api.svg)](https://src.run/vermicious-console-io-library/api)                   |
 

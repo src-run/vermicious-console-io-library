@@ -11,7 +11,11 @@
 
 namespace SR\Console\Output\Style;
 
-use SR\Console\Output\Helper\Text\BlockHelper;
+use SR\Console\Input\Component\Question\Answer\AnswerInterface;
+use SR\Console\Input\Component\Question\Answer\BooleanAnswer;
+use SR\Console\Output\Component\Action\AbstractAction;
+use SR\Console\Output\Component\Block\Block;
+use SR\Console\Output\Markup\Markup;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -133,24 +137,27 @@ interface StyleInterface extends OutputInterface
 
     /**
      * @param string|string[] $lines
+     * @param mixed[]         $replacements
      *
      * @return self
      */
-    public function text($lines): self;
+    public function text($lines, array $replacements = []): self;
 
     /**
      * @param string|string[] $lines
+     * @param mixed[]         $replacements
      *
      * @return self
      */
-    public function comment($lines): self;
+    public function comment($lines, array $replacements = []): self;
 
     /**
      * @param string|string[] $lines
+     * @param mixed[]         $replacements
      *
      * @return self
      */
-    public function muted($lines): self;
+    public function muted($lines, array $replacements = []): self;
 
     /**
      * @param array         $listing
@@ -216,105 +223,72 @@ interface StyleInterface extends OutputInterface
     /**
      * @param string|string[] $lines
      * @param string|null     $header
+     * @param mixed[]         $replacements
      * @param int             $type
      * @param string|null     $prefix
-     * @param string|null     $fg
-     * @param string|null     $bg
-     * @param array           ...$options
+     * @param Markup          $markup
      *
      * @return self
      */
-    public function block($lines, string $header = null, int $type = BlockHelper::TYPE_SM, string $prefix = null, string $fg = null, string $bg = null, ...$options): self;
+    public function block($lines, string $header = null, array $replacements = [], int $type = Block::TYPE_MD, string $prefix = null, Markup $markup = null): self;
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return self
      */
-    public function info($lines, int $type = BlockHelper::TYPE_SM, string $header = 'INFO'): self;
+    public function info($lines, array $replacements = [], int $type = Block::TYPE_MD, string $header = 'INFO'): self;
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return self
      */
-    public function success($lines, int $type = BlockHelper::TYPE_SM, string $header = 'OK'): self;
+    public function success($lines, array $replacements = [], int $type = Block::TYPE_MD, string $header = 'OK'): self;
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return self
      */
-    public function warning($lines, int $type = BlockHelper::TYPE_SM, string $header = 'WARN'): self;
+    public function warning($lines, array $replacements = [], int $type = Block::TYPE_MD, string $header = 'WARN'): self;
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return self
      */
-    public function error($lines, int $type = BlockHelper::TYPE_LG, string $header = 'ERR'): self;
+    public function error($lines, array $replacements = [], int $type = Block::TYPE_LG, string $header = 'ERR'): self;
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return self
      */
-    public function critical($lines, int $type = BlockHelper::TYPE_LG, string $header = 'CRITICAL'): self;
+    public function critical($lines, array $replacements = [], int $type = Block::TYPE_LG, string $header = 'CRITICAL'): self;
 
     /**
      * @param string $action
+     * @param string $type
      *
-     * @return self
+     * @return AbstractAction
      */
-    public function action(string $action): self;
-
-    /**
-     * @param string $result
-     * @param string $fg
-     * @param string $bg
-     * @param array ...$options
-     *
-     * @return self
-     */
-    public function actionResult(string $result, string $fg, string $bg, ...$options): self;
-
-    /**
-     * @param string $result
-     *
-     * @return self
-     */
-    public function actionDone(string $result = 'done'): self;
-
-    /**
-     * @param string $result
-     *
-     * @return self
-     */
-    public function actionOkay(string $result = 'okay'): self;
-
-    /**
-     * @param string $result
-     *
-     * @return self
-     */
-    public function actionStop(string $result = 'stop'): self;
-
-    /**
-     * @param string $result
-     *
-     * @return self
-     */
-    public function actionFail(string $result = 'fail'): self;
+    public function action(string $action = null, string $type = null): AbstractAction;
 
     /**
      * @param array $headers
@@ -338,9 +312,9 @@ interface StyleInterface extends OutputInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return string
+     * @return AnswerInterface
      */
-    public function ask(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ?string;
+    public function ask(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface;
 
     /**
      * @param string        $question
@@ -348,26 +322,41 @@ interface StyleInterface extends OutputInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return string
+     * @return AnswerInterface
      */
-    public function askHidden(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ?string;
+    public function askHidden(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface;
 
     /**
-     * @param string $question
-     * @param bool   $default
+     * @param string        $question
+     * @param bool          $default
+     * @param \Closure|null $validator
+     * @param \Closure|null $sanitizer
      *
-     * @return bool
+     * @return BooleanAnswer
      */
-    public function confirm(string $question, bool $default = true): bool;
+    public function confirm(string $question, bool $default = true, \Closure $validator = null, \Closure $sanitizer = null): BooleanAnswer;
 
     /**
-     * @param string      $question
-     * @param array       $choices
-     * @param string|null $default
+     * @param string        $question
+     * @param array         $choices
+     * @param string|null   $default
+     * @param \Closure|null $validator
+     * @param \Closure|null $sanitizer
      *
-     * @return string
+     * @return AnswerInterface
      */
-    public function choice(string $question, array $choices, string $default = null): ?string;
+    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface;
+
+    /**
+     * @param string        $question
+     * @param array         $choices
+     * @param string|null   $default
+     * @param \Closure|null $validator
+     * @param \Closure|null $sanitizer
+     *
+     * @return AnswerInterface
+     */
+    public function multipleChoice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface;
 
     /**
      * @param int|null $steps
@@ -404,16 +393,6 @@ interface StyleInterface extends OutputInterface
      * @return int
      */
     public function getMaxLength(): int;
-
-    /**
-     * @return int
-     */
-    public function termHeight(): ?int;
-
-    /**
-     * @return int
-     */
-    public function termWidth(): int;
 
     /**
      * @param string $string

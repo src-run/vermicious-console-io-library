@@ -1,19 +1,12 @@
 
  A boolean question with yes or no answer (yes/no) [yes]:
  > 
-
  A boolean question with yes or no answer (yes/no) [yes]:
  > 
 
  Enter your initials:
  > 
-
  Select your preferred fruit:
   [0] apple
   [1] orange
-{ > o.*}
-
- Select your preferred fruit:
-  [0] apple
-  [1] orange
-{ > 0}
+{ > .+}

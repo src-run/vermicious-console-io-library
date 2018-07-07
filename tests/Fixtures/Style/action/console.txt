@@ -1,13 +1,42 @@
 
- Peforming an action ... CUSTOM
+default action with "custom" result ... [custom]
 
- Performing a second action ... DONE
+default action with "warn" result ... [warn]
 
- Performing a third action ... OKAY
+default action with "done" result ... [done]
 
- Performing a fourth action ... STOP
+default action with "okay" result ... [okay]
 
- Performing a fifth action ... FAIL
+default action with "stop" result ... [stop]
 
- [ Doing something ] ...  OK 
- [ Another something ] ...  ERR 
+default action with "fail" result ... [fail]
+
+custom action with extras and 4 newlines ... [result] (an extra)
+
+
+
+custom action with extras and 10 newlines and "foo" result ... [foo] (an extra) (a second extras)
+
+
+
+
+
+
+
+
+
+custom action with no result and extras ... (one) (two) (three)
+
+custom action with no result and no extras and early complete ... 
+
+
+ [ bracketed action with "complete" result ] ...  COMPLETE 
+
+ [ bracketed action with no newlines and "error" result ] ...  ERROR 
+ [ bracketed action with 5 newlines and extras and "warning" result ] ...  WARNING  (one) (two) (three)
+
+
+
+
+ [ bracketed action with "foobar" result ] ...  FOOBAR 
+

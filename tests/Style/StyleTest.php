@@ -3,7 +3,7 @@
 /*
  * This file is part of the `src-run/vermicious-console-io-library` project.
  *
- * (c) 2016 Rob Frawley 2nd(rmf) <rmf AT src DOT run>
+ * (c) Rob Frawley 2nd <rmf@src.run>
  *
  * For the full copyright and license information, please view the LICENSE.md
  * file that was distributed with this source code.
@@ -11,11 +11,12 @@
 
 namespace SR\Console\Tests\Style;
 
-use SR\Console\Output\Helper\Text\BlockHelper;
-use SR\Console\Output\Helper\Style\DecorationHelper;
+use PHPUnit\Framework\TestCase;
+use SR\Console\Output\Component\Block\Block;
+use SR\Console\Output\Markup\Markup;
 use SR\Console\Output\Style\Style;
 use SR\Console\Output\Style\StyleInterface;
-use SR\Console\Tests\Input\TestInput;
+use SR\Console\Tests\Input\MemoryInput;
 use SR\Console\Tests\Output\TestOutput;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -23,14 +24,51 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class StyleTest extends \PHPUnit_Framework_TestCase
+/**
+ * @covers \SR\Console\Input\Component\Question\Answer\AbstractAnswer
+ * @covers \SR\Console\Input\Component\Question\Answer\BooleanAnswer
+ * @covers \SR\Console\Input\Component\Question\Answer\ChoiceAnswer
+ * @covers \SR\Console\Input\Component\Question\Answer\MultipleChoiceAnswer
+ * @covers \SR\Console\Input\Component\Question\Answer\ScalarAnswer
+ * @covers \SR\Console\Input\Component\Question\QuestionHelper
+ * @covers \SR\Console\Output\Component\Action\AbstractAction
+ * @covers \SR\Console\Output\Component\Action\ActionFactory
+ * @covers \SR\Console\Output\Component\Action\BracketedAction
+ * @covers \SR\Console\Output\Component\Action\SimpleAction
+ * @covers \SR\Console\Output\Component\Header\SectionHeader
+ * @covers \SR\Console\Output\Component\Header\TitleHeader
+ * @covers \SR\Console\Output\Component\Listing\DefinitionList
+ * @covers \SR\Console\Output\Component\Listing\SimpleList
+ * @covers \SR\Console\Output\Component\Progress\Message\ProgressMessageHelper
+ * @covers \SR\Console\Output\Component\Progress\AbstractPercentageProgress
+ * @covers \SR\Console\Output\Component\Progress\AbstractProgressHelper
+ * @covers \SR\Console\Output\Component\Progress\ConcisePercentageProgress
+ * @covers \SR\Console\Output\Component\Progress\ConciseProgress
+ * @covers \SR\Console\Output\Component\Progress\DefaultProgress
+ * @covers \SR\Console\Output\Component\Progress\VerbosePercentageProgress
+ * @covers \SR\Console\Output\Component\Progress\VerboseProgress
+ * @covers \SR\Console\Output\Component\Table\AbstractTable
+ * @covers \SR\Console\Output\Component\Table\HorizontalTable
+ * @covers \SR\Console\Output\Component\Table\VerticalTable
+ * @covers \SR\Console\Output\Component\Block\Block
+ * @covers \SR\Console\Output\Component\Text\Text
+ * @covers \SR\Console\Output\Markup\Markup
+ * @covers \SR\Console\Output\Style\Style
+ * @covers \SR\Console\Tests\Fixtures\StyleAwareExternalClass
+ * @covers \SR\Console\Tests\Fixtures\StyleAwareInternalClass
+ * @covers \SR\Console\Output\Utility\Interpolate\AbstractStringInterpolator
+ * @covers \SR\Console\Output\Utility\Interpolate\PsrStringInterpolator
+ * @covers \SR\Console\Output\Utility\Interpolate\SpfStringInterpolator
+ * @covers \SR\Console\Output\Utility\Interpolate\StringInterpolatorTrait
+ */
+class StyleTest extends TestCase
 {
     /**
      * @var string
      */
     private static $fixtureRootPath = __DIR__.'/../Fixtures/Style/';
 
-    public function testInputOutputAccessorMethods()
+    public function testInputOutputAccessorMethods(): void
     {
         $s = static::createStyleInstance($i = static::createInputInstance(), $o = static::createOutputInstance());
 
@@ -38,7 +76,10 @@ class StyleTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($o, $s->getOutput());
     }
 
-    public static function dataVerbosityAccessorMethodProvider()
+    /**
+     * @return array
+     */
+    public static function provideVerbosityAccessorMethodData(): array
     {
         return [
             [StyleInterface::VERBOSITY_QUIET],
@@ -52,7 +93,7 @@ class StyleTest extends \PHPUnit_Framework_TestCase
     /**
      * @param int $verbosity
      *
-     * @dataProvider dataVerbosityAccessorMethodProvider
+     * @dataProvider provideVerbosityAccessorMethodData
      */
     public function testVerbosityAccessorMethods(int $verbosity)
     {
@@ -80,14 +121,14 @@ class StyleTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse($s->isVerbose());
         }
 
-        if ($verbosity === StyleInterface::VERBOSITY_QUIET) {
+        if (StyleInterface::VERBOSITY_QUIET === $verbosity) {
             $this->assertTrue($s->isQuiet());
         } else {
             $this->assertFalse($s->isQuiet());
         }
     }
 
-    public function testDecorationAccessorMethods()
+    public function testDecorationAccessorMethods(): void
     {
         $s = static::createStyleInstance();
 
@@ -96,7 +137,7 @@ class StyleTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($s->getOutput()->isDecorated());
     }
 
-    public function testFormatterAccessorMethods()
+    public function testFormatterAccessorMethods(): void
     {
         $s = static::createStyleInstance();
         $f = new OutputFormatter();
@@ -105,32 +146,21 @@ class StyleTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($f, $s->getFormatter());
     }
 
-    public function testTermDimensionsAccessorMethods()
+    public function testDecorationHelper(): void
     {
-        $s = static::createStyleInstance();
-
-        $this->assertInternalType('int', $s->termHeight());
-        $this->assertGreaterThan(0, $s->termHeight());
-        $this->assertInternalType('int', $s->termWidth());
-        $this->assertGreaterThan(0, $s->termWidth());
-    }
-
-    public function testDecorationHelper()
-    {
-        $d = new DecorationHelper();
+        $d = new Markup();
         $d->setForeground('white');
         $d->setBackground('magenta');
         $d->setOptions('bold', 'reverse');
 
-        $this->assertSame('<fg=white;bg=magenta;options=bold,reverse>A string to decorate</>', $d->decorate('A string to decorate'));
+        $this->assertSame('<fg=white;bg=magenta;options=bold,reverse>A string to decorate</>', $d->markupValue('A string to decorate'));
     }
 
-    /**
-     * @expectedException \SR\Exception\Logic\InvalidArgumentException
-     * @expectedExceptionMessage Header count does not match row count!
-     */
-    public function testThrowsOnInvalidTableHeaderRowsCount()
+    public function testThrowsOnInvalidTableHeaderRowsCount(): void
     {
+        $this->expectException(\SR\Exception\Logic\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Header count does not match row count!');
+
         $s = static::createStyleInstance();
         $s->tableVertical([
             'header 1',
@@ -141,26 +171,26 @@ class StyleTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testQuestionDefaults()
+    public function testQuestionDefaults(): void
     {
         $s = static::createStyleInstance($i = static::createInputInstance());
         $i->setInteractive(false);
 
-        $this->assertSame('A default answer', $s->ask('A question', 'A default answer'));
-        $this->assertSame('A default answer', $s->askHidden('A hidden question', 'A default answer'));
-        $this->assertFalse($s->confirm('A confirmation', false));
-        $this->assertTrue($s->confirm('A confirmation', true));
+        $this->assertSame('A default answer', $s->ask('A question', 'A default answer')->getAnswer());
+        $this->assertSame('A default answer', $s->askHidden('A hidden question', 'A default answer')->getAnswer());
+        $this->assertFalse($s->confirm('A confirmation', false)->getAnswer());
+        $this->assertTrue($s->confirm('A confirmation', true)->getAnswer());
 
         $choices = ['a' => 'Apple', 'p' => 'Pear', 'b' => 'Banana'];
         foreach ($choices as $index => $value) {
-            $this->assertSame($index, $s->choice('A choice', $choices, $value));
+            $this->assertSame($value, $s->choice('A choice', $choices, $value)->getAnswer());
         }
     }
 
     /**
      * @return array
      */
-    public static function dataCommandOutputBufferProvider(): array
+    public static function provideStyleTestResourcesData(): array
     {
         $closurePaths = glob(static::$fixtureRootPath.'/*/closure.php');
         $consolePaths = glob(static::$fixtureRootPath.'/*/console.txt');
@@ -172,14 +202,14 @@ class StyleTest extends \PHPUnit_Framework_TestCase
      * @param string $commandFile
      * @param string $outputFile
      *
-     * @dataProvider dataCommandOutputBufferProvider
+     * @dataProvider provideStyleTestResourcesData
      */
     public function testCommandOutputBuffer(string $commandFile, string $outputFile)
     {
         $fuzzy = false;
 
-        foreach (['progress', 'question'] as $type) {
-            if (false !== strpos($outputFile, $type)) {
+        foreach (['progress', 'question', 'title', 'functional'] as $type) {
+            if (false !== mb_strpos($outputFile, $type)) {
                 $fuzzy = true;
             }
         }
@@ -195,9 +225,9 @@ class StyleTest extends \PHPUnit_Framework_TestCase
         $return = [];
         $string = [];
         $blocks = [
-            [BlockHelper::TYPE_SM, 0],
-            [BlockHelper::TYPE_MD, 0],
-            [BlockHelper::TYPE_LG, 1],
+            [Block::TYPE_SM, 0],
+            [Block::TYPE_MD, 0],
+            [Block::TYPE_LG, 1],
         ];
 
         foreach (range(2, 4, 2) as $repeat) {
@@ -222,40 +252,15 @@ class StyleTest extends \PHPUnit_Framework_TestCase
      */
     public function testBlockWordWrapping(string $inputString, int $blockType, int $lineAdjustment)
     {
-        $inputLength = strlen($inputString);
+        $inputLength = mb_strlen($inputString);
         $needleChars = ' § ';
         $needleLines = (int) (ceil($inputLength / 80) + ($inputLength > 80 - 5) + $lineAdjustment);
 
         $result = $this->setAndExecuteCommandTest(function (InputInterface $input, OutputInterface $output) use ($inputString, $blockType, $needleChars) {
-            (new Style($input, $output, 80))->block($inputString, 'TEST', $blockType, $needleChars);
+            (new Style($input, $output, 80))->block($inputString, 'TEST', [], $blockType, $needleChars);
         });
 
-        $this->assertSame($needleLines, substr_count($result, $needleChars));
-    }
-
-    /**
-     * @param \Closure $code
-     * @param bool     $normalize
-     * @param array    $options
-     *
-     * @return string
-     */
-    private function setAndExecuteCommandTest(\Closure $code, bool $normalize = true, array $options = null): string
-    {
-        if (null === $options) {
-            $options = [
-                'interactive' => false,
-                'decorated'   => false
-            ];
-        }
-
-        $command = new Command(sprintf('src-run-style-%s', spl_object_hash($code)));
-        $command->setCode($code);
-
-        $tester = new CommandTester($command);
-        $tester->execute([], $options);
-
-        return $tester->getDisplay($normalize);
+        $this->assertSame($needleLines, mb_substr_count($result, $needleChars));
     }
 
     /**
@@ -270,11 +275,36 @@ class StyleTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param \Closure $code
+     * @param bool     $normalize
+     * @param array    $options
+     *
+     * @return string
+     */
+    private function setAndExecuteCommandTest(\Closure $code, bool $normalize = true, array $options = null): string
+    {
+        if (null === $options) {
+            $options = [
+                'interactive' => false,
+                'decorated' => false,
+            ];
+        }
+
+        $command = new Command(sprintf('src-run-style-%s', spl_object_hash($code)));
+        $command->setCode($code);
+
+        $tester = new CommandTester($command);
+        $tester->execute([], $options);
+
+        return $tester->getDisplay($normalize);
+    }
+
+    /**
      * @return InputInterface
      */
     private static function createInputInstance(): InputInterface
     {
-        return new TestInput();
+        return new MemoryInput();
     }
 
     /**
@@ -304,25 +334,61 @@ class StyleTest extends \PHPUnit_Framework_TestCase
         $expectedLines = explode("\n", file_get_contents($expectedFile));
         $providedLines = explode("\n", $actualString);
 
-        for ($i = 0; $i < count($expectedLines); $i++) {
-            static::assertLineFuzzyEqualsLine($expectedLines[$i] ?? null, $providedLines[$i] ?? null, $i, $expectedFile);
+        for ($i = 0; $i < count($expectedLines); ++$i) {
+            static::assertLineFuzzyEqualsLine($expectedLines[$i] ?? null, $providedLines[$i] ?? null, $i + 1, $expectedFile);
         }
     }
 
     /**
-     * @param string $expected
-     * @param string $provided
-     * @param int    $line
-     * @param string $expectedFile
+     * @param string $expectedText
+     * @param string $providedText
+     * @param int    $fileLine
+     * @param string $fileName
      */
-    private static function assertLineFuzzyEqualsLine($expected, $provided, int $line, string $expectedFile)
+    private static function assertLineFuzzyEqualsLine($expectedText, $providedText, int $fileLine, string $fileName)
     {
-        if (0 !== strpos($expected, '{') || false === strpos($expected, '}')) {
-            static::assertEquals($expected, $provided, sprintf('Line %d of file "%s" should match "%s"', $line, $expectedFile, $provided));
-
-            return;
+        if (1 === preg_match('{^\{.+\}$}', $expectedText)) {
+            self::assertGeneratedOutputEqualsExpectedRegExp($expectedText, $providedText, $fileLine, $fileName);
+        } else {
+            self::assertGeneratedOutputEqualsExpectedOutput($expectedText, $providedText, $fileLine, $fileName);
         }
+    }
 
-        static::assertRegExp($expected, $provided, sprintf('Line %d of file "%s" (pattern "%s) should match "%s"', $line, $expectedFile, $expected, $provided));
+    /**
+     * @param string $expectedOutput
+     * @param string $providedOutput
+     * @param int    $fileLine
+     * @param string $fileName
+     */
+    private static function assertGeneratedOutputEqualsExpectedOutput($expectedOutput, $providedOutput, int $fileLine, string $fileName)
+    {
+        static::assertSame($expectedOutput, $providedOutput, vsprintf(
+            '%sExpectation from line "%d" of file "%s" (as explicit text) does not match generated text.%1$s  [expected output] => "%s"%1$s  [provided output] => "%s"%1$s', [
+                PHP_EOL,
+                $fileLine,
+                $fileName,
+                $expectedOutput,
+                $providedOutput,
+            ]
+        ));
+    }
+
+    /**
+     * @param string $expectedRegExp
+     * @param string $providedOutput
+     * @param int    $fileLine
+     * @param string $fileName
+     */
+    private static function assertGeneratedOutputEqualsExpectedRegExp($expectedRegExp, $providedOutput, int $fileLine, string $fileName)
+    {
+        static::assertRegExp($expectedRegExp, $providedOutput, vsprintf(
+            '%sExpectation from line "%d" of file "%s" (as regular expression) does not match generated text.%1$s  [expected regexp] => "%s"%1$s  [provided output] => "%s"%1$s', [
+                PHP_EOL,
+                $fileLine,
+                $fileName,
+                $expectedRegExp,
+                $providedOutput,
+            ]
+        ));
     }
 }

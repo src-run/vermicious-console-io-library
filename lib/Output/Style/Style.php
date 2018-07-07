@@ -11,19 +11,23 @@
 
 namespace SR\Console\Output\Style;
 
-use SR\Console\Input\Helper\QuestionHelper;
+use SR\Console\Input\Component\Question\Answer\AnswerInterface;
+use SR\Console\Input\Component\Question\Answer\BooleanAnswer;
+use SR\Console\Input\Component\Question\QuestionHelper;
 use SR\Console\Input\InputAwareTrait;
-use SR\Console\Output\Helper\Lists\DefinitionHelper;
-use SR\Console\Output\Helper\Lists\ListingHelper;
-use SR\Console\Output\Helper\Style\DecorationHelper;
-use SR\Console\Output\Helper\Action\ActionHelper;
-use SR\Console\Output\Helper\Text\BlockHelper;
-use SR\Console\Output\Helper\Header\SectionHelper;
-use SR\Console\Output\Helper\Table\TableHorizontalHelper;
-use SR\Console\Output\Helper\Table\TableVerticalHelper;
-use SR\Console\Output\Helper\Text\TextHelper;
-use SR\Console\Output\Helper\Header\TitleHelper;
+use SR\Console\Output\Component\Action\AbstractAction;
+use SR\Console\Output\Component\Action\ActionFactory;
+use SR\Console\Output\Component\Block\Block;
+use SR\Console\Output\Component\Header\SectionHeader;
+use SR\Console\Output\Component\Header\TitleHeader;
+use SR\Console\Output\Component\Listing\DefinitionList;
+use SR\Console\Output\Component\Listing\SimpleList;
+use SR\Console\Output\Component\Table\HorizontalTable;
+use SR\Console\Output\Component\Table\VerticalTable;
+use SR\Console\Output\Component\Text\Text;
+use SR\Console\Output\Markup\Markup;
 use SR\Console\Output\OutputAwareTrait;
+use SR\Console\Output\Utility\Terminal\Terminal;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Formatter\OutputFormatterInterface;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -32,7 +36,6 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Terminal;
 
 class Style implements StyleInterface
 {
@@ -266,36 +269,39 @@ class Style implements StyleInterface
 
     /**
      * @param string|string[] $lines
+     * @param mixed[]         $replacements
      *
      * @return StyleInterface
      */
-    public function text($lines): StyleInterface
+    public function text($lines, array $replacements = []): StyleInterface
     {
-        (new TextHelper($this))->text($lines);
+        (new Text($this))->text($lines, $replacements);
 
         return $this;
     }
 
     /**
      * @param string|string[] $lines
+     * @param mixed[]         $replacements
      *
      * @return StyleInterface
      */
-    public function comment($lines): StyleInterface
+    public function comment($lines, array $replacements = []): StyleInterface
     {
-        (new TextHelper($this))->comment($lines);
+        (new Text($this))->comment($lines, $replacements);
 
         return $this;
     }
 
     /**
      * @param string|string[] $lines
+     * @param mixed[]         $replacements
      *
      * @return StyleInterface
      */
-    public function muted($lines): StyleInterface
+    public function muted($lines, array $replacements = []): StyleInterface
     {
-        (new TextHelper($this))->muted($lines);
+        (new Text($this))->muted($lines, $replacements);
 
         return $this;
     }
@@ -308,7 +314,7 @@ class Style implements StyleInterface
      */
     public function listing(array $listing, \Closure $lineFormatter = null): StyleInterface
     {
-        (new ListingHelper($this, $lineFormatter))->listing($listing);
+        (new SimpleList($this, $lineFormatter))->listing($listing);
 
         return $this;
     }
@@ -320,7 +326,7 @@ class Style implements StyleInterface
      */
     public function definitions(array $definitions): StyleInterface
     {
-        (new DefinitionHelper($this))->definitions($definitions);
+        (new DefinitionList($this))->definitions($definitions);
 
         return $this;
     }
@@ -333,7 +339,7 @@ class Style implements StyleInterface
      */
     public function separator(int $length = null, string $character = '-'): StyleInterface
     {
-        (new TextHelper($this))->separator($length, $character);
+        (new Text($this))->separator($length, $character);
 
         return $this;
     }
@@ -345,7 +351,7 @@ class Style implements StyleInterface
      */
     public function title(string $title): StyleInterface
     {
-        (new TitleHelper($this))->title($title);
+        (new TitleHeader($this))->title($title);
 
         return $this;
     }
@@ -358,7 +364,7 @@ class Style implements StyleInterface
      */
     public function applicationTitle(Application $application, ...$properties): StyleInterface
     {
-        (new TitleHelper($this))->applicationTitle($application, ...$properties);
+        (new TitleHeader($this))->applicationTitle($application, ...$properties);
 
         return $this;
     }
@@ -370,7 +376,7 @@ class Style implements StyleInterface
      */
     public function section(string $section): StyleInterface
     {
-        (new SectionHelper($this))->section($section);
+        (new SectionHeader($this))->section($section);
 
         return $this;
     }
@@ -382,7 +388,7 @@ class Style implements StyleInterface
      */
     public function subSection(string $section): StyleInterface
     {
-        (new SectionHelper($this))->subSection($section);
+        (new SectionHeader($this))->subSection($section);
 
         return $this;
     }
@@ -397,7 +403,7 @@ class Style implements StyleInterface
      */
     public function enumeratedSection(string $section, int $iteration, int $size = null, string $type = null): StyleInterface
     {
-        (new SectionHelper($this))->enumeratedSection($section, $iteration, $size, $type);
+        (new SectionHeader($this))->enumeratedSection($section, $iteration, $size, $type);
 
         return $this;
     }
@@ -405,146 +411,101 @@ class Style implements StyleInterface
     /**
      * @param string|string[] $lines
      * @param string|null     $header
+     * @param mixed[]         $replacements
      * @param int             $type
      * @param string|null     $prefix
-     * @param string|null     $fg
-     * @param string|null     $bg
-     * @param array           ...$options
+     * @param Markup          $markup
      *
      * @return StyleInterface
      */
-    public function block($lines, string $header = null, int $type = BlockHelper::TYPE_MD, string $prefix = null, string $fg = null, string $bg = null, ...$options): StyleInterface
+    public function block($lines, string $header = null, array $replacements = [], int $type = Block::TYPE_MD, string $prefix = null, Markup $markup = null): StyleInterface
     {
-        (new BlockHelper($this, $type))->write((array) $lines, $header, $prefix, $fg, $bg, ...$options);
+        (new Block($this, $type))->write((array) $lines, $header, $replacements, $prefix, $markup);
 
         return $this;
     }
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return StyleInterface
      */
-    public function info($lines, int $type = BlockHelper::TYPE_MD, string $header = 'INFO'): StyleInterface
+    public function info($lines, array $replacements = [], int $type = Block::TYPE_MD, string $header = 'INFO'): StyleInterface
     {
-        return $this->block((array) $lines, $header, $type, '--', 'white', 'blue');
+        return $this->block((array) $lines, $header, $replacements, $type, '--', new Markup('white', 'blue'));
     }
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return StyleInterface
      */
-    public function success($lines, int $type = BlockHelper::TYPE_MD, string $header = 'OK'): StyleInterface
+    public function success($lines, array $replacements = [], int $type = Block::TYPE_MD, string $header = 'OK'): StyleInterface
     {
-        return $this->block((array) $lines, $header, $type, '||', 'black', 'green');
+        return $this->block((array) $lines, $header, $replacements, $type, '||', new Markup('black', 'green'));
     }
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return StyleInterface
      */
-    public function warning($lines, int $type = BlockHelper::TYPE_MD, string $header = 'WARN'): StyleInterface
+    public function warning($lines, array $replacements = [], int $type = Block::TYPE_MD, string $header = 'WARN'): StyleInterface
     {
-        return $this->block((array) $lines, $header, $type, '##', 'black', 'yellow');
+        return $this->block((array) $lines, $header, $replacements, $type, '##', new Markup('black', 'yellow'));
     }
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return StyleInterface
      */
-    public function error($lines, int $type = BlockHelper::TYPE_LG, string $header = 'ERR'): StyleInterface
+    public function error($lines, array $replacements = [], int $type = Block::TYPE_LG, string $header = 'ERR'): StyleInterface
     {
-        return $this->block((array) $lines, $header, $type, '!!', 'white', 'red');
+        return $this->block((array) $lines, $header, $replacements, $type, '!!', new Markup('white', 'red'));
     }
 
     /**
      * @param string|array $lines
+     * @param mixed[]      $replacements
      * @param int          $type
      * @param string       $header
      *
      * @return StyleInterface
      */
-    public function critical($lines, int $type = BlockHelper::TYPE_LG, string $header = 'CRITICAL'): StyleInterface
+    public function critical($lines, array $replacements = [], int $type = Block::TYPE_LG, string $header = 'CRITICAL'): StyleInterface
     {
-        return $this->block((array) $lines, $header, $type, '**', 'white', 'red');
+        return $this->block((array) $lines, $header, $replacements, $type, '**', new Markup('white', 'red'));
     }
 
     /**
-     * @param string $action
+     * @param string $actionText
+     * @param string $type
      *
-     * @return StyleInterface
+     * @return AbstractAction
      */
-    public function action(string $action): StyleInterface
+    public function action(string $actionText = null, string $type = null): AbstractAction
     {
-        (new ActionHelper($this))->action($action);
+        $action = ActionFactory::create($type);
+        $action->setStyle($this);
 
-        return $this;
-    }
+        if (null !== $actionText) {
+            $action->action($actionText);
+        }
 
-    /**
-     * @param string $result
-     * @param string $fg
-     * @param string $bg
-     * @param array ...$options
-     *
-     * @return StyleInterface
-     */
-    public function actionResult(string $result, string $fg, string $bg, ...$options): StyleInterface
-    {
-        (new ActionHelper($this))->result($result, new DecorationHelper($fg, $bg, ...$options));
-
-        return $this;
-    }
-
-    /**
-     * @param string $result
-     *
-     * @return StyleInterface
-     */
-    public function actionDone(string $result = 'done'): StyleInterface
-    {
-        return $this->actionResult($result, 'white', 'blue');
-    }
-
-    /**
-     * @param string $result
-     *
-     * @return StyleInterface
-     */
-    public function actionOkay(string $result = 'okay'): StyleInterface
-    {
-        return $this->actionResult($result, 'black', 'green');
-    }
-
-    /**
-     * @param string $result
-     *
-     * @return StyleInterface
-     */
-    public function actionStop(string $result = 'stop'): StyleInterface
-    {
-        return $this->actionResult($result, 'black', 'yellow');
-    }
-
-    /**
-     * @param string $result
-     *
-     * @return StyleInterface
-     */
-    public function actionFail(string $result = 'fail'): StyleInterface
-    {
-        return $this->actionResult($result, 'white', 'red');
+        return $action;
     }
 
     /**
@@ -555,7 +516,7 @@ class Style implements StyleInterface
      */
     public function table(array $headers, ...$rows): StyleInterface
     {
-        (new TableHorizontalHelper($this))->write($headers, ...$rows);
+        (new HorizontalTable($this))->write($headers, ...$rows);
 
         return $this;
     }
@@ -568,7 +529,7 @@ class Style implements StyleInterface
      */
     public function tableVertical(array $headers, ...$rows): StyleInterface
     {
-        (new TableVerticalHelper($this))->write($headers, ...$rows);
+        (new VerticalTable($this))->write($headers, ...$rows);
 
         return $this;
     }
@@ -579,11 +540,11 @@ class Style implements StyleInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return string
+     * @return AnswerInterface
      */
-    public function ask(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ?string
+    public function ask(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface
     {
-        return (new QuestionHelper($this))->ask($question, $default, $validator, $sanitizer);
+        return (new QuestionHelper($this))->question($question, $default, $validator, $sanitizer);
     }
 
     /**
@@ -592,34 +553,52 @@ class Style implements StyleInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return string
+     * @return AnswerInterface
      */
-    public function askHidden(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ?string
+    public function askHidden(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface
     {
-        return (new QuestionHelper($this))->askHidden($question, $default, $validator, $sanitizer);
+        return (new QuestionHelper($this))->hiddenQuestion($question, $default, $validator, $sanitizer);
     }
 
     /**
-     * @param string $question
-     * @param bool   $default
+     * @param string        $question
+     * @param bool          $default
+     * @param \Closure|null $validator
+     * @param \Closure|null $sanitizer
      *
-     * @return bool
+     * @return BooleanAnswer
      */
-    public function confirm(string $question, bool $default = true): bool
+    public function confirm(string $question, bool $default = true, \Closure $validator = null, \Closure $sanitizer = null): BooleanAnswer
     {
-        return (new QuestionHelper($this))->confirm($question, $default);
+        return (new QuestionHelper($this))->confirm($question, $default, $validator, $sanitizer);
     }
 
     /**
-     * @param string      $question
-     * @param array       $choices
-     * @param string|null $default
+     * @param string        $question
+     * @param array         $choices
+     * @param string|null   $default
+     * @param \Closure|null $validator
+     * @param \Closure|null $sanitizer
      *
-     * @return string
+     * @return AnswerInterface
      */
-    public function choice(string $question, array $choices, string $default = null): ?string
+    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface
     {
-        return (new QuestionHelper($this))->choice($question, $choices, $default);
+        return (new QuestionHelper($this))->choice($question, $choices, $default, false, $validator, $sanitizer);
+    }
+
+    /**
+     * @param string        $question
+     * @param array         $choices
+     * @param string|null   $default
+     * @param \Closure|null $validator
+     * @param \Closure|null $sanitizer
+     *
+     * @return AnswerInterface
+     */
+    public function multipleChoice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface
+    {
+        return (new QuestionHelper($this))->choice($question, $choices, $default, true, $validator, $sanitizer);
     }
 
     /**
@@ -663,7 +642,7 @@ class Style implements StyleInterface
      */
     public function prependText(): StyleInterface
     {
-        if ("\n" !== substr($fetched = $this->buffer->fetch(), -1)) {
+        if ("\n" !== mb_substr($fetched = $this->buffer->fetch(), -1)) {
             $this->newline();
         }
 
@@ -675,8 +654,8 @@ class Style implements StyleInterface
      */
     public function prependBlock(): StyleInterface
     {
-        $chars = substr(str_replace(PHP_EOL, "\n", $this->buffer->fetch()), -2);
-        $count = isset($chars[0]) ? 2 - substr_count($chars, "\n") : 1;
+        $chars = mb_substr(str_replace(PHP_EOL, "\n", $this->buffer->fetch()), -2);
+        $count = isset($chars[0]) ? 2 - mb_substr_count($chars, "\n") : 1;
 
         $this->newline($count);
 
@@ -688,7 +667,7 @@ class Style implements StyleInterface
      */
     public function getMaxLength(): int
     {
-        return min($this->termWidth() - (int) (DIRECTORY_SEPARATOR === '\\'), $this->maxLength);
+        return min(Terminal::x($this->maxLength) - (int) (\DIRECTORY_SEPARATOR === '\\'), $this->maxLength);
     }
 
     /**
@@ -699,22 +678,6 @@ class Style implements StyleInterface
     public function strLength(string $string): int
     {
         return Helper::strlenWithoutDecoration($this->getFormatter(), $string);
-    }
-
-    /**
-     * @return int
-     */
-    public function termHeight(): ?int
-    {
-        return (new Terminal())->getHeight();
-    }
-
-    /**
-     * @return int
-     */
-    public function termWidth(): int
-    {
-        return (new Terminal())->getWidth() ?: $this->maxLength;
     }
 
     /**
@@ -753,7 +716,7 @@ class Style implements StyleInterface
     private function reduceBuffer($lines): array
     {
         return array_map(function ($value) {
-            return substr($value, -4);
+            return mb_substr($value, -4);
         }, array_merge((array) $this->buffer->fetch(), (array) $lines));
     }
 

@@ -4,7 +4,7 @@
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
-- Test Application (v0.0.0) [7a6be6b5dbf2f2bb24a85f2c1dd261d29d254490]
+{\- Test Application \((v[0-9\.]+|master)\) \[7a6be6b5dbf2f2bb24a85f2c1dd261d29d254490\]}
 -
 - @author  Author Name <name@domain.tld>
 - @license MIT License <https://opensource.org/licenses/MIT>
@@ -12,7 +12,7 @@
 
 --------------------------------------------------------------------------------
 -
-- Test Application (v0.0.0) [7a6be6b5dbf2f2bb24a85f2c1dd261d29d254490]
+{\- Test Application \((v[0-9\.]+|master)\) \[7a6be6b5dbf2f2bb24a85f2c1dd261d29d254490\]}
 -
 - @author  Author Name <name@domain.tld>
 - @license MIT License <https://opensource.org/licenses/MIT>
@@ -20,6 +20,6 @@
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
-- Test Application (master) 
+{\- Test Application \((v[0-9\.]+|master)\)}
 --------------------------------------------------------------------------------
 

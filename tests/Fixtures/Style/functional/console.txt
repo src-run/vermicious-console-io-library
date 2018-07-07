@@ -55,6 +55,15 @@ Some muted text
 --------------------------------------------------------------------------------
 
                                                                                 
+ [ Has "simple-string" scalar, "100" integer, and complex replacement ] Line 1  
+ with simple-string scalar replacement                                          
+ And line 2 with 100 integer replacement                                        
+{ And line 3 with \{#[0-9]+\} complex replacement                                    }
+                                                                                
+
+--------------------------------------------------------------------------------
+
+                                                                                
  -- [ INFO ] Info block                                                         
                                                                                 
 
@@ -88,16 +97,19 @@ Some muted text
 
                                [ ACTION HELPERS ]                               
 
- Action ... DONE
+Action 1 ... [done]
 
 --------------------------------------------------------------------------------
- Action ... FAIL
+Action 2 ... [fail]
 
 --------------------------------------------------------------------------------
- Action ... STOP
+Action 3 ... [stop]
 
 --------------------------------------------------------------------------------
- Action ... OKAY
+Action 4 ... [warn]
+
+--------------------------------------------------------------------------------
+Action 5 ... [okay]
 
                                [ TABLE HELPERS ]                                
 
