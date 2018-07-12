@@ -22,7 +22,6 @@ use SR\Console\Output\Style\Style;
 use SR\Console\Output\Style\StyleAwareInternalTrait;
 use SR\Console\Output\Style\StyleInterface;
 use SR\Console\Output\Utility\Terminal\Terminal;
-use SR\Exception\Logic\LogicException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\StreamableInputInterface;
@@ -575,7 +574,6 @@ class QuestionHelper
         if (null !== $configurator) {
             $configurator($question);
         }
-
     }
 
     /**
@@ -611,7 +609,7 @@ class QuestionHelper
                 return array_flip($choices)[$default];
             }
 
-            if (isset($choices[$default]) && false !== $v = array_search($choices[$default], $choices)) {
+            if (isset($choices[$default]) && false !== $v = array_search($choices[$default], $choices, true)) {
                 return $v;
             }
         }
@@ -661,19 +659,19 @@ class QuestionHelper
                 );
             }
 
-            if (!self::isAssociativeArray($availableChoices) && (int) $choice == $choice && isset($availableChoices[(int) $choice])) {
+            if (!self::isAssociativeArray($availableChoices) && (int) $choice === $choice && isset($availableChoices[(int) $choice])) {
                 $found[(int) $choice] = $availableChoices[(int) $choice];
             } elseif (isset($availableChoices[$choice])) {
                 $found[$choice] = $availableChoices[$choice];
             }
 
-            if (count($found) === 0 && empty($choice)) {
+            if (0 === count($found) && empty($choice)) {
                 throw new InvalidArgumentException(
                     'Invalid empty choice answer provided. Available choices: %s.', self::stringifyQuestionChoices($question)
                 );
             }
 
-            if (count($found) === 0) {
+            if (0 === count($found)) {
                 throw new InvalidArgumentException(
                     'Invalid choice answer "%s" provided. Available choices: %s.', $choice, self::stringifyQuestionChoices($question)
                 );

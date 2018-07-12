@@ -64,7 +64,7 @@ trait AnswerTrait
      */
     public function hasAnswer(): bool
     {
-        return null !== $this->result && ($this->result === false || !empty($this->result));
+        return null !== $this->result && (false === $this->result || !empty($this->result));
     }
 
     /**

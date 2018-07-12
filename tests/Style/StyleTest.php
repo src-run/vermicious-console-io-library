@@ -11,7 +11,6 @@
 
 namespace SR\Console\Tests\Style;
 
-use PHPUnit\Framework\TestCase;
 use SR\Console\Input\Component\Question\Answer\AnswerInterface;
 use SR\Console\Input\Component\Question\Answer\BooleanAnswer;
 use SR\Console\Input\Component\Question\Answer\ChoiceAnswer;
@@ -227,21 +226,6 @@ class StyleTest extends AbstractTestCase
     }
 
     /**
-     * @param array $array
-     *
-     * @return array
-     */
-    private static function shuffleArrayPreserveKeys(array $array): array
-    {
-        $keys = array_keys($array);
-        shuffle($keys);
-
-        return array_combine($keys, array_map(function ($k) use ($array) {
-            return $array[$k];
-        }, $keys));
-    }
-
-    /**
      * @return \Generator
      */
     public static function provideChoiceData(): \Generator
@@ -281,34 +265,9 @@ class StyleTest extends AbstractTestCase
     }
 
     /**
-     * @param ChoiceAnswer $answer
-     * @param string       $question
-     * @param array        $choices
-     * @param string       $value
-     * @param mixed        $index
-     */
-    private function assertValidSingleChoiceAnswer(ChoiceAnswer $answer, string $question, array $choices, string $value, $index): void
-    {
-        $this->assertSame($question, $answer->stringifyQuestion());
-
-        $this->assertInstanceOf(Question::class, $answer->getQuestion());
-        $this->assertTrue($answer->hasAnswer());
-        $this->assertFalse($answer->isMultiAnswer());
-        $this->assertFalse($answer->isBooleanAnswer());
-        $this->assertTrue($answer->isStringAnswer());
-
-        $this->assertContains($answer->getAnswer(), $choices);
-        $this->assertContains($answer->getIndex(), array_keys($choices));
-        $this->assertSame($choices[$answer->getIndex()], $answer->getAnswer());
-        $this->assertSame($value, $answer->getAnswer());
-        $this->assertSame((string) $index, (string) $answer->getIndex());
-        $this->assertSame(mb_strlen($value), $answer->length());
-    }
-
-    /**
      * @dataProvider provideChoiceData
      *
-     * @param array  $choices
+     * @param array $choices
      */
     public function testInvalidChoiceDefault(array $choices): void
     {
@@ -442,8 +401,8 @@ class StyleTest extends AbstractTestCase
 
         $stream = $o->getStream();
         rewind($stream);
-        $this->assertRegExp('{Invalid.+empty.+choice.+answer.+provided\..+Available.+choices:}', $contents = stream_get_contents($stream));
-        $this->assertRegExp('{Invalid.+choice.+answer.+"foo".+provided\..+Available.+choices:}', $contents);
+        $this->assertRegExp('{Invalid.+\n?.*empty.+\n?.*choice.+\n?.*answer.+\n?.*provided\..+\n?.*Available.+\n?.*choices:}', $contents = stream_get_contents($stream));
+        $this->assertRegExp('{Invalid.+\n?.*choice.+\n?.*answer.+\n?.*"foo".+\n?.*provided\..+\n?.*Available.+\n?.*choices:}', $contents);
     }
 
     public function testAmbiguouisChoice(): void
@@ -470,48 +429,7 @@ class StyleTest extends AbstractTestCase
 
         $stream = $o->getStream();
         rewind($stream);
-        $this->assertRegExp('{The.+provided.+answer.+is.+ambiguous\..+Value.+should.+be.+one.+of}', stream_get_contents($stream));
-    }
-
-    /**
-     * @param MultipleChoiceAnswer $c
-     * @param array                $choices
-     * @param array                $inputs
-     */
-    private function assertMultipleChoiceAnswerAccessors(MultipleChoiceAnswer $c, array $choices, array $inputs): void
-    {
-        $this->assertCount($c->count(), $inputs);
-
-        foreach ($c->getAnswer() as $a) {
-            $this->assertContains($a->getAnswer(), $inputs);
-        }
-
-        foreach ($inputs as $i) {
-            $this->assertContains($i, $c->stringifyAnswer());
-            $this->assertInstanceOf(AnswerInterface::class, $c->findAnswer($i));
-
-            foreach ($c->filterAnswers($i) as $f) {
-                $this->assertInstanceOf(AnswerInterface::class, $f);
-            }
-        }
-
-        $this->assertSame($inputs[0], $c->firstAnswer()->stringifyAnswer());
-
-        $c->filterAnswers(function ($a) {
-            $this->assertInstanceOf(ChoiceAnswer::class, $a);
-        });
-
-        $this->assertCount(0, $c->filterAnswers(function ($a) {
-            return false;
-        }));
-
-        $c->findAnswer(function ($a) {
-            $this->assertInstanceOf(ChoiceAnswer::class, $a);
-        });
-
-        $this->assertNull($c->findAnswer(function ($a) {
-            return false;
-        }));
+        $this->assertRegExp('{The.+\n?.*provided.+\n?.*answer.+\n?.*is.+\n?.*ambiguous\..+\n?.*Value.+\n?.*should.+\n?.*be.+\n?.*one.+\n?.*of}', stream_get_contents($stream));
     }
 
     /**
@@ -654,6 +572,87 @@ class StyleTest extends AbstractTestCase
     public static function createStyleInstance(InputInterface $i = null, OutputInterface $o = null): StyleInterface
     {
         return new Style($i ?: static::createInputInstance(), $o ?: static::createOutputInstance());
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    private static function shuffleArrayPreserveKeys(array $array): array
+    {
+        $keys = array_keys($array);
+        shuffle($keys);
+
+        return array_combine($keys, array_map(function ($k) use ($array) {
+            return $array[$k];
+        }, $keys));
+    }
+
+    /**
+     * @param ChoiceAnswer $answer
+     * @param string       $question
+     * @param array        $choices
+     * @param string       $value
+     * @param mixed        $index
+     */
+    private function assertValidSingleChoiceAnswer(ChoiceAnswer $answer, string $question, array $choices, string $value, $index): void
+    {
+        $this->assertSame($question, $answer->stringifyQuestion());
+
+        $this->assertInstanceOf(Question::class, $answer->getQuestion());
+        $this->assertTrue($answer->hasAnswer());
+        $this->assertFalse($answer->isMultiAnswer());
+        $this->assertFalse($answer->isBooleanAnswer());
+        $this->assertTrue($answer->isStringAnswer());
+
+        $this->assertContains($answer->getAnswer(), $choices);
+        $this->assertContains($answer->getIndex(), array_keys($choices));
+        $this->assertSame($choices[$answer->getIndex()], $answer->getAnswer());
+        $this->assertSame($value, $answer->getAnswer());
+        $this->assertSame((string) $index, (string) $answer->getIndex());
+        $this->assertSame(mb_strlen($value), $answer->length());
+    }
+
+    /**
+     * @param MultipleChoiceAnswer $c
+     * @param array                $choices
+     * @param array                $inputs
+     */
+    private function assertMultipleChoiceAnswerAccessors(MultipleChoiceAnswer $c, array $choices, array $inputs): void
+    {
+        $this->assertCount($c->count(), $inputs);
+
+        foreach ($c->getAnswer() as $a) {
+            $this->assertContains($a->getAnswer(), $inputs);
+        }
+
+        foreach ($inputs as $i) {
+            $this->assertContains($i, $c->stringifyAnswer());
+            $this->assertInstanceOf(AnswerInterface::class, $c->findAnswer($i));
+
+            foreach ($c->filterAnswers($i) as $f) {
+                $this->assertInstanceOf(AnswerInterface::class, $f);
+            }
+        }
+
+        $this->assertSame($inputs[0], $c->firstAnswer()->stringifyAnswer());
+
+        $c->filterAnswers(function ($a) {
+            $this->assertInstanceOf(ChoiceAnswer::class, $a);
+        });
+
+        $this->assertCount(0, $c->filterAnswers(function ($a) {
+            return false;
+        }));
+
+        $c->findAnswer(function ($a) {
+            $this->assertInstanceOf(ChoiceAnswer::class, $a);
+        });
+
+        $this->assertNull($c->findAnswer(function ($a) {
+            return false;
+        }));
     }
 
     /**
