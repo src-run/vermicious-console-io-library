@@ -442,8 +442,8 @@ class StyleTest extends AbstractTestCase
 
         $stream = $o->getStream();
         rewind($stream);
-        $this->assertContains('Invalid empty choice answer provided. Available choices:', $contents = stream_get_contents($stream));
-        $this->assertContains('Invalid choice answer "foo" provided. Available choices:', $contents);
+        $this->assertRegExp('{Invalid.+empty.+choice.+answer.+provided\..+Available.+choices:}', $contents = stream_get_contents($stream));
+        $this->assertRegExp('{Invalid.+choice.+answer.+"foo".+provided\..+Available.+choices:}', $contents);
     }
 
     public function testAmbiguouisChoice(): void
@@ -470,7 +470,7 @@ class StyleTest extends AbstractTestCase
 
         $stream = $o->getStream();
         rewind($stream);
-        $this->assertContains('The provided answer is ambiguous. Value should be one of', stream_get_contents($stream));
+        $this->assertRegExp('{The.+provided.+answer.+is.+ambiguous\..+Value.+should.+be.+one.+of}', stream_get_contents($stream));
     }
 
     /**
