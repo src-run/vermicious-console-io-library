@@ -14,11 +14,11 @@ namespace SR\Console\Output\Component\Text;
 use SR\Console\Output\Markup\Markup;
 use SR\Console\Output\Style\StyleAwareInternalTrait;
 use SR\Console\Output\Style\StyleInterface;
-use SR\Console\Output\Utility\Interpolate\StringInterpolatorTrait;
+use SR\Console\Output\Utility\Interpolate\PsrStringInterpolatorTrait;
 
 class Text
 {
-    use StringInterpolatorTrait;
+    use PsrStringInterpolatorTrait;
     use StyleAwareInternalTrait;
 
     /**
@@ -37,8 +37,8 @@ class Text
      */
     public function text($lines, array $replacements = []): self
     {
-        $this->style->prependText();
-        $this->style->writeln(array_map(function (string $line) {
+        $this->style()->prependText();
+        $this->style()->writeln(array_map(function (string $line) {
             return sprintf(' %s', $line);
         }, (array) self::interpolate($lines, $replacements)));
 
@@ -53,8 +53,8 @@ class Text
      */
     public function comment($lines, array $replacements = []): self
     {
-        $this->style->prependText();
-        $this->style->writeln(array_map(function ($line) {
+        $this->style()->prependText();
+        $this->style()->writeln(array_map(function ($line) {
             return sprintf(' // %s', $line);
         }, (array) self::interpolate($lines, $replacements)));
 
@@ -69,7 +69,7 @@ class Text
      */
     public function muted($lines, array $replacements = []): self
     {
-        $this->style->writeln((new Markup('black', null, 'bold'))->markupLines(
+        $this->style()->writeln((new Markup('black', null, 'bold'))->markupLines(
             (array) self::interpolate($lines, $replacements)
         ));
 
@@ -84,7 +84,7 @@ class Text
      */
     public function separator(int $length = null, string $character = '-'): self
     {
-        $this->muted(str_repeat($character, $length ?: $this->style->getMaxLength()));
+        $this->muted(str_repeat($character, $length ?: $this->style()->getMaxLength()));
 
         return $this;
     }

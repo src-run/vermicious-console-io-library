@@ -353,10 +353,6 @@ class Markup implements MarkupColors, MarkupOptions
         $normalized = null === $input ? null : preg_replace('{[^a-z]}', '', mb_strtolower($input));
         $acceptable = 'colour' === $context ? self::ACCEPTED_COLOURS : self::ACCEPTED_OPTIONS;
 
-        if (false === $nullable && true === (null === $normalized)) {
-            throw new InvalidArgumentException(...self::getExcArgsNull($context, $acceptable));
-        }
-
         if (false === $nullable && true === empty($normalized)) {
             throw new InvalidArgumentException(...self::getExcArgsEmpty($context, $acceptable));
         }
@@ -366,21 +362,6 @@ class Markup implements MarkupColors, MarkupOptions
         }
 
         return $normalized;
-    }
-
-    /**
-     * @param string   $context
-     * @param string[] $available
-     *
-     * @return mixed[]
-     */
-    private static function getExcArgsNull(string $context, array $available): array
-    {
-        return [
-            'Invalid %s name provided: a null value is not allowed (%s).',
-            $context,
-            self::getAvailableValuesAsString($available),
-        ];
     }
 
     /**

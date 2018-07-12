@@ -14,13 +14,13 @@ namespace SR\Console\Output\Component\Block;
 use SR\Console\Output\Markup\Markup;
 use SR\Console\Output\Style\StyleAwareInternalTrait;
 use SR\Console\Output\Style\StyleInterface;
-use SR\Console\Output\Utility\Interpolate\StringInterpolatorTrait;
+use SR\Console\Output\Utility\Interpolate\PsrStringInterpolatorTrait;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 
 class Block
 {
-    use StringInterpolatorTrait;
+    use PsrStringInterpolatorTrait;
     use StyleAwareInternalTrait;
 
     /**
@@ -80,12 +80,12 @@ class Block
 
         $head = null !== $head ? self::interpolate($head, $replacements) : $head;
         $text = self::interpolate($text, $replacements);
-        $text = static::wordwrap($this->prependHeader($text, $head), $prefix, $this->style->getMaxLength());
+        $text = static::wordwrap($this->prependHeader($text, $head), $prefix, $this->style()->getMaxLength());
         $text = $this->padLength($this->padHeight($this->prefix($text, $prefix)));
 
-        $this->style->prependBlock();
-        $this->style->writeln($markup->markupLines($text));
-        $this->style->newline();
+        $this->style()->prependBlock();
+        $this->style()->writeln($markup->markupLines($text));
+        $this->style()->newline();
 
         return $this;
     }
@@ -138,7 +138,7 @@ class Block
             switch ($this->type) {
                 case self::TYPE_LG:
                     $header = sprintf('[ %s ]', mb_strtoupper($header));
-                    array_unshift($lines, str_repeat('-', $this->style->strLength($header)));
+                    array_unshift($lines, str_repeat('-', $this->style()->strLength($header)));
                     array_unshift($lines, $header);
                     break;
 
@@ -164,7 +164,7 @@ class Block
     private function padLength(array $lines): array
     {
         return array_map(function ($line) {
-            return $this->style->padByTermWidth(sprintf('%s%s', ' ', $line), ' ', STR_PAD_RIGHT);
+            return $this->style()->padByTermWidth(sprintf('%s%s', ' ', $line), ' ', STR_PAD_RIGHT);
         }, $lines);
     }
 

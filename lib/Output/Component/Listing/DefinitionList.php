@@ -56,7 +56,7 @@ final class DefinitionList
     {
         $this->titleFormatter = $formatter ?? function (string $title, int $maxLength) {
             return (new Markup('black', null, 'bold'))->markupValue(
-                sprintf('[%s]', $this->style->pad($title, $maxLength, ' ', STR_PAD_RIGHT))
+                sprintf('[%s]', $this->style()->pad($title, $maxLength, ' ', STR_PAD_RIGHT))
             );
         };
 
@@ -98,9 +98,9 @@ final class DefinitionList
      */
     public function definitions(array $definitions): self
     {
-        $this->style->prependText();
+        $this->style()->prependText();
         $this->writeDefinitionLines($definitions);
-        $this->style->newline();
+        $this->style()->newline();
 
         return $this;
     }
@@ -122,7 +122,7 @@ final class DefinitionList
             );
         });
 
-        $this->style->writeln(array_values($definitions));
+        $this->style()->writeln(array_values($definitions));
 
         return $this;
     }

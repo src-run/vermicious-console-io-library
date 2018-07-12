@@ -13,7 +13,7 @@ namespace SR\Console\Input\Component\Question\Answer;
 
 use Symfony\Component\Console\Question\Question;
 
-abstract class AbstractAnswer implements AnswerInterface
+trait AnswerTrait
 {
     /**
      * @var Question
@@ -23,7 +23,7 @@ abstract class AbstractAnswer implements AnswerInterface
     /**
      * @var mixed
      */
-    private $answer;
+    private $result;
 
     /**
      * @var bool
@@ -34,20 +34,6 @@ abstract class AbstractAnswer implements AnswerInterface
      * @var bool
      */
     private $interactive;
-
-    /**
-     * @param Question   $question
-     * @param mixed|null $answer
-     * @param bool       $default
-     * @param bool       $interactive
-     */
-    public function __construct(Question $question, $answer = null, bool $default = false, bool $interactive = true)
-    {
-        $this->question = $question;
-        $this->answer = $answer;
-        $this->default = $default;
-        $this->interactive = $interactive;
-    }
 
     /**
      * @return string
@@ -78,39 +64,31 @@ abstract class AbstractAnswer implements AnswerInterface
      */
     public function hasAnswer(): bool
     {
-        return null !== $this->answer && !empty($this->answer);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAnswer()
-    {
-        return $this->answer;
+        return null !== $this->result && ($this->result === false || !empty($this->result));
     }
 
     /**
      * @return bool
      */
-    public function isAnswerArray(): bool
+    public function isMultiAnswer(): bool
     {
-        return is_array($this->answer);
+        return is_array($this->result);
     }
 
     /**
      * @return bool
      */
-    public function isAnswerScalar(): bool
+    public function isStringAnswer(): bool
     {
-        return is_scalar($this->answer);
+        return is_string($this->result);
     }
 
     /**
      * @return bool
      */
-    public function isAnswerBoolean(): bool
+    public function isBooleanAnswer(): bool
     {
-        return is_bool($this->answer);
+        return is_bool($this->result);
     }
 
     /**

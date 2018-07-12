@@ -11,49 +11,32 @@
 
 namespace SR\Console\Output\Utility\Interpolate;
 
-use SR\Console\Output\Exception\InvalidArgumentException;
-use SR\Reflection\Inspect;
-
-trait StringInterpolatorTrait
+trait PsrStringInterpolatorTrait
 {
-    /**
-     * @var string
-     */
-    private static $interpolatorType = PsrStringInterpolator::class;
-
     /**
      * @var bool
      */
-    private static $interpolatorThrows = false;
+    private static $interpolateThrows = false;
 
     /**
-     * @param string $interpolator
+     * @var \Closure|null
      */
-    public static function setInterpolatorType(string $interpolator): void
+    private static $interpolateNormalizer;
+
+    /**
+     * @param bool $interpolateThrows
+     */
+    public static function setInterpolateThrows(bool $interpolateThrows): void
     {
-        try {
-            $inspect = Inspect::useClass($interpolator);
-        } catch (\Exception $exception) {
-            throw new InvalidArgumentException(
-                'Invalid string interpolator type "%s": %s', $interpolator, $exception->getMessage(), $exception
-            );
-        }
-
-        if (!$inspect->extendsClass(AbstractStringInterpolator::class)) {
-            throw new InvalidArgumentException(
-                'Invalid string interpolator type "%s": does not extend "%s" parent class', $interpolator, AbstractStringInterpolator::class
-            );
-        }
-
-        self::$interpolatorType = $interpolator;
+        static::$interpolateThrows = $interpolateThrows;
     }
 
     /**
-     * @param bool $throws
+     * @param null|\Closure $interpolateNormalizer
      */
-    public static function setInterpolatorThrows(bool $throws): void
+    public static function setInterpolateNormalizer(?\Closure $interpolateNormalizer): void
     {
-        self::$interpolatorThrows = $throws;
+        static::$interpolateNormalizer = $interpolateNormalizer;
     }
 
     /**
@@ -81,7 +64,7 @@ trait StringInterpolatorTrait
      */
     private static function interpolateLine(string $line, array $replacements = []): string
     {
-        return self::createInterpolator($line, $replacements)->compile(self::$interpolatorThrows);
+        return self::createInterpolator($line, $replacements)->compile(static::$interpolateThrows);
     }
 
     /**
@@ -92,6 +75,6 @@ trait StringInterpolatorTrait
      */
     private static function createInterpolator(string $format, array $replacements): AbstractStringInterpolator
     {
-        return new self::$interpolatorType($format, $replacements);
+        return new PsrStringInterpolator($format, $replacements, self::$interpolateNormalizer);
     }
 }

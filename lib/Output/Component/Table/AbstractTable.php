@@ -37,12 +37,12 @@ abstract class AbstractTable
      */
     public function write(array $headers, ...$rows): self
     {
-        $this->style->prependBlock();
+        $this->style()->prependBlock();
 
         $table = $this->createTable(...$this->formatInputData($headers, $rows));
         $table->render();
 
-        $this->style->newline();
+        $this->style()->newline();
 
         return $this;
     }
@@ -81,7 +81,7 @@ abstract class AbstractTable
         $style->setDefaultCrossingChar($color->markupValue('+'));
         $style->setCellHeaderFormat('%s');
 
-        $table = new Table($this->style);
+        $table = new Table($this->style());
         $table->setStyle($style);
         $table->setHeaders(static::stylizeHeaders($h));
         $table->setRows($r);

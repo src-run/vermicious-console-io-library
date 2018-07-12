@@ -13,7 +13,7 @@ namespace SR\Console\Input\Component\Question\Answer;
 
 use Symfony\Component\Console\Question\Question;
 
-class ChoiceAnswer extends AbstractAnswer
+class ChoiceAnswer extends StringAnswer
 {
     /**
      * @var string|int|null
@@ -21,32 +21,17 @@ class ChoiceAnswer extends AbstractAnswer
     private $index;
 
     /**
-     * @param Question        $question
-     * @param mixed|null      $answer
-     * @param string|int|null $index
-     * @param bool            $default
-     * @param bool            $interactive
+     * @param Question   $question
+     * @param mixed|null $answer
+     * @param mixed|null $index
+     * @param bool       $default
+     * @param bool       $interactive
      */
     public function __construct(Question $question, $answer = null, $index = null, bool $default = false, bool $interactive = true)
     {
         parent::__construct($question, $answer, $default, $interactive);
+
         $this->index = $index;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getAnswer(): ?string
-    {
-        return parent::getAnswer();
-    }
-
-    /**
-     * @return string
-     */
-    public function stringifyAnswer(): string
-    {
-        return (string) ($this->getAnswer() ?? '');
     }
 
     /**

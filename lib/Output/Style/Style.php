@@ -13,6 +13,9 @@ namespace SR\Console\Output\Style;
 
 use SR\Console\Input\Component\Question\Answer\AnswerInterface;
 use SR\Console\Input\Component\Question\Answer\BooleanAnswer;
+use SR\Console\Input\Component\Question\Answer\ChoiceAnswer;
+use SR\Console\Input\Component\Question\Answer\MultipleChoiceAnswer;
+use SR\Console\Input\Component\Question\Answer\StringAnswer;
 use SR\Console\Input\Component\Question\QuestionHelper;
 use SR\Console\Input\InputAwareTrait;
 use SR\Console\Output\Component\Action\AbstractAction;
@@ -491,15 +494,21 @@ class Style implements StyleInterface
     }
 
     /**
-     * @param string $actionText
-     * @param string $type
+     * @param string|null $actionText
+     * @param string|null $prefixText
+     * @param string|null $type
+     * @param mixed       $typeArguments
      *
      * @return AbstractAction
      */
-    public function action(string $actionText = null, string $type = null): AbstractAction
+    public function action(string $actionText = null, string $prefixText = null, string $type = null, array $typeArguments = []): AbstractAction
     {
-        $action = ActionFactory::create($type);
+        $action = ActionFactory::create($type, ...$typeArguments);
         $action->setStyle($this);
+
+        if (null !== $prefixText) {
+            $action->prefix($prefixText);
+        }
 
         if (null !== $actionText) {
             $action->action($actionText);
@@ -540,9 +549,9 @@ class Style implements StyleInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|StringAnswer
      */
-    public function ask(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface
+    public function ask(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): StringAnswer
     {
         return (new QuestionHelper($this))->question($question, $default, $validator, $sanitizer);
     }
@@ -553,9 +562,9 @@ class Style implements StyleInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|StringAnswer
      */
-    public function askHidden(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface
+    public function askHidden(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): StringAnswer
     {
         return (new QuestionHelper($this))->hiddenQuestion($question, $default, $validator, $sanitizer);
     }
@@ -566,7 +575,7 @@ class Style implements StyleInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return BooleanAnswer
+     * @return AnswerInterface|BooleanAnswer
      */
     public function confirm(string $question, bool $default = true, \Closure $validator = null, \Closure $sanitizer = null): BooleanAnswer
     {
@@ -580,9 +589,9 @@ class Style implements StyleInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|ChoiceAnswer
      */
-    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface
+    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ChoiceAnswer
     {
         return (new QuestionHelper($this))->choice($question, $choices, $default, false, $validator, $sanitizer);
     }
@@ -594,9 +603,23 @@ class Style implements StyleInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|ChoiceAnswer
      */
-    public function multipleChoice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface
+    public function hiddenChoice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ChoiceAnswer
+    {
+        return (new QuestionHelper($this))->hiddenChoice($question, $choices, $default, false, $validator, $sanitizer);
+    }
+
+    /**
+     * @param string        $question
+     * @param array         $choices
+     * @param string|null   $default
+     * @param \Closure|null $validator
+     * @param \Closure|null $sanitizer
+     *
+     * @return AnswerInterface|MultipleChoiceAnswer
+     */
+    public function multipleChoice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): MultipleChoiceAnswer
     {
         return (new QuestionHelper($this))->choice($question, $choices, $default, true, $validator, $sanitizer);
     }

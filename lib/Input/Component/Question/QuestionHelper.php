@@ -15,14 +15,16 @@ use SR\Console\Input\Component\Question\Answer\AnswerInterface;
 use SR\Console\Input\Component\Question\Answer\BooleanAnswer;
 use SR\Console\Input\Component\Question\Answer\ChoiceAnswer;
 use SR\Console\Input\Component\Question\Answer\MultipleChoiceAnswer;
-use SR\Console\Input\Component\Question\Answer\ScalarAnswer;
+use SR\Console\Input\Component\Question\Answer\StringAnswer;
 use SR\Console\Output\Exception\InvalidArgumentException;
 use SR\Console\Output\Exception\RuntimeException;
+use SR\Console\Output\Style\Style;
 use SR\Console\Output\Style\StyleAwareInternalTrait;
 use SR\Console\Output\Style\StyleInterface;
+use SR\Console\Output\Utility\Terminal\Terminal;
+use SR\Exception\Logic\LogicException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Helper\QuestionHelper as BaseQuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\StreamableInputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -30,14 +32,14 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class QuestionHelper extends BaseQuestionHelper
+class QuestionHelper
 {
     use StyleAwareInternalTrait;
 
     /**
-     * @var \ReflectionClass
+     * @var null|resource
      */
-    private $reflection;
+    private $inputStream;
 
     /**
      * @param StyleInterface $style
@@ -45,26 +47,6 @@ class QuestionHelper extends BaseQuestionHelper
     public function __construct(StyleInterface $style)
     {
         $this->setStyle($style);
-
-        try {
-            $this->reflection = new \ReflectionClass(BaseQuestionHelper::class);
-        } catch (\ReflectionException $exception) {
-            $this->reflection = new \ReflectionObject($this);
-        }
-    }
-
-    /**
-     * @deprecated use {@see askQuestion} instead
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @param Question        $question
-     *
-     * @return mixed
-     */
-    public function ask(InputInterface $input, OutputInterface $output, Question $question)
-    {
-        return $this->createStyleNewInputOutput($input, $output)->handleQuestion(new ConfirmationQuestion($question));
     }
 
     /**
@@ -73,9 +55,9 @@ class QuestionHelper extends BaseQuestionHelper
      * @param \Closure|null $validator
      * @param \Closure|null $normalizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|StringAnswer
      */
-    public function question(string $question, string $default = null, \Closure $validator = null, \Closure $normalizer = null): AnswerInterface
+    public function question(string $question, string $default = null, \Closure $validator = null, \Closure $normalizer = null): StringAnswer
     {
         return $this->handleQuestion(new Question($question, $default), $validator, $normalizer);
     }
@@ -86,9 +68,9 @@ class QuestionHelper extends BaseQuestionHelper
      * @param \Closure|null $validator
      * @param \Closure|null $normalizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|StringAnswer
      */
-    public function hiddenQuestion(string $question, string $default = null, \Closure $validator = null, \Closure $normalizer = null): AnswerInterface
+    public function hiddenQuestion(string $question, string $default = null, \Closure $validator = null, \Closure $normalizer = null): StringAnswer
     {
         return $this->handleQuestion(new Question($question, $default), $validator, $normalizer, function (Question $question) {
             $question->setHidden(true);
@@ -101,7 +83,7 @@ class QuestionHelper extends BaseQuestionHelper
      * @param \Closure|null $validator
      * @param \Closure|null $normalizer
      *
-     * @return BooleanAnswer|AnswerInterface
+     * @return AnswerInterface|BooleanAnswer
      */
     public function confirm(string $question, bool $default = true, \Closure $validator = null, \Closure $normalizer = null): BooleanAnswer
     {
@@ -112,22 +94,25 @@ class QuestionHelper extends BaseQuestionHelper
      * @param string        $question
      * @param array         $choices
      * @param string|null   $default
-     * @param bool          $multiSelect
+     * @param bool          $multipleChoice
      * @param \Closure|null $validator
      * @param \Closure|null $normalizer
+     * @param iterable|null $completionValues
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|ChoiceAnswer|MultipleChoiceAnswer
      */
-    public function choice(string $question, array $choices, string $default = null, bool $multiSelect = false, \Closure $validator = null, \Closure $normalizer = null): AnswerInterface
+    public function choice(string $question, array $choices, string $default = null, bool $multipleChoice = false, \Closure $validator = null, \Closure $normalizer = null, iterable $completionValues = null): AnswerInterface
     {
-        if (null !== $default) {
-            $default = array_flip($choices)[$default] ?? null;
-        }
-
         return $this->handleQuestion(
-            (new ChoiceQuestion($question, $choices, $default))->setMultiselect($multiSelect),
+            new ChoiceQuestion($question, $choices, self::resolveDefault($choices, $default, $multipleChoice)),
             $validator,
-            $normalizer
+            $normalizer,
+            function (ChoiceQuestion $question) use ($completionValues): void {
+                if (null !== $completionValues) {
+                    $question->setAutocompleterValues($completionValues);
+                }
+            },
+            $multipleChoice
         );
     }
 
@@ -135,35 +120,39 @@ class QuestionHelper extends BaseQuestionHelper
      * @param string        $question
      * @param array         $choices
      * @param string|null   $default
-     * @param bool          $multiSelect
+     * @param bool          $multipleChoice
      * @param \Closure|null $validator
      * @param \Closure|null $normalizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|ChoiceAnswer|MultipleChoiceAnswer
      */
-    public function hiddenChoice(string $question, array $choices, string $default = null, bool $multiSelect = false, \Closure $validator = null, \Closure $normalizer = null): AnswerInterface
+    public function hiddenChoice(string $question, array $choices, string $default = null, bool $multipleChoice = false, \Closure $validator = null, \Closure $normalizer = null): AnswerInterface
     {
-        if (null !== $default) {
-            $default = array_flip($choices)[$default];
-        }
-
         return $this->handleQuestion(
-            (new ChoiceQuestion($question, $choices, $default))->setMultiselect($multiSelect),
+            new ChoiceQuestion($question, $choices, self::resolveDefault($choices, $default, $multipleChoice)),
             $validator,
             $normalizer,
             function (ChoiceQuestion $question): void {
+                $question->setAutocompleterValues(null);
                 $question->setHidden(true);
-            }
+            },
+            $multipleChoice
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function writeError(OutputInterface $output, \Exception $exception = null)
+    protected function writeError(\Exception $exception = null, OutputInterface $output = null)
     {
-        $this->style->newline();
-        $this->style->error($exception->getMessage());
+        $s = $this->style();
+
+        if (null !== $output) {
+            $s = new Style($s->getInput(), $output);
+        }
+
+        $s->newline();
+        $s->error(sprintf('[%s] %s', get_class($exception), $exception->getMessage()));
     }
 
     /**
@@ -185,21 +174,27 @@ class QuestionHelper extends BaseQuestionHelper
      * @param \Closure|null $validator
      * @param \Closure|null $normalizer
      * @param \Closure|null $configurator
+     * @param bool          $multipleChoice
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|ChoiceAnswer|MultipleChoiceAnswer|StringAnswer|BooleanAnswer
      */
-    private function handleQuestion(Question $question, \Closure $validator = null, \Closure $normalizer = null, \Closure $configurator = null): AnswerInterface
+    private function handleQuestion(Question $question, \Closure $validator = null, \Closure $normalizer = null, \Closure $configurator = null, bool $multipleChoice = false): AnswerInterface
     {
-        $this->configureQuestion($question, $validator, $normalizer, $configurator);
-        $this->writePriorQuestionOutput();
+        $this->configureQuestion($question, $validator, $normalizer, $configurator, $multipleChoice);
+
+        if ($this->style()->getInput()->isInteractive()) {
+            $this->style()->prependBlock();
+        }
 
         try {
             $answer = $this->interviewQuestion($question);
-        } catch (\Exception $exception) {
-            $this->writeError($this->getOutput(), $exception);
+        } catch (RuntimeException $exception) {
+            throw $exception;
         }
 
-        $this->writeAfterQuestionOutput();
+        if ($this->style()->getInput()->isInteractive()) {
+            $this->style()->newLine();
+        }
 
         return $answer ?? self::createAnswer($question, null, false, true);
     }
@@ -207,13 +202,11 @@ class QuestionHelper extends BaseQuestionHelper
     /**
      * @param Question $question
      *
-     * @throws \Exception
-     *
      * @return AnswerInterface
      */
     private function interviewQuestion(Question $question): AnswerInterface
     {
-        return $this->getInput()->isInteractive()
+        return $this->style()->getInput()->isInteractive()
             ? $this->interviewQuestionAsInteractiveValidated($question)
             : $this->interviewQuestionNoInteractive($question);
     }
@@ -225,27 +218,24 @@ class QuestionHelper extends BaseQuestionHelper
      */
     private function interviewQuestionAsInteractiveValidated(Question $question): AnswerInterface
     {
-        $i = $this->getInput();
-        $o = $this->getOutput();
+        $i = $this->style()->getInput();
+        $o = $this->style()->getOutput();
+        $o = $o instanceof ConsoleOutputInterface ? $o->getErrorOutput() : $o;
 
-        if ($o instanceof ConsoleOutputInterface) {
-            $o = $o->getErrorOutput();
-        }
-
-        if ($i instanceof StreamableInputInterface && $stream = $i->getStream()) {
-            $this->setInputStream($stream);
+        if ($i instanceof StreamableInputInterface && is_resource($stream = $i->getStream())) {
+            $this->inputStream = $stream;
         }
 
         $priorError = null;
-        $iterations = $question->getMaxAttempts();
+        $iterations = $question->getMaxAttempts() ?? 100;
 
-        while (null === $iterations || $iterations--) {
+        while ($iterations-- > 0) {
             if (null !== $priorError) {
-                $this->writeError($o, $priorError);
+                $this->writeError($priorError, $o);
             }
 
             try {
-                return ($question->getValidator())(
+                return (self::getQuestionValidationClosure($question))(
                     $this->interviewQuestionAsInteractive($question, $o)
                 );
             } catch (RuntimeException $exception) {
@@ -269,7 +259,15 @@ class QuestionHelper extends BaseQuestionHelper
             $choices = $question->getChoices();
 
             if (isset($choices[$question->getDefault()])) {
-                return self::createAnswer($question, $choices[$question->getDefault()], true, false);
+                return (self::getQuestionValidationClosure($question))(
+                    self::createAnswer($question, $choices[$question->getDefault()], true, false)
+                );
+            }
+
+            if (count(self::parseAnswerChoices($answer = self::createAnswer($question, $question->getDefault(), true, false), $question->isMultiselect())) > 1) {
+                return (self::getQuestionValidationClosure($question))(
+                    $answer
+                );
             }
 
             throw new RuntimeException(
@@ -277,21 +275,23 @@ class QuestionHelper extends BaseQuestionHelper
             );
         }
 
-        return self::createAnswer($question, $question->getDefault(), true, false);
+        return (self::getQuestionValidationClosure($question))(
+            self::createAnswer($question, $question->getDefault(), true, false)
+        );
     }
 
     /**
      * @param Question        $question
      * @param OutputInterface $o
      *
-     * @return ScalarAnswer
+     * @return StringAnswer
      */
     private function interviewQuestionAsInteractive(Question $question, OutputInterface $o): AnswerInterface
     {
         $this->writePrompt($o, $question);
 
         $isDefault = false;
-        $userInput = null === $question->getAutocompleterValues() || false === $this->invokePrivateMethod('hasSttyAvailable')
+        $userInput = null === $question->getAutocompleterValues() || false === Terminal::stty()
             ? trim($this->readResponseNonAutoComplete($question, $o))
             : trim($this->readResponseUseAutoComplete($question, $o));
 
@@ -317,11 +317,12 @@ class QuestionHelper extends BaseQuestionHelper
     {
         $values = $question->getAutocompleterValues();
 
-        if ($values instanceof \Traversable) {
-            $values = iterator_to_array($values);
-        }
-
-        return $this->invokePrivateMethod('autocomplete', [$o, $question, $this->getInputStream(), $values]);
+        return $this->performInputAutoCompletion(
+            $o,
+            $question,
+            $this->inputStream ?? STDIN,
+            $values instanceof \Traversable ? iterator_to_array($values) : $values
+        );
     }
 
     /**
@@ -333,7 +334,7 @@ class QuestionHelper extends BaseQuestionHelper
     private function readResponseNonAutoComplete(Question $question, OutputInterface $o)
     {
         if (false === $response = ($question->isHidden() ? $this->readResponseHidden($question, $o) : false)) {
-            $response = $this->readResponseInputs();
+            $response = fgets($this->inputStream ?? STDIN, 4096);
         }
 
         return $response;
@@ -348,7 +349,7 @@ class QuestionHelper extends BaseQuestionHelper
     private function readResponseHidden(Question $question, OutputInterface $o): string
     {
         try {
-            $response = $this->invokePrivateMethod('getHiddenResponse', [$o, $this->getInputStream()]);
+            $response = $this->getHiddenResponse($o);
         } catch (RuntimeException $e) {
             if (!$question->isHiddenFallback()) {
                 throw $e;
@@ -359,43 +360,212 @@ class QuestionHelper extends BaseQuestionHelper
     }
 
     /**
+     * @param OutputInterface $output
+     * @param Question        $question
+     * @param                 $inputStream
+     * @param array           $autoCompleteValues
+     *
      * @return string
      */
-    private function readResponseInputs(): string
+    private function performInputAutoCompletion(OutputInterface $output, Question $question, $inputStream, array $autoCompleteValues): string
     {
-        $response = fgets($this->getInputStream(), 4096);
+        $ret = '';
+        $all = '';
 
-        if (false === $response) {
-            throw new RuntimeException('Aborted');
+        $i = 0;
+        $ofs = -1;
+        $matchesSet = $autoCompleteValues;
+        $matchesLen = count($matchesSet);
+
+        $sttyMode = shell_exec('stty -g');
+
+        // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
+        shell_exec('stty -icanon -echo');
+
+        // Add highlighted text style
+        $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
+
+        // Read a keypress
+        while (!feof($inputStream)) {
+            $c = fread($inputStream, 1);
+
+            // Backspace Character
+            if ("\177" === $c || "\010" === $c) {
+                // Pop the last character off the end of our string
+                if (0 !== $i) {
+                    $ret = mb_substr($ret, 0, mb_strlen($ret) - 1);
+                    $all = mb_substr($all, 0, mb_strlen($all) - 1);
+                }
+                if (0 === $matchesLen && 0 !== $i) {
+                    --$i;
+
+                    // Move cursor backwards
+                    $output->write("\033[1D");
+                }
+
+                if (0 === $i) {
+                    $ofs = -1;
+                    $matchesSet = $autoCompleteValues;
+                    $matchesLen = count($matchesSet);
+                } else {
+                    $matchesLen = 0;
+                }
+            } elseif ("\033" === $c) {
+                // Did we read an escape sequence?
+                $c .= fread($inputStream, 2);
+
+                // A = Up Arrow. B = Down Arrow
+                if (isset($c[2]) && ('A' === $c[2] || 'B' === $c[2])) {
+                    if ('A' === $c[2] && -1 === $ofs) {
+                        $ofs = 0;
+                    }
+
+                    if (0 === $matchesLen) {
+                        continue;
+                    }
+
+                    $ofs += ('A' === $c[2]) ? -1 : 1;
+                    $ofs = ($matchesLen + $ofs) % $matchesLen;
+                }
+            } elseif (ord($c) < 32) {
+                if ("\t" === $c || "\n" === $c) {
+                    if ($matchesLen > 0 && -1 !== $ofs) {
+                        $last = self::extractLastAutoCompleteMultiChoiceInput($question, $all) ?? $ret;
+                        $ret = $matchesSet[$ofs];
+                        $all .= mb_substr($ret, mb_strlen($last));
+                        // Echo out remaining chars for current match
+                        $output->write(mb_substr($ret, mb_strlen($last)));
+                        $i = mb_strlen($ret);
+                    }
+
+                    if ("\n" === $c) {
+                        $output->write($c);
+                        break;
+                    }
+
+                    $matchesLen = 0;
+                }
+
+                continue;
+            } else {
+                $output->write($c);
+                $ret .= $c;
+                $all .= $c;
+                ++$i;
+
+                $matchesLen = 0;
+                $matchesSet = array_slice($matchesSet, 0, 20);
+                $ofs = 0;
+                $last = self::extractLastAutoCompleteMultiChoiceInput($question, $all);
+
+                foreach ($autoCompleteValues as $value) {
+                    if (null !== $match = $this->resolveAutoCompleteMatch($value, $all, $last)) {
+                        $matchesSet[$matchesLen++] = $match;
+                    }
+                }
+            }
+
+            // Erase characters from cursor to end of line
+            $output->write("\033[K");
+
+            if ($matchesLen > 0 && -1 !== $ofs) {
+                $last = self::extractLastAutoCompleteMultiChoiceInput($question, $all) ?? $ret;
+                // Save cursor position
+                $output->write("\0337");
+                // Write highlighted text
+                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(mb_substr($matchesSet[$ofs], mb_strlen($last))).'</hl>');
+                // Restore cursor position
+                $output->write("\0338");
+            }
         }
 
-        return $response;
+        // Reset stty so it behaves normally again
+        shell_exec(sprintf('stty %s', $sttyMode));
+
+        return $all;
+    }
+
+    /**
+     * @param string      $completionValue
+     * @param string      $input
+     * @param null|string $prior
+     *
+     * @return string|null
+     */
+    private function resolveAutoCompleteMatch(string $completionValue, string $input, ?string $prior): ?string
+    {
+        if ($input === mb_substr($completionValue, 0, mb_strlen($input))) {
+            return $completionValue;
+        }
+
+        if (null !== $prior && $prior === mb_substr($completionValue, 0, mb_strlen($prior))) {
+            return $completionValue;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param OutputInterface $output An Output instance
+     *
+     * @throws RuntimeException In case the fallback is deactivated and the response cannot be hidden
+     *
+     * @return string
+     */
+    private function getHiddenResponse(OutputInterface $output): string
+    {
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            if (Terminal::stty()) {
+                $sttyMode = shell_exec('stty -g');
+
+                shell_exec('stty -echo');
+                $value = fgets($this->inputStream ?? STDIN, 4096);
+                shell_exec(sprintf('stty %s', $sttyMode));
+
+                if (false === $value) {
+                    throw new RuntimeException('Aborted');
+                }
+
+                $value = trim($value);
+                $output->writeln('');
+
+                return $value;
+            }
+
+            if (null !== $shell = Terminal::shell()) {
+                $value = rtrim(shell_exec(vsprintf("/usr/bin/env %s -c 'stty -echo; %s; stty echo; echo \$HIDDEN_INPUT'", [
+                    $shell,
+                    Terminal::isShell('csh') ? 'set HIDDEN_INPUT = $<' : 'read -r HIDDEN_INPUT',
+                ])));
+                $output->writeln('');
+
+                return $value;
+            }
+        }
+
+        throw new RuntimeException('Unable to hide the response.');
     }
 
     /**
      * @param Question      $question
-     * @param \Closure|null $validator
+     * @param \Closure|null $validate
      * @param \Closure|null $normalizer
      * @param \Closure|null $configurator
+     * @param bool          $multipleChoice
      */
-    private function configureQuestion(Question $question, \Closure $validator = null, \Closure $normalizer = null, \Closure $configurator = null): void
+    private function configureQuestion(Question $question, ?\Closure $validate, ?\Closure $normalizer, ?\Closure $configurator, bool $multipleChoice): void
     {
-        if (null !== $validator) {
-            $question->setValidator($validator);
-        }
-
         if ($question instanceof ChoiceQuestion) {
-            $question->setValidator(function ($result) use ($question, $validator): AnswerInterface {
-                return ($validator ?? function ($answer) { return $answer; })(
-                    $this->validateChoiceResult($question, $result)
+            $question->setMultiselect($multipleChoice);
+            $validate = function (AnswerInterface $answer) use ($question, $validate, $multipleChoice): AnswerInterface {
+                return ($validate ?? function (AnswerInterface $answer): AnswerInterface { return $answer; })(
+                    $this->validateChoiceResult($question, $answer, $multipleChoice)
                 );
-            });
+            };
         }
 
-        if (null === $question->getValidator()) {
-            $question->setValidator(function (AnswerInterface $answer): AnswerInterface {
-                return $answer;
-            });
+        if (null !== $validate) {
+            $question->setValidator($validate);
         }
 
         if (null !== $normalizer) {
@@ -405,78 +575,195 @@ class QuestionHelper extends BaseQuestionHelper
         if (null !== $configurator) {
             $configurator($question);
         }
-    }
 
-    private function validateChoiceResult(ChoiceQuestion $question, AnswerInterface $answer)
-    {
-        $multiSelects = $this->resolvePrivateProperty('multiselect', null, $question);
-        $choiceValues = $question->getChoices();
-        $inputChoices = true === $multiSelects && 1 === preg_match('/^[^,]+(?:,[^,]+)*$/', $answer->stringifyAnswer(), $matches)
-            ? explode(',', preg_replace('{,\s+}', ',', $answer->stringifyAnswer()))
-            : [$answer->stringifyAnswer()];
-
-        $multiSelectChoices = [];
-
-        foreach ($inputChoices as $value) {
-            $choices = [];
-
-            foreach ($choiceValues as $choiceIndex => $choiceValue) {
-                if ($choiceValue === $value) {
-                    $choices[] = $choiceIndex;
-                }
-            }
-
-            if (count($choices) > 1) {
-                throw new InvalidArgumentException(
-                    'The provided answer is ambiguous. Value should be one of %s.', implode(' or ', $choices)
-                );
-            }
-
-            $choice = array_search($value, $choiceValues, true);
-
-            if (!self::isAssociativeArray($choiceValues)) {
-                if (false !== $choice) {
-                    $choice = $choiceValues[$choice];
-                } elseif (isset($choiceValues[$value])) {
-                    $choice = $choiceValues[$value];
-                }
-            } elseif (false === $choice && isset($choiceValues[$value])) {
-                $choice = $value;
-            }
-
-            if (false === $choice) {
-                if (empty($value)) {
-                    throw new InvalidArgumentException(
-                        'Invalid empty choice answer provided. Available choices: %s.', self::stringifyChoices($choiceValues)
-                    );
-                }
-                throw new InvalidArgumentException(
-                    'Invalid choice answer "%s" provided. Available choices: %s.', $value, self::stringifyChoices($choiceValues)
-                );
-            }
-
-            $multiSelectChoices[] = (string) $choice;
-        }
-
-        return true === $multiSelects
-            ? new MultipleChoiceAnswer($question, $multiSelectChoices, $answer->isDefault(), $answer->isInteractive())
-            : new ChoiceAnswer($question, current($multiSelectChoices), $answer->isDefault(), $answer->isInteractive());
     }
 
     /**
-     * @param array $choices
+     * @param array           $choices
+     * @param string|int|null $default
+     * @param bool            $multiChoice
+     *
+     * @return null|string|int
+     */
+    private static function resolveDefault(array $choices, $default = null, bool $multiChoice = false)
+    {
+        if (!$multiChoice) {
+            return self::resolveDefaultIndex($choices, $default);
+        }
+
+        return implode(',', array_filter(array_map(function ($d) use ($choices) {
+            return self::resolveDefaultIndex($choices, trim($d));
+        }, explode(',', $default)), function ($d): bool {
+            return null !== $d;
+        })) ?: null;
+    }
+
+    /**
+     * @param array           $choices
+     * @param string|int|null $default
+     *
+     * @return null|string|int
+     */
+    private static function resolveDefaultIndex(array $choices, $default = null)
+    {
+        if (null !== $default) {
+            if (isset(array_flip($choices)[$default])) {
+                return array_flip($choices)[$default];
+            }
+
+            if (isset($choices[$default]) && false !== $v = array_search($choices[$default], $choices)) {
+                return $v;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param AnswerInterface $answer
+     * @param bool            $multipleChoice
+     *
+     * @return array
+     */
+    private static function parseAnswerChoices(AnswerInterface $answer, bool $multipleChoice): array
+    {
+        if ($multipleChoice && 1 === preg_match('/^[^,]+(?:,[^,]+)*$/', $answer->stringifyAnswer(), $found)) {
+            return explode(',', preg_replace('{\s*,\s*}', ',', $answer->stringifyAnswer()));
+        }
+
+        return [$answer->stringifyAnswer()];
+    }
+
+    /**
+     * @param ChoiceQuestion  $question
+     * @param AnswerInterface $answer
+     * @param bool            $multipleChoice
+     *
+     * @return ChoiceAnswer|MultipleChoiceAnswer
+     */
+    private function validateChoiceResult(ChoiceQuestion $question, AnswerInterface $answer, bool $multipleChoice)
+    {
+        $availableChoices = $question->getChoices();
+        $validatedChoices = [];
+
+        foreach (self::parseAnswerChoices($answer, $multipleChoice) as $choice) {
+            $found = [];
+
+            foreach ($availableChoices as $index => $value) {
+                if ($choice === $index || $choice === $value) {
+                    $found[$index] = $value;
+                }
+            }
+
+            if (count($found) > 1) {
+                throw new InvalidArgumentException(
+                    'The provided answer is ambiguous. Value should be one of %s.', self::stringifyQuestionChoices($found)
+                );
+            }
+
+            if (!self::isAssociativeArray($availableChoices) && (int) $choice == $choice && isset($availableChoices[(int) $choice])) {
+                $found[(int) $choice] = $availableChoices[(int) $choice];
+            } elseif (isset($availableChoices[$choice])) {
+                $found[$choice] = $availableChoices[$choice];
+            }
+
+            if (count($found) === 0 && empty($choice)) {
+                throw new InvalidArgumentException(
+                    'Invalid empty choice answer provided. Available choices: %s.', self::stringifyQuestionChoices($question)
+                );
+            }
+
+            if (count($found) === 0) {
+                throw new InvalidArgumentException(
+                    'Invalid choice answer "%s" provided. Available choices: %s.', $choice, self::stringifyQuestionChoices($question)
+                );
+            }
+
+            foreach ($found as $index => $value) {
+                $validatedChoices[$index] = $value;
+            }
+        }
+
+        return $multipleChoice
+            ? self::createMultipleChoiceAnswer($question, $answer, $validatedChoices)
+            : self::createSingularChoiceAnswer($question, $answer, $validatedChoices);
+    }
+
+    /**
+     * @param Question        $question
+     * @param AnswerInterface $answer
+     * @param array           $choices
+     *
+     * @return MultipleChoiceAnswer
+     */
+    private static function createMultipleChoiceAnswer(Question $question, AnswerInterface $answer, array $choices): MultipleChoiceAnswer
+    {
+        return new MultipleChoiceAnswer(
+            $question, $choices, $answer->isDefault(), $answer->isInteractive()
+        );
+    }
+
+    /**
+     * @param Question        $question
+     * @param AnswerInterface $answer
+     * @param array           $choices
+     *
+     * @return ChoiceAnswer
+     */
+    private static function createSingularChoiceAnswer(Question $question, AnswerInterface $answer, array $choices): ChoiceAnswer
+    {
+        return new ChoiceAnswer(
+            $question, current($choices), key($choices), $answer->isDefault(), $answer->isInteractive()
+        );
+    }
+
+    /**
+     * @param Question $question
+     *
+     * @return \Closure
+     */
+    private static function getQuestionValidationClosure(Question $question): \Closure
+    {
+        return $question->getValidator() ?? function ($answer) {
+            return $answer;
+        };
+    }
+
+    /**
+     * @param string $choices
+     *
+     * @return null|string
+     */
+    private static function extractLastAutoCompleteMultiChoiceInput(Question $question, string $choices): ?string
+    {
+        if (!$question instanceof ChoiceQuestion || !$question->isMultiselect()) {
+            return null;
+        }
+
+        $multiChoices = array_filter(array_map(function (string $c) {
+            return trim($c);
+        }, explode(',', $choices)), function (string $c) {
+            return !empty($c);
+        });
+
+        return array_pop($multiChoices);
+    }
+
+    /**
+     * @param ChoiceQuestion|array $choices
      *
      * @return string
      */
-    private static function stringifyChoices(array $choices): string
+    private static function stringifyQuestionChoices($choices): string
     {
-        $string = implode(', ', array_map(function ($value) use ($choices): string {
+        $choices = $choices instanceof ChoiceQuestion ? $choices->getChoices() : (array) $choices;
+        $strings = array_map(function ($value) use ($choices): string {
             return sprintf('"%s" or "%s"', $value, $choices[$value]);
-        }, array_keys($choices)));
+        }, array_keys($choices));
 
-        return count(explode(', ', $string)) > 2
-            ? preg_replace('{(.+".+?"), (.+?)$}', '\1, and \2', $string)
-            : preg_replace('{(.+".+?"), (.+?)$}', '\1 and \2', $string);
+        return count($strings) > 2
+            ? preg_replace('{(.+".+?"), (.+?)$}', '\1, and \2', implode(', ', $strings))
+            : preg_replace('{(.+".+?"), (.+?)$}', '\1 and \2', implode(', ', $strings));
     }
 
     /**
@@ -486,7 +773,7 @@ class QuestionHelper extends BaseQuestionHelper
     private function writeQuestionText(Question $question, OutputInterface $o): void
     {
         $o->writeln(self::formatQuestionPromptText($question, function (string $text, ...$replacements): string {
-            return vsprintf($text, array_map(function ($question) {
+            return vsprintf($text, array_map(function ($question): string {
                 return $question instanceof Question
                     ? OutputFormatter::escapeTrailingBackslash($question->getQuestion())
                     : OutputFormatter::escape($question);
@@ -507,20 +794,36 @@ class QuestionHelper extends BaseQuestionHelper
         }
 
         if ($question instanceof ConfirmationQuestion) {
-            return $formatter(' <info>%s (yes/no)</info> [<comment>%s</comment>]:', $question, $question->getDefault() ? 'yes' : 'no');
+            return $formatter(
+                ' <info>%s (yes/no)</info> [<comment>%s</comment>]:',
+                $question,
+                $question->getDefault() ? 'yes' : 'no'
+            );
         }
 
         if ($question instanceof ChoiceQuestion && $question->isMultiselect()) {
-            return $formatter(' <info>%s</info> [<comment>%s</comment>]:', $question, implode(', ', array_map(function ($value) use ($question) {
-                return $question->getChoices()[trim($value)];
-            }, explode(',', $question->getDefault()))));
+            return $formatter(
+                ' <info>%s</info> [%s]:',
+                $question,
+                implode(', ', array_map(function (string $choice) use ($question) {
+                    return sprintf('<comment>%s</comment>', $question->getChoices()[trim($choice)] ?? $choice);
+                }, explode(',', $question->getDefault())))
+            );
         }
 
         if ($question instanceof ChoiceQuestion) {
-            return $formatter(' <info>%s</info> [<comment>%s</comment>]:', $question, $question->getChoices()[$question->getDefault()]);
+            return $formatter(
+                ' <info>%s</info> [<comment>%s</comment>]:',
+                $question,
+                $question->getChoices()[$question->getDefault()] ?? $question->getDefault()
+            );
         }
 
-        return $formatter(' <info>%s</info> [<comment>%s</comment>]:', $question, $question->getDefault());
+        return $formatter(
+            ' <info>%s</info> [<comment>%s</comment>]:',
+            $question,
+            $question->getDefault()
+        );
     }
 
     /**
@@ -537,122 +840,18 @@ class QuestionHelper extends BaseQuestionHelper
     }
 
     /**
-     * Write pre-question output (handle prepending block).
-     */
-    private function writePriorQuestionOutput(): void
-    {
-        if ($this->getInput()->isInteractive()) {
-            $this->style->prependBlock();
-        }
-    }
-
-    /**
-     * Write post-question output (handle final newlines)
-     */
-    private function writeAfterQuestionOutput(): void
-    {
-        if ($this->getInput()->isInteractive()) {
-            $this->style->newLine();
-        }
-    }
-
-    /**
-     * @return OutputInterface
-     */
-    private function getOutput(): OutputInterface
-    {
-        return $this->style->getOutput();
-    }
-
-    /**
-     * @return InputInterface
-     */
-    private function getInput(): InputInterface
-    {
-        return $this->style->getInput();
-    }
-
-    /**
-     * @param resource $stream
-     */
-    private function setInputStream($stream): void
-    {
-        $this->assignPrivateProperty('inputStream', $stream);
-    }
-
-    /**
-     * @return resource
-     */
-    private function getInputStream()
-    {
-        return $this->resolvePrivateProperty('inputStream', STDIN);
-    }
-
-    /**
-     * @param null $object
-     *
-     * @return \ReflectionClass
-     */
-    private function resolveReflectionObject($object = null): \ReflectionClass
-    {
-        return null === $object ? $this->reflection : new \ReflectionObject($object);
-    }
-
-    /**
-     * @param string      $name
-     * @param mixed[]     ...$arguments
-     * @param object|null $object
-     *
-     * @return mixed
-     */
-    private function invokePrivateMethod(string $name, array $arguments = [], $object = null)
-    {
-        $method = $this->resolveReflectionObject($object)->getMethod($name);
-        $method->setAccessible(true);
-
-        return $method->invokeArgs($object ?? $this, $arguments);
-    }
-
-    /**
-     * @param string      $name
-     * @param mixed       $value
-     * @param object|null $object
-     */
-    private function assignPrivateProperty(string $name, $value, $object = null): void
-    {
-        $property = $this->resolveReflectionObject($object)->getProperty($name);
-        $property->setAccessible(true);
-        $property->setValue($object ?? $this, $value);
-    }
-
-    /**
-     * @param string      $name
-     * @param mixed|null  $default
-     * @param object|null $object
-     *
-     * @return mixed|null
-     */
-    private function resolvePrivateProperty(string $name, $default = null, $object = null)
-    {
-        $property = $this->resolveReflectionObject($object)->getProperty($name);
-        $property->setAccessible(true);
-
-        return $property->getValue($object ?? $this) ?? $default;
-    }
-
-    /**
      * @param Question   $question
-     * @param mixed|null $response
+     * @param mixed|null $answer
      * @param bool       $default
      * @param bool       $interactive
      *
      * @return AnswerInterface
      */
-    private static function createAnswer(Question $question, $response = null, bool $default = false, bool $interactive = true): AnswerInterface
+    private static function createAnswer(Question $question, $answer = null, bool $default = false, bool $interactive = true): AnswerInterface
     {
         return $question instanceof ConfirmationQuestion
-            ? new BooleanAnswer($question, $response, $default, $interactive)
-            : new ScalarAnswer($question, $response, $default, $interactive);
+            ? new BooleanAnswer($question, $answer, $default, $interactive)
+            : new StringAnswer($question, $answer, $default, $interactive);
     }
 
     /**

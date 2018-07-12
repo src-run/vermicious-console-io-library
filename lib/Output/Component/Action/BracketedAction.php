@@ -18,96 +18,142 @@ final class BracketedAction extends AbstractAction
 {
     /**
      * @param StyleInterface|null $style
-     * @param Markup|null         $actionDefMarkup
-     * @param \Closure|null       $actionFormatter
      * @param Markup|null         $prefixDefMarkup
      * @param \Closure|null       $prefixFormatter
+     * @param Markup|null         $actionDefMarkup
+     * @param \Closure|null       $actionFormatter
+     * @param Markup|null         $statusBeginDefMarkup
+     * @param \Closure|null       $statusBeginFormatter
+     * @param Markup|null         $statusInnerDefMarkup
+     * @param \Closure|null       $statusInnerFormatter
+     * @param string|null         $statusProgressCharacter
+     * @param Markup|null         $statusCloseDefMarkup
+     * @param \Closure|null       $statusCloseFormatter
      * @param Markup|null         $resultDefMarkup
      * @param \Closure|null       $resultFormatter
-     * @param Markup|null         $extrasDefMarkup
-     * @param \Closure|null       $extrasFormatter
+     * @param Markup|null         $extrasBeginDefMarkup
+     * @param \Closure|null       $extrasBeginFormatter
+     * @param Markup|null         $extrasInnerDefMarkup
+     * @param \Closure|null       $extrasInnerFormatter
+     * @param Markup|null         $extrasCloseDefMarkup
+     * @param \Closure|null       $extrasCloseFormatter
      */
     public function __construct(
-        StyleInterface $style = null,
-        Markup         $actionDefMarkup = null,
-        ?\Closure      $actionFormatter = null,
-        Markup         $prefixDefMarkup = null,
-        ?\Closure      $prefixFormatter = null,
-        Markup         $resultDefMarkup = null,
-        ?\Closure      $resultFormatter = null,
-        Markup         $extrasDefMarkup = null,
-        ?\Closure      $extrasFormatter = null
+        ?StyleInterface $style = null,
+        ?Markup         $prefixDefMarkup = null,
+        ?\Closure       $prefixFormatter = null,
+        ?Markup         $actionDefMarkup = null,
+        ?\Closure       $actionFormatter = null,
+        ?Markup         $statusBeginDefMarkup = null,
+        ?\Closure       $statusBeginFormatter = null,
+        ?Markup         $statusInnerDefMarkup = null,
+        ?\Closure       $statusInnerFormatter = null,
+        ?string         $statusProgressCharacter = null,
+        ?Markup         $statusCloseDefMarkup = null,
+        ?\Closure       $statusCloseFormatter = null,
+        ?Markup         $resultDefMarkup = null,
+        ?\Closure       $resultFormatter = null,
+        ?Markup         $extrasBeginDefMarkup = null,
+        ?\Closure       $extrasBeginFormatter = null,
+        ?Markup         $extrasInnerDefMarkup = null,
+        ?\Closure       $extrasInnerFormatter = null,
+        ?Markup         $extrasCloseDefMarkup = null,
+        ?\Closure       $extrasCloseFormatter = null
     ) {
         parent::__construct(
             $style,
+            $prefixDefMarkup ?? Markup::createExplicit(),
+            $prefixFormatter ?? function (Markup $markup, string $prefix): string {
+                return $markup(sprintf('%s ', Markup::createExplicit()($prefix)));
+            },
             $actionDefMarkup ?? Markup::createExplicit(),
             $actionFormatter ?? function (Markup $markup, string $action): string {
-                return $markup(sprintf(' %s ... ', Markup::createExplicit()(sprintf('[ %s ]', $action))));
+                return Markup::createExplicit()(sprintf('%s ... ', $markup(sprintf('[ %s ]', $action))));
             },
-            $prefixDefMarkup ?? Markup::createExplicit('white', null, Markup::O_BOLD),
-            $prefixFormatter ?? function (Markup $markup, string $prefix): string {
-                return $markup(sprintf('(%s) ', $prefix));
+            $statusBeginDefMarkup ?? Markup::createExplicit(Markup::C_BLACK, null, Markup::O_BOLD),
+            $statusBeginFormatter ?? function (Markup $markup): string {
+                return $markup('(');
             },
-            $resultDefMarkup ?? Markup::createExplicit('black', 'white'),
+            $statusInnerDefMarkup ?? Markup::createExplicit(Markup::C_BLACK, null, Markup::O_BOLD),
+            $statusInnerFormatter ?? function (Markup $markup, string $character): string {
+                return $markup($character);
+            },
+            $statusProgressCharacter,
+            $statusCloseDefMarkup ?? Markup::createExplicit(Markup::C_BLACK, null, Markup::O_BOLD),
+            $statusCloseFormatter ?? function (Markup $markup): string {
+                return $markup(')');
+            },
+            $resultDefMarkup ?? Markup::createExplicit(Markup::C_BLACK, Markup::C_WHITE),
             $resultFormatter ?? function (Markup $markup, string $result): string {
                 return $markup(sprintf(' %s ', mb_strtoupper($result)));
             },
-            $extrasDefMarkup ?? Markup::createExplicit('black', 'white', Markup::O_BOLD, Markup::O_REVERSE),
-            $extrasFormatter ?? function (Markup $markup, string ...$extras): string {
-                return implode(' ', array_map(function ($extra) use ($markup) {
-                    return $markup(sprintf('(%s)', $extra));
-                }, $extras));
+            $extrasBeginDefMarkup ?? Markup::createExplicit(Markup::C_BLACK, null, Markup::O_BOLD),
+            $extrasBeginFormatter ?? function (Markup $markup): string {
+                return $markup('(');
+            },
+            $extrasInnerDefMarkup ?? Markup::createExplicit(Markup::C_BLACK, null, Markup::O_BOLD),
+            $extrasInnerFormatter ?? function (Markup $markup, string $character): string {
+                return $markup($character);
+            },
+            $extrasCloseDefMarkup ?? Markup::createExplicit(Markup::C_BLACK, null, Markup::O_BOLD),
+            $extrasCloseFormatter ?? function (Markup $markup): string {
+                return $markup(')');
             }
         );
     }
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return AbstractAction
      */
-    public function resultDone(string $result = 'done'): AbstractAction
+    public function resultDone(string $result = null, bool $supportExtras = null): AbstractAction
     {
-        return $this->result($result, new Markup(Markup::C_WHITE, Markup::C_BLACK));
+        return $this->result($result ?? 'done', $supportExtras, new Markup(Markup::C_WHITE, Markup::C_BLACK));
     }
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return AbstractAction
      */
-    public function resultOkay(string $result = 'okay'): AbstractAction
+    public function resultOkay(string $result = null, bool $supportExtras = null): AbstractAction
     {
-        return $this->result($result, new Markup(Markup::C_BLACK, Markup::C_GREEN));
+        return $this->result($result ?? 'okay', $supportExtras, new Markup(Markup::C_BLACK, Markup::C_GREEN));
     }
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return AbstractAction
      */
-    public function resultWarn(string $result = 'warn'): AbstractAction
+    public function resultWarn(string $result = null, bool $supportExtras = null): AbstractAction
     {
-        return $this->result($result, new Markup(Markup::C_BLACK, Markup::C_YELLOW));
+        return $this->result($result ?? 'warn', $supportExtras, new Markup(Markup::C_BLACK, Markup::C_YELLOW));
     }
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return AbstractAction
      */
-    public function resultStop(string $result = 'stop'): AbstractAction
+    public function resultStop(string $result = null, bool $supportExtras = null): AbstractAction
     {
-        return $this->resultWarn($result);
+        return $this->resultWarn($result ?? 'stop', $supportExtras);
     }
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return AbstractAction
      */
-    public function resultFail(string $result = 'fail'): AbstractAction
+    public function resultFail(string $result = null, bool $supportExtras = null): AbstractAction
     {
-        return $this->result($result, new Markup(Markup::C_WHITE, Markup::C_RED, Markup::O_BOLD));
+        return $this->result($result ?? 'fail', $supportExtras, new Markup(Markup::C_WHITE, Markup::C_RED, Markup::O_BOLD));
     }
 }

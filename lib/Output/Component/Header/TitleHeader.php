@@ -40,11 +40,11 @@ class TitleHeader
             $title,
         ])];
 
-        $this->style->prependBlock();
-        $this->style->separator();
-        $this->style->writeln($lines);
-        $this->style->separator();
-        $this->style->newline();
+        $this->style()->prependBlock();
+        $this->style()->separator();
+        $this->style()->writeln($lines);
+        $this->style()->separator();
+        $this->style()->newline();
 
         return $this;
     }
@@ -57,10 +57,10 @@ class TitleHeader
      */
     public function applicationTitle(Application $application, ...$properties): self
     {
-        $this->style->prependBlock();
-        $this->style->separator();
-        $this->style->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
-        $this->style->writeln([vsprintf('%s <em>%s (%s) %s</em>', [
+        $this->style()->prependBlock();
+        $this->style()->separator();
+        $this->style()->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
+        $this->style()->writeln([vsprintf('%s <em>%s (%s) %s</em>', [
             (new Markup('black', null, 'bold'))->markupValue('-'),
             $application->getName(),
             $this->getApplicationVersion($application),
@@ -68,13 +68,13 @@ class TitleHeader
         ])]);
 
         if (0 < count($properties = $this->compileApplicationProps($application, $properties))) {
-            $this->style->separator(1);
-            $this->style->writeln($properties);
+            $this->style()->separator(1);
+            $this->style()->writeln($properties);
         }
 
-        $this->style->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
-        $this->style->separator();
-        $this->style->newline();
+        $this->style()->environment(StyleInterface::VERBOSITY_VERBOSE)->separator(1);
+        $this->style()->separator();
+        $this->style()->newline();
 
         return $this;
     }
@@ -95,7 +95,7 @@ class TitleHeader
             array_walk($properties, function (&$prop, $name) use ($len) {
                 $prop = vsprintf('%s %s %s', [
                     (new Markup('black', null, 'bold'))->markupValue('-'),
-                    $this->style->pad('@'.$name, $len + 1, ' ', STR_PAD_RIGHT),
+                    $this->style()->pad('@'.$name, $len + 1, ' ', STR_PAD_RIGHT),
                     $prop,
                 ]);
             });
@@ -184,10 +184,8 @@ class TitleHeader
      */
     private function getApplicationVersion(Application $application): string
     {
-        if (null !== $version = $application->getVersion()) {
-            return 'v' === mb_substr($version, 0, 1) ? $version : sprintf('v%s', $version);
-        }
-
-        return 'master';
+        return null !== ($version = $application->getVersion())
+            ? 'v' === mb_substr($version, 0, 1) ? $version : sprintf('v%s', $version)
+            : 'master';
     }
 }

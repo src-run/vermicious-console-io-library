@@ -13,7 +13,7 @@ namespace SR\Console\Input\Component\Question\Answer;
 
 use Symfony\Component\Console\Question\Question;
 
-class BooleanAnswer implements AnswerInterface
+class StringAnswer implements AnswerInterface
 {
     use AnswerTrait;
 
@@ -32,9 +32,9 @@ class BooleanAnswer implements AnswerInterface
     }
 
     /**
-     * @return null|bool
+     * @return null|string
      */
-    public function getAnswer(): ?bool
+    public function getAnswer(): ?string
     {
         return $this->result;
     }
@@ -44,22 +44,14 @@ class BooleanAnswer implements AnswerInterface
      */
     public function stringifyAnswer(): string
     {
-        return $this->getAnswer() ? 'true' : 'false';
+        return (string) ($this->getAnswer() ?? '');
     }
 
     /**
-     * @return bool
+     * @return int
      */
-    public function isTrue(): bool
+    public function length(): int
     {
-        return true === $this->getAnswer();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isFalse(): bool
-    {
-        return false === $this->getAnswer();
+        return mb_strlen($this->getAnswer());
     }
 }

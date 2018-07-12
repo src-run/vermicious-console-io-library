@@ -34,11 +34,11 @@ class SectionHeader
      */
     public function section(string $section): self
     {
-        $this->style->prependBlock();
-        $this->style->writeln([
+        $this->style()->prependBlock();
+        $this->style()->writeln([
             $this->compileSection($section, 'white', 'magenta'),
         ]);
-        $this->style->newline();
+        $this->style()->newline();
 
         return $this;
     }
@@ -50,11 +50,11 @@ class SectionHeader
      */
     public function subSection(string $section): self
     {
-        $this->style->prependBlock();
-        $this->style->writeln([
+        $this->style()->prependBlock();
+        $this->style()->writeln([
             $this->compileSection($section, 'white', 'blue'),
         ]);
-        $this->style->newline();
+        $this->style()->newline();
 
         return $this;
     }
@@ -69,12 +69,12 @@ class SectionHeader
      */
     public function enumeratedSection(string $section, int $iteration, int $size = null, string $type = null): self
     {
-        $this->style->prependBlock();
-        $this->style->writeln([
+        $this->style()->prependBlock();
+        $this->style()->writeln([
             $this->compileEnumeratedString($iteration, $size, $type),
             sprintf(' # %s', $section),
         ]);
-        $this->style->newline();
+        $this->style()->newline();
 
         return $this;
     }
@@ -107,7 +107,7 @@ class SectionHeader
     private function compileSection(string $section, string $fg = null, string $bg = null): string
     {
         return (new Markup($fg, $bg))->markupValue(
-            $this->style->padByTermWidth(sprintf('[ %s ]', mb_strtoupper($section)))
+            $this->style()->padByTermWidth(sprintf('[ %s ]', mb_strtoupper($section)))
         );
     }
 }

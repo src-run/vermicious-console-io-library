@@ -14,19 +14,24 @@ namespace SR\Console\Input\Component\Question\Answer;
 use SR\Console\Output\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Question\Question;
 
-class MultipleChoiceAnswer extends AbstractAnswer
+class MultipleChoiceAnswer implements AnswerInterface, \Countable
 {
+    use AnswerTrait;
+
     /**
-     * @param Question $question
-     * @param string[] $choices
-     * @param bool     $default
-     * @param bool     $interactive
+     * @param Question   $question
+     * @param mixed|null $choices
+     * @param bool       $default
+     * @param bool       $interactive
      */
     public function __construct(Question $question, array $choices = [], bool $default = false, bool $interactive = true)
     {
-        parent::__construct(
-            $question, self::hydrateChoiceAnswers($choices, $question, $default, $interactive), $default, $interactive
-        );
+        $this->question = $question;
+        $this->default = $default;
+        $this->interactive = $interactive;
+        $this->result = array_map(function (string $index) use ($choices, $question, $default, $interactive): ChoiceAnswer {
+            return new ChoiceAnswer($question, $choices[$index], $index, $default, $interactive);
+        }, array_keys($choices));
     }
 
     /**
@@ -34,8 +39,8 @@ class MultipleChoiceAnswer extends AbstractAnswer
      */
     public function stringifyAnswer(): string
     {
-        return implode(',', array_map(function (ChoiceAnswer $answer): string {
-            return sprintf('"%s"', $answer->stringifyAnswer());
+        return implode(',', array_map(function (ChoiceAnswer $a): string {
+            return sprintf('"%s"', $a->stringifyAnswer());
         }, $this->getAnswer()));
     }
 
@@ -44,7 +49,7 @@ class MultipleChoiceAnswer extends AbstractAnswer
      */
     public function getAnswer(): array
     {
-        return parent::getAnswer() ?? [];
+        return $this->result ?? [];
     }
 
     /**
@@ -58,47 +63,36 @@ class MultipleChoiceAnswer extends AbstractAnswer
     }
 
     /**
-     * @param string $search
+     * @param string|\Closure $search
      *
-     * @return null|AnswerInterface
+     * @return null|AnswerInterface|ChoiceAnswer
      */
-    public function findAnswer(string $search): ?AnswerInterface
+    public function findAnswer($search): ?ChoiceAnswer
     {
-        $answers = $this->getAnswer();
-
-        array_filter($answers, function (ChoiceAnswer $answer) use ($search): bool {
-            return $answer->getAnswer() === $search || $answer->getIndex() === $search;
-        });
-
-        if (count($answers) > 1) {
+        if (count($answers = $this->filterAnswers($search)) > 1) {
             throw new InvalidArgumentException('Search was ambiguous and returned %d results.', count($answers));
         }
 
-        return $answers[0] ?? null;
+        return array_shift($answers) ?? null;
+    }
+
+    /**
+     * @param string|\Closure $search
+     *
+     * @return AnswerInterface[]|ChoiceAnswer[]
+     */
+    public function filterAnswers($search): array
+    {
+        return array_filter($this->getAnswer(), $search instanceof \Closure ? $search : function (ChoiceAnswer $a) use ($search) {
+            return $a->getAnswer() === $search || $a->getIndex() === $search;
+        });
     }
 
     /**
      * @return int
      */
-    public function countAnswers(): int
+    public function count(): int
     {
         return count($this->getAnswer());
-    }
-
-    /**
-     * @param array    $choices
-     * @param Question $question
-     * @param bool     $default
-     * @param bool     $interactive
-     *
-     * @return array
-     */
-    private static function hydrateChoiceAnswers(array $choices, Question $question, bool $default, bool $interactive): array
-    {
-        array_walk($choices, function (&$choice, $index) use ($question, $default, $interactive) {
-            $choice = new ChoiceAnswer($question, $choice, $index, $default, $interactive);
-        });
-
-        return $choices;
     }
 }

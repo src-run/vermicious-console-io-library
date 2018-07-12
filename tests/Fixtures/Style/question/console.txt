@@ -9,4 +9,10 @@
  Select your preferred fruit:
   [0] apple
   [1] orange
-{ > .+}
+{ > [a-z]+}
+
+
+ Select your favorite fruit:
+  [0] apple
+  [1] orange
+{ > [0-9]+}

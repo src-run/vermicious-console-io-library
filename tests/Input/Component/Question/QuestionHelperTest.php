@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace SR\Console\Tests\Output\Component\Progress;
+namespace SR\Console\Tests\Input\Component\Question;
 
 use PHPUnit\Framework\TestCase;
 use SR\Console\Input\Component\Question\QuestionHelper;
@@ -17,11 +17,11 @@ use SR\Console\Tests\Input\MemoryInput;
 use SR\Console\Tests\Style\StyleTest;
 
 /**
- * @covers \SR\Console\Input\Component\Question\Answer\AbstractAnswer
+ * @covers \SR\Console\Input\Component\Question\Answer\AnswerTrait
  * @covers \SR\Console\Input\Component\Question\Answer\BooleanAnswer
  * @covers \SR\Console\Input\Component\Question\Answer\ChoiceAnswer
  * @covers \SR\Console\Input\Component\Question\Answer\MultipleChoiceAnswer
- * @covers \SR\Console\Input\Component\Question\Answer\ScalarAnswer
+ * @covers \SR\Console\Input\Component\Question\Answer\StringAnswer
  * @covers \SR\Console\Input\Component\Question\QuestionHelper
  */
 class QuestionHelperTest extends TestCase

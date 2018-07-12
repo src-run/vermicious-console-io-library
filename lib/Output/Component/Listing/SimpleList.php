@@ -62,7 +62,7 @@ final class SimpleList
      */
     public function listingStart(): self
     {
-        $this->style->prependText();
+        $this->style()->prependText();
         $this->listingPrepended = true;
         $this->listingAppended = false;
 
@@ -74,7 +74,7 @@ final class SimpleList
      */
     public function listingClose(): self
     {
-        $this->style->newline();
+        $this->style()->newline();
         $this->listingPrepended = false;
         $this->listingAppended = true;
 
@@ -123,7 +123,7 @@ final class SimpleList
      */
     private function writeListLines(array $lines): self
     {
-        $this->style->writeln(array_map($this->lineFormatter, $lines));
+        $this->style()->writeln(array_map($this->lineFormatter, $lines));
 
         return $this;
     }

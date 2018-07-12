@@ -13,6 +13,9 @@ namespace SR\Console\Output\Style;
 
 use SR\Console\Input\Component\Question\Answer\AnswerInterface;
 use SR\Console\Input\Component\Question\Answer\BooleanAnswer;
+use SR\Console\Input\Component\Question\Answer\ChoiceAnswer;
+use SR\Console\Input\Component\Question\Answer\MultipleChoiceAnswer;
+use SR\Console\Input\Component\Question\Answer\StringAnswer;
 use SR\Console\Output\Component\Action\AbstractAction;
 use SR\Console\Output\Component\Block\Block;
 use SR\Console\Output\Markup\Markup;
@@ -283,12 +286,14 @@ interface StyleInterface extends OutputInterface
     public function critical($lines, array $replacements = [], int $type = Block::TYPE_LG, string $header = 'CRITICAL'): self;
 
     /**
-     * @param string $action
-     * @param string $type
+     * @param string|null $actionText
+     * @param string|null $prefixText
+     * @param string|null $type
+     * @param mixed       $typeArguments
      *
      * @return AbstractAction
      */
-    public function action(string $action = null, string $type = null): AbstractAction;
+    public function action(string $actionText = null, string $prefixText = null, string $type = null, array $typeArguments = []): AbstractAction;
 
     /**
      * @param array $headers
@@ -312,9 +317,9 @@ interface StyleInterface extends OutputInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|StringAnswer
      */
-    public function ask(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface;
+    public function ask(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): StringAnswer;
 
     /**
      * @param string        $question
@@ -322,9 +327,9 @@ interface StyleInterface extends OutputInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|StringAnswer
      */
-    public function askHidden(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface;
+    public function askHidden(string $question, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): StringAnswer;
 
     /**
      * @param string        $question
@@ -332,7 +337,7 @@ interface StyleInterface extends OutputInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return BooleanAnswer
+     * @return AnswerInterface|BooleanAnswer
      */
     public function confirm(string $question, bool $default = true, \Closure $validator = null, \Closure $sanitizer = null): BooleanAnswer;
 
@@ -343,9 +348,9 @@ interface StyleInterface extends OutputInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|ChoiceAnswer
      */
-    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface;
+    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ChoiceAnswer;
 
     /**
      * @param string        $question
@@ -354,9 +359,20 @@ interface StyleInterface extends OutputInterface
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
      *
-     * @return AnswerInterface
+     * @return AnswerInterface|ChoiceAnswer
      */
-    public function multipleChoice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): AnswerInterface;
+    public function hiddenChoice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ChoiceAnswer;
+
+    /**
+     * @param string        $question
+     * @param array         $choices
+     * @param string|null   $default
+     * @param \Closure|null $validator
+     * @param \Closure|null $sanitizer
+     *
+     * @return AnswerInterface|MultipleChoiceAnswer
+     */
+    public function multipleChoice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): MultipleChoiceAnswer;
 
     /**
      * @param int|null $steps

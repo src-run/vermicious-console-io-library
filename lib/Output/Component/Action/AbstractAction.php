@@ -11,45 +11,33 @@
 
 namespace SR\Console\Output\Component\Action;
 
-use SR\Console\Output\Exception\InvalidArgumentException;
+use SR\Console\Output\Component\Action\Style\Extras\ExtrasText;
+use SR\Console\Output\Component\Action\Style\Status\StatusProgress;
+use SR\Console\Output\Component\Action\Style\Status\StatusText;
 use SR\Console\Output\Exception\RuntimeException;
 use SR\Console\Output\Markup\Markup;
 use SR\Console\Output\Style\StyleAwareExternalTrait;
 use SR\Console\Output\Style\StyleInterface;
+use SR\Console\Output\Utility\State\State;
 
-abstract class AbstractAction
+abstract class AbstractAction implements ActionStates
 {
     use StyleAwareExternalTrait;
 
     /**
-     * @var string
+     * @var State
      */
-    private const STATE_INACTIVE = 'inactive';
+    private $state;
 
     /**
-     * @var string
+     * @var \Closure
      */
-    private const STATE_ACTION = 'action';
+    private $prefixFormatter;
 
     /**
-     * @var string
+     * @var Markup
      */
-    private const STATE_PREFIX = 'prefix';
-
-    /**
-     * @var string
-     */
-    private const STATE_RESULT = 'result';
-
-    /**
-     * @var string
-     */
-    private const STATE_EXTRAS = 'extras';
-
-    /**
-     * @var string
-     */
-    private $state = self::STATE_INACTIVE;
+    private $prefixDefMarkup;
 
     /**
      * @var \Closure|null
@@ -62,17 +50,42 @@ abstract class AbstractAction
     private $actionDefMarkup;
 
     /**
-     * @var \Closure|null
+     * @var \Closure
      */
-    private $prefixFormatter;
+    private $statusBeginFormatter;
 
     /**
      * @var Markup
      */
-    private $prefixDefMarkup;
+    private $statusBeginDefMarkup;
 
     /**
-     * @var \Closure|null
+     * @var \Closure
+     */
+    private $statusInnerFormatter;
+
+    /**
+     * @var Markup
+     */
+    private $statusInnerDefMarkup;
+
+    /**
+     * @var \Closure
+     */
+    private $statusCloseFormatter;
+
+    /**
+     * @var Markup
+     */
+    private $statusCloseDefMarkup;
+
+    /**
+     * @var string
+     */
+    private $statusProgressCharacter;
+
+    /**
+     * @var \Closure
      */
     private $resultFormatter;
 
@@ -82,14 +95,34 @@ abstract class AbstractAction
     private $resultDefMarkup;
 
     /**
-     * @var \Closure|null
+     * @var \Closure
      */
-    private $extrasFormatter;
+    private $extrasBeginFormatter;
 
     /**
      * @var Markup
      */
-    private $extrasDefMarkup;
+    private $extrasBeginDefMarkup;
+
+    /**
+     * @var \Closure
+     */
+    private $extrasInnerFormatter;
+
+    /**
+     * @var Markup
+     */
+    private $extrasInnerDefMarkup;
+
+    /**
+     * @var \Closure
+     */
+    private $extrasCloseFormatter;
+
+    /**
+     * @var Markup
+     */
+    private $extrasCloseDefMarkup;
 
     /**
      * @var bool
@@ -103,53 +136,81 @@ abstract class AbstractAction
 
     /**
      * @param StyleInterface|null $style
-     * @param Markup|null         $actionDefMarkup
-     * @param \Closure|null       $actionFormatter
      * @param Markup|null         $prefixDefMarkup
      * @param \Closure|null       $prefixFormatter
+     * @param Markup|null         $actionDefMarkup
+     * @param \Closure|null       $actionFormatter
+     * @param Markup|null         $statusBeginDefMarkup
+     * @param \Closure|null       $statusBeginFormatter
+     * @param Markup|null         $statusInnerDefMarkup
+     * @param \Closure|null       $statusInnerFormatter
+     * @param string|null         $statusProgressCharacter
+     * @param Markup|null         $statusCloseDefMarkup
+     * @param \Closure|null       $statusCloseFormatter
      * @param Markup|null         $resultDefMarkup
      * @param \Closure|null       $resultFormatter
-     * @param Markup|null         $extrasDefMarkup
-     * @param \Closure|null       $extrasFormatter
+     * @param Markup|null         $extrasBeginDefMarkup
+     * @param \Closure|null       $extrasBeginFormatter
+     * @param Markup|null         $extrasInnerDefMarkup
+     * @param \Closure|null       $extrasInnerFormatter
+     * @param Markup|null         $extrasCloseDefMarkup
+     * @param \Closure|null       $extrasCloseFormatter
      */
     public function __construct(
-        StyleInterface $style = null,
-        Markup         $actionDefMarkup = null,
-        ?\Closure      $actionFormatter = null,
-        Markup         $prefixDefMarkup = null,
-        ?\Closure      $prefixFormatter = null,
-        Markup         $resultDefMarkup = null,
-        ?\Closure      $resultFormatter = null,
-        Markup         $extrasDefMarkup = null,
-        ?\Closure      $extrasFormatter = null
+        ?StyleInterface $style = null,
+        ?Markup         $prefixDefMarkup = null,
+        ?\Closure       $prefixFormatter = null,
+        ?Markup         $actionDefMarkup = null,
+        ?\Closure       $actionFormatter = null,
+        ?Markup         $statusBeginDefMarkup = null,
+        ?\Closure       $statusBeginFormatter = null,
+        ?Markup         $statusInnerDefMarkup = null,
+        ?\Closure       $statusInnerFormatter = null,
+        ?string         $statusProgressCharacter = null,
+        ?Markup         $statusCloseDefMarkup = null,
+        ?\Closure       $statusCloseFormatter = null,
+        ?Markup         $resultDefMarkup = null,
+        ?\Closure       $resultFormatter = null,
+        ?Markup         $extrasBeginDefMarkup = null,
+        ?\Closure       $extrasBeginFormatter = null,
+        ?Markup         $extrasInnerDefMarkup = null,
+        ?\Closure       $extrasInnerFormatter = null,
+        ?Markup         $extrasCloseDefMarkup = null,
+        ?\Closure       $extrasCloseFormatter = null
     ) {
-        $this->setStyle($style);
-        $this->actionDefMarkup = $actionDefMarkup ?? Markup::createExplicit();
-        $this->actionFormatter = $actionFormatter;
+        $this->state = new State(self::STATE_INACTIVE);
         $this->prefixDefMarkup = $prefixDefMarkup ?? Markup::createExplicit();
         $this->prefixFormatter = $prefixFormatter;
+        $this->actionDefMarkup = $actionDefMarkup ?? Markup::createExplicit();
+        $this->actionFormatter = $actionFormatter;
+        $this->statusBeginDefMarkup = $statusBeginDefMarkup ?? Markup::createExplicit();
+        $this->statusBeginFormatter = $statusBeginFormatter;
+        $this->statusInnerDefMarkup = $statusInnerDefMarkup ?? Markup::createExplicit();
+        $this->statusInnerFormatter = $statusInnerFormatter;
+        $this->statusProgressCharacter = $statusProgressCharacter;
+        $this->statusCloseDefMarkup = $statusCloseDefMarkup ?? Markup::createExplicit();
+        $this->statusCloseFormatter = $statusCloseFormatter;
         $this->resultDefMarkup = $resultDefMarkup ?? Markup::createExplicit();
         $this->resultFormatter = $resultFormatter;
-        $this->extrasDefMarkup = $extrasDefMarkup ?? Markup::createExplicit();
-        $this->extrasFormatter = $extrasFormatter;
+        $this->extrasBeginDefMarkup = $extrasBeginDefMarkup ?? Markup::createExplicit();
+        $this->extrasBeginFormatter = $extrasBeginFormatter;
+        $this->extrasInnerDefMarkup = $extrasInnerDefMarkup ?? Markup::createExplicit();
+        $this->extrasInnerFormatter = $extrasInnerFormatter;
+        $this->extrasCloseDefMarkup = $extrasCloseDefMarkup ?? Markup::createExplicit();
+        $this->extrasCloseFormatter = $extrasCloseFormatter;
 
-        $this->setNewlinesCount();
-        $this->setSupportExtras();
+        $this
+            ->setNewlinesCount()
+            ->setSupportExtras()
+            ->setStyle($style);
     }
 
     /**
-     * @param string|null $type
-     * @param array       ...$constructorArguments
-     *
-     * @return AbstractAction
+     * @return State
      */
-    public static function createActionType(string $type = null, ...$constructorArguments): self
+    public function getState(): State
     {
-        if (class_exists($class = sprintf('%s\%sActionHelper', __NAMESPACE__, ucfirst($type ?? '')))) {
-            return new $class(...$constructorArguments);
-        }
-
-        throw new InvalidArgumentException('Unable to find action helper of type "%s".', $type ?? 'default');
+        return $this->state;
     }
 
     /**
@@ -159,8 +220,21 @@ abstract class AbstractAction
      */
     public function setNewlinesCount(int $newlinesCount = null): self
     {
-        $this->requireState(__METHOD__, self::STATE_INACTIVE, self::STATE_ACTION);
-        $this->finalNewlines = $newlinesCount ?? 2;
+        $this->state->stateRequireRunAndSetAction(
+            __METHOD__,
+            function () use ($newlinesCount) {
+                $this->finalNewlines = $newlinesCount ?? 2;
+            },
+            [
+                self::STATE_INACTIVE,
+                self::STATE_PREFIX,
+                self::STATE_ACTION,
+                self::STATE_STATUS_TEXT_ACTIVE,
+                self::STATE_STATUS_TEXT_INACTIVE,
+                self::STATE_STATUS_PROGRESS_ACTIVE,
+                self::STATE_STATUS_PROGRESS_INACTIVE,
+            ]
+        );
 
         return $this;
     }
@@ -172,8 +246,68 @@ abstract class AbstractAction
      */
     public function setSupportExtras(bool $supportExtras = null): self
     {
-        $this->requireState(__METHOD__, self::STATE_INACTIVE, self::STATE_ACTION);
-        $this->supportExtras = $supportExtras ?? false;
+        $this->state->stateRequireRunAndSetAction(
+            __METHOD__,
+            function () use ($supportExtras) {
+                $this->supportExtras = $supportExtras ?? false;
+            },
+            [
+                self::STATE_INACTIVE,
+                self::STATE_PREFIX,
+                self::STATE_ACTION,
+                self::STATE_STATUS_TEXT_ACTIVE,
+                self::STATE_STATUS_TEXT_INACTIVE,
+                self::STATE_STATUS_PROGRESS_ACTIVE,
+                self::STATE_STATUS_PROGRESS_INACTIVE,
+            ]
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param string $character
+     *
+     * @return self
+     */
+    public function setStatusProgressCharacter(string $character): self
+    {
+        $this->state->stateRequireRunAndSetAction(
+            __METHOD__,
+            function () use ($character) {
+                $this->statusProgressCharacter = $character;
+            },
+            [
+                self::STATE_INACTIVE,
+                self::STATE_PREFIX,
+                self::STATE_ACTION,
+                self::STATE_STATUS_TEXT_ACTIVE,
+                self::STATE_STATUS_TEXT_INACTIVE,
+                self::STATE_STATUS_PROGRESS_INACTIVE,
+            ]
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $prefix
+     * @param Markup      $markup
+     *
+     * @return self
+     */
+    public function prefix(string $prefix = null, Markup $markup = null): self
+    {
+        $this->state->stateRequireRunAndSetAction(
+            __METHOD__,
+            function () use ($prefix, $markup) {
+                $this->style()->prependText()->write(
+                    ($this->prefixFormatter)($markup ?? $this->prefixDefMarkup, $prefix ?? '')
+                );
+            },
+            self::STATE_INACTIVE,
+            self::STATE_PREFIX
+        );
 
         return $this;
     }
@@ -186,36 +320,104 @@ abstract class AbstractAction
      */
     public function action(string $action, Markup $markup = null): self
     {
-        return $this->invokeStateful(__METHOD__, function () use ($action, $markup) {
-            $this->style->prependText();
-            $this->style->write(($this->actionFormatter)($markup ?? $this->actionDefMarkup, $action));
-        }, self::STATE_ACTION, self::STATE_INACTIVE);
+        if ($this->state->isState(self::STATE_INACTIVE)) {
+            $this->prefix();
+        }
+
+        $this->state->stateRequireRunAndSetAction(
+            __METHOD__,
+            function () use ($action, $markup) {
+                $this->style()->write(
+                    ($this->actionFormatter)($markup ?? $this->actionDefMarkup, $action)
+                );
+            },
+            self::STATE_PREFIX,
+            self::STATE_ACTION
+        );
+
+        return $this;
     }
 
     /**
-     * @param string      $prefix
-     * @param Markup|null $markup
+     * @param string|null $status
+     * @param bool        $end
      *
-     * @return self
+     * @return StatusText
      */
-    public function resultPrefix(string $prefix, Markup $markup = null): self
+    public function statusText(string $status = null, bool $end = false): StatusText
     {
-        return $this->invokeStateful(__METHOD__, function () use ($prefix, $markup) {
-            $this->style->write(($this->prefixFormatter)($markup ?? $this->prefixDefMarkup, $prefix));
-        }, self::STATE_PREFIX, [self::STATE_ACTION]);
+        $this->state->stateRequirements(__METHOD__, self::STATE_ACTION, self::STATE_STATUS_TEXT_ACTIVE);
+
+        $s = new StatusText(
+            $this->style(),
+            $this,
+            $this->statusBeginDefMarkup,
+            $this->statusBeginFormatter,
+            $this->statusInnerDefMarkup,
+            $this->statusInnerFormatter,
+            $this->statusCloseDefMarkup,
+            $this->statusCloseFormatter
+        );
+
+        if (null !== $status) {
+            $s->text($status);
+        }
+
+        return $s;
     }
 
     /**
-     * @param string $result
-     * @param Markup $markup
+     * @param int|null    $steps
+     * @param int         $progress
+     * @param string|null $character
+     *
+     * @return StatusProgress
+     */
+    public function statusProgress(int $steps = null, int $progress = 0, string $character = null): StatusProgress
+    {
+        $p = new StatusProgress(
+            $this->style(),
+            $this,
+            $this->statusBeginDefMarkup,
+            $this->statusBeginFormatter,
+            $this->statusInnerDefMarkup,
+            $this->statusInnerFormatter,
+            $this->statusCloseDefMarkup,
+            $this->statusCloseFormatter,
+            $steps,
+            $character ?? $this->statusProgressCharacter
+        );
+
+        return 0 < $progress ? $p->progress($progress) : $p;
+    }
+
+    /**
+     * @param string    $result
+     * @param bool|null $supportExtras
+     * @param Markup    $markup
      *
      * @return self
      */
-    public function result(string $result, Markup $markup = null): self
+    public function result(string $result, bool $supportExtras = null, Markup $markup = null): self
     {
-        $this->invokeStateful(__METHOD__, function () use ($markup, $result) {
-            $this->style->write(($this->resultFormatter)($markup ?? $this->resultDefMarkup, $result));
-        }, self::STATE_RESULT, [self::STATE_ACTION, self::STATE_PREFIX]);
+        if (null !== $supportExtras) {
+            $this->setSupportExtras($supportExtras);
+        }
+
+        $this->state->stateRequireRunAndSetAction(
+            __METHOD__,
+            function () use ($markup, $result) {
+                $this->style()->write(
+                    ($this->resultFormatter)($markup ?? $this->resultDefMarkup, $result)
+                );
+            },
+            [
+                self::STATE_ACTION,
+                self::STATE_STATUS_TEXT_INACTIVE,
+                self::STATE_STATUS_PROGRESS_INACTIVE,
+            ],
+            self::STATE_RESULT
+        );
 
         if (false === $this->supportExtras) {
             $this->complete();
@@ -225,60 +427,76 @@ abstract class AbstractAction
     }
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return self
      */
-    abstract public function resultDone(string $result = 'done'): self;
+    abstract public function resultDone(string $result = null, bool $supportExtras = null): self;
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return self
      */
-    abstract public function resultOkay(string $result = 'okay'): self;
+    abstract public function resultOkay(string $result = null, bool $supportExtras = null): self;
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return self
      */
-    abstract public function resultWarn(string $result = 'warn'): self;
+    abstract public function resultWarn(string $result = null, bool $supportExtras = null): self;
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return self
      */
-    abstract public function resultStop(string $result = 'stop'): self;
+    abstract public function resultStop(string $result = null, bool $supportExtras = null): self;
 
     /**
-     * @param string $result
+     * @param string|null $result
+     * @param bool|null   $supportExtras
      *
      * @return self
      */
-    abstract public function resultFail(string $result = 'fail'): self;
+    abstract public function resultFail(string $result = null, bool $supportExtras = null): self;
 
     /**
-     * @param string[] ...$extras
+     * @param string ...$extras
      *
-     * @return self
+     * @return ExtrasText
      */
-    public function extras(string ...$extras): self
+    public function extras(string ...$extras): ExtrasText
     {
         if (false === $this->supportExtras) {
             throw new RuntimeException('Action extras disabled: enable by passing "true" to "extrasEnabled()"');
         }
 
-        if (self::STATE_RESULT === $this->state) {
-            $this->style->write(' ');
+        if ($this->state->isState(self::STATE_RESULT)) {
+            $this->style()->write(' ');
         }
 
-        return $this
-            ->invokeStateful(__METHOD__, function () use ($extras) {
-                $this->style->write(($this->extrasFormatter)($this->extrasDefMarkup, ...$extras));
-            }, self::STATE_EXTRAS, [self::STATE_ACTION, self::STATE_PREFIX, self::STATE_RESULT])
-            ->complete();
+        $e = new ExtrasText(
+            $this->style(),
+            $this,
+            $this->extrasBeginDefMarkup,
+            $this->extrasBeginFormatter,
+            $this->extrasInnerDefMarkup,
+            $this->extrasInnerFormatter,
+            $this->extrasCloseDefMarkup,
+            $this->extrasCloseFormatter
+        );
+
+        foreach ($extras as $extra) {
+            $e->text($extra);
+        }
+
+        return $e;
     }
 
     /**
@@ -286,47 +504,21 @@ abstract class AbstractAction
      */
     public function complete(): self
     {
-        return $this->invokeStateful(__METHOD__, function () {
-            $this->style->newline($this->finalNewlines);
-        }, self::STATE_INACTIVE, [self::STATE_ACTION, self::STATE_PREFIX, self::STATE_RESULT, self::STATE_EXTRAS]);
-    }
-
-    /**
-     * @param string          $context
-     * @param \Closure        $closure
-     * @param string          $afterAssignment
-     * @param string|string[] $beforeRequire
-     *
-     * @return self
-     */
-    private function invokeStateful(string $context, \Closure $closure, string $afterAssignment, $beforeRequire): self
-    {
-        $this->requireState($context, ...(array) $beforeRequire);
-        $closure();
-
-        if (null !== $afterAssignment) {
-            $this->state = $afterAssignment;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string   $context
-     * @param string[] ...$supportedStates
-     *
-     * @return self
-     */
-    private function requireState(string $context, string ...$supportedStates): self
-    {
-        $matched = array_filter($supportedStates, function (string $state): bool {
-            return $this->state === $state;
-        });
-
-        if (0 === count($matched)) {
-            throw new RuntimeException('Cannot call %s method in state "%s" (acceptable states: %s).', $context,
-                $this->state, implode(', ', $supportedStates));
-        }
+        $this->state->stateRequireRunAndSetAction(
+            __METHOD__,
+            function () {
+                $this->style()->newline($this->finalNewlines);
+            },
+            [
+                self::STATE_ACTION,
+                self::STATE_STATUS_TEXT_INACTIVE,
+                self::STATE_STATUS_PROGRESS_INACTIVE,
+                self::STATE_EXTRAS_TEXT_INACTIVE,
+                self::STATE_RESULT,
+                self::STATE_EXTRAS_TEXT_ACTIVE,
+            ],
+            self::STATE_INACTIVE
+        );
 
         return $this;
     }

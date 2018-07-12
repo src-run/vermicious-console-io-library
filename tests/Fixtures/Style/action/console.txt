@@ -3,6 +3,10 @@ default action with "custom" result ... [custom]
 
 default action with "warn" result ... [warn]
 
+ --> default action with "warn" result ... [warn]
+
+ --> default action with "warn" result ... (1st status) (2nd status) [warn] (foo) (bar) (baz)
+
 default action with "done" result ... [done]
 
 default action with "okay" result ... [okay]
@@ -29,6 +33,8 @@ custom action with no result and extras ... (one) (two) (three)
 
 custom action with no result and no extras and early complete ... 
 
+custom action with no result and no extras and early complete ... [okay]
+
 
  [ bracketed action with "complete" result ] ...  COMPLETE 
 
@@ -39,4 +45,22 @@ custom action with no result and no extras and early complete ...
 
 
  [ bracketed action with "foobar" result ] ...  FOOBAR 
+
+ [ bracketed action with "done" result ] ...  DONE  (foo) (bar)
+
+ [ bracketed action with "stop" result ] ...  STOP  (foo)
+
+ [ bracketed action with "foobar" result and prefix ] ...  FOOBAR 
+
+> [ bracketed action with "foobar" result and prefix ] ...  FOOBAR 
+
+> [ bracketed action with "foobar" result and prefix ] ... (some status text)  FOOBAR 
+
+ --> [ default action with "warn" result ] ... (1st status) (2nd status)  WARN  (foo) (bar) (baz)
+
+downloading remote resource ... (....................................................................................................) [stop]
+
+downloading remote resource ... (....................................................................................................) [stop]
+
+ [ custom argument bracketed type ] ...  RESULT 
 

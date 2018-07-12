@@ -12,8 +12,9 @@
 namespace SR\Console\Tests\Input;
 
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\StreamableInputInterface;
 
-class MemoryInput extends ArrayInput
+class MemoryInput extends ArrayInput implements StreamableInputInterface
 {
     /**
      * @param array $parameters
@@ -29,7 +30,6 @@ class MemoryInput extends ArrayInput
     public function setInput(array $inputs)
     {
         $stream = fopen('php://memory', 'r+', false);
-
         fwrite($stream, implode(PHP_EOL, $inputs));
         rewind($stream);
 

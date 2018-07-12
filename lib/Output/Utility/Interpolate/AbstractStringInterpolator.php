@@ -11,9 +11,8 @@
 
 namespace SR\Console\Output\Utility\Interpolate;
 
+use SR\Console\Output\Exception\InvalidArgumentException;
 use SR\Dumper\VarDumper\ReturnDumper;
-use SR\Exception\Logic\InvalidArgumentException;
-use SR\Exception\Runtime\RuntimeException;
 
 abstract class AbstractStringInterpolator
 {
@@ -130,7 +129,7 @@ abstract class AbstractStringInterpolator
     {
         try {
             return ($this->normalizer)($this->interpolate());
-        } catch (RuntimeException $exception) {
+        } catch (\RuntimeException $exception) {
             if ($throwOnFailure) {
                 throw $exception;
             }
