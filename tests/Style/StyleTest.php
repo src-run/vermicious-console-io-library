@@ -465,8 +465,8 @@ class StyleTest extends AbstractTestCase
         $stream = $o->getStream();
         rewind($stream);
         $content = stream_get_contents($stream);
-        $this->assertRegExp('{Invalid choice answer "z" provided}', $content);
-        $this->assertRegExp('{Invalid choice answer "bb" provided}', $content);
+        $this->assertRegExp('{Invalid.+\n?.*choice.+\n?.*answer.+\n?.*"z".+\n?.*provided}', $content);
+        $this->assertRegExp('{Invalid.+\n?.*choice.+\n?.*answer.+\n?.*"bb".+\n?.*provided}', $content);
     }
 
     /**
