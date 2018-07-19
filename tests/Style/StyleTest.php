@@ -432,6 +432,43 @@ class StyleTest extends AbstractTestCase
         $this->assertRegExp('{The.+\n?.*provided.+\n?.*answer.+\n?.*is.+\n?.*ambiguous\..+\n?.*Value.+\n?.*should.+\n?.*be.+\n?.*one.+\n?.*of}', stream_get_contents($stream));
     }
 
+    public function testAutoCompletion(): void
+    {
+        $choices = [
+            'aaaaaa',
+            'aaabbb',
+            'aaaccc',
+            'aaaddd',
+            'bbbaaa',
+            'bbbbbb',
+            'bbbccc',
+            'bbbddd',
+        ];
+
+        $i = new MemoryInput();
+        $i->setInteractive(true);
+        $i->setInput([
+            'z',
+            "bbbd\t\177\177\177\t\033[B\177",
+            "aaaccc\177\177\177\177a\t\033[A\033[A\033[A\033[B\033[B",
+        ]);
+
+        $o = self::createOutputStream();
+
+        /** @var MultipleChoiceAnswer $c */
+        $c = static::createStyleInstance($i, $o)->choice('What are your favorite candy?', $choices, null, null, null, $choices);
+
+        $this->assertFalse($c->isDefault());
+        $this->assertTrue($c->isInteractive());
+        $this->assertSame('aaaaaa', $c->getAnswer());
+
+        $stream = $o->getStream();
+        rewind($stream);
+        $content = stream_get_contents($stream);
+        $this->assertRegExp('{Invalid choice answer "z" provided}', $content);
+        $this->assertRegExp('{Invalid choice answer "bb" provided}', $content);
+    }
+
     /**
      * @return \Generator
      */

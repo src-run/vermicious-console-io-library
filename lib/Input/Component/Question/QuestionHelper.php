@@ -532,10 +532,12 @@ class QuestionHelper
             }
 
             if (null !== $shell = Terminal::shell()) {
-                $value = rtrim(shell_exec(vsprintf("/usr/bin/env %s -c 'stty -echo; %s; stty echo; echo \$HIDDEN_INPUT'", [
-                    $shell,
-                    Terminal::isShell('csh') ? 'set HIDDEN_INPUT = $<' : 'read -r HIDDEN_INPUT',
-                ])));
+                $value = rtrim(shell_exec(
+                    vsprintf("/usr/bin/env %s -c 'stty -echo; %s; stty echo; echo \$HIDDEN_INPUT'", [
+                        $shell,
+                        Terminal::isShell('csh') ? 'set HIDDEN_INPUT = $<' : 'read -r HIDDEN_INPUT',
+                    ])
+                ));
                 $output->writeln('');
 
                 return $value;

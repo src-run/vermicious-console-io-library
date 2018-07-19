@@ -588,12 +588,13 @@ class Style implements StyleInterface
      * @param string|null   $default
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
+     * @param iterable      $completionValues
      *
      * @return AnswerInterface|ChoiceAnswer
      */
-    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ChoiceAnswer
+    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null, iterable $completionValues = null): ChoiceAnswer
     {
-        return (new QuestionHelper($this))->choice($question, $choices, $default, false, $validator, $sanitizer);
+        return (new QuestionHelper($this))->choice($question, $choices, $default, false, $validator, $sanitizer, $completionValues);
     }
 
     /**

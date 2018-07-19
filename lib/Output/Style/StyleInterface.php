@@ -347,10 +347,11 @@ interface StyleInterface extends OutputInterface
      * @param string|null   $default
      * @param \Closure|null $validator
      * @param \Closure|null $sanitizer
+     * @param iterable      $completionValues
      *
      * @return AnswerInterface|ChoiceAnswer
      */
-    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null): ChoiceAnswer;
+    public function choice(string $question, array $choices, string $default = null, \Closure $validator = null, \Closure $sanitizer = null, iterable $completionValues = null): ChoiceAnswer;
 
     /**
      * @param string        $question

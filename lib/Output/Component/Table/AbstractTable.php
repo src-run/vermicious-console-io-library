@@ -75,11 +75,16 @@ abstract class AbstractTable
     {
         $color = new Markup('blue');
         $style = new TableStyle();
-
-        $style->setVerticalBorderChars($color->markupValue('|'));
-        $style->setHorizontalBorderChars($color->markupValue('-'));
-        $style->setDefaultCrossingChar($color->markupValue('+'));
         $style->setCellHeaderFormat('%s');
+        $style->{method_exists($style, 'setVerticalBorderChars') ? 'setVerticalBorderChars' : 'setVerticalBorderChar'}(
+            $color->markupValue('|')
+        );
+        $style->{method_exists($style, 'setHorizontalBorderChars') ? 'setHorizontalBorderChars' : 'setHorizontalBorderChar'}(
+            $color->markupValue('-')
+        );
+        $style->{method_exists($style, 'setDefaultCrossingChar') ? 'setDefaultCrossingChar' : 'setCrossingChar'}(
+            $color->markupValue('+')
+        );
 
         $table = new Table($this->style());
         $table->setStyle($style);
