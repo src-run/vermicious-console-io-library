@@ -58,7 +58,7 @@ Some muted text
  [ Has "simple-string" scalar, "100" integer, and complex replacement ] Line 1  
  with simple-string scalar replacement                                          
  And line 2 with 100 integer replacement                                        
-{ And line 3 with \{#[0-9]+\} complex replacement                                    }
+{ And line 3 with \{#[0-9]+\} complex replacement\s+}
                                                                                 
 
 --------------------------------------------------------------------------------

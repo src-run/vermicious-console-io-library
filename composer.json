@@ -28,9 +28,9 @@
   ],
   "require" : {
     "php": "^7.1",
-    "src-run/cocoa-var-dumper-library": "^0.1.1",
-    "src-run/augustus-exception-library": "^0.8.4",
-    "src-run/augustus-reflection-library": "^0.8.0",
+    "src-run/cocoa-var-dumper-library": "^0.3",
+    "src-run/augustus-exception-library": "^0.10",
+    "src-run/augustus-reflection-library": "^0.8",
     "symfony/console": "^3.4|^4.1"
   },
   "require-dev": {

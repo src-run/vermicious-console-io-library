@@ -12,7 +12,7 @@
 namespace SR\Console\Output\Utility\Interpolate;
 
 use SR\Console\Output\Exception\InvalidArgumentException;
-use SR\Dumper\VarDumper\ReturnDumper;
+use SR\Dumper\VarDumper\ReturnedCliDumper;
 
 abstract class AbstractStringInterpolator
 {
@@ -164,6 +164,6 @@ abstract class AbstractStringInterpolator
             return $replacement;
         }
 
-        return (new ReturnDumper())->dump($replacement);
+        return (new ReturnedCliDumper())->dump($replacement);
     }
 }
