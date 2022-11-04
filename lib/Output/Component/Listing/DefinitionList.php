@@ -34,11 +34,6 @@ final class DefinitionList
      */
     private $lineFormatter;
 
-    /**
-     * @param StyleInterface $style
-     * @param \Closure|null  $titleFormatter
-     * @param \Closure|null  $definitionFormatter
-     */
     public function __construct(StyleInterface $style, \Closure $titleFormatter = null, \Closure $definitionFormatter = null, \Closure $lineFormatter = null)
     {
         $this->setStyle($style);
@@ -47,11 +42,6 @@ final class DefinitionList
         $this->setLineFormatter($lineFormatter);
     }
 
-    /**
-     * @param \Closure|null $formatter
-     *
-     * @return self
-     */
     public function setTitleFormatter(\Closure $formatter = null): self
     {
         $this->titleFormatter = $formatter ?? function (string $title, int $maxLength) {
@@ -63,11 +53,6 @@ final class DefinitionList
         return $this;
     }
 
-    /**
-     * @param \Closure|null $formatter
-     *
-     * @return self
-     */
     public function setDefinitionFormatter(\Closure $formatter = null): self
     {
         $this->definitionFormatter = $formatter ?? function (string $definition, int $maxLength) {
@@ -77,11 +62,6 @@ final class DefinitionList
         return $this;
     }
 
-    /**
-     * @param \Closure|null $formatter
-     *
-     * @return self
-     */
     public function setLineFormatter(\Closure $formatter = null): self
     {
         $this->lineFormatter = $formatter ?? function (string $title, string $definition) {
@@ -91,11 +71,6 @@ final class DefinitionList
         return $this;
     }
 
-    /**
-     * @param array $definitions
-     *
-     * @return self
-     */
     public function definitions(array $definitions): self
     {
         $this->style()->prependText();
@@ -107,8 +82,6 @@ final class DefinitionList
 
     /**
      * @param string[] $definitions
-     *
-     * @return self
      */
     private function writeDefinitionLines(array $definitions): self
     {
@@ -129,8 +102,6 @@ final class DefinitionList
 
     /**
      * @param string[] $array
-     *
-     * @return int
      */
     private function getMaxArrayValueLength(array $array): int
     {

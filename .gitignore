@@ -1,6 +1,6 @@
 
 #
-# This file is part of the `src-run/vermicious-console-io-library` project.
+# This file is part of the `src-run/augustus-utility-library` project.
 #
 # (c) Rob Frawley 2nd <rmf@src.run>
 #
@@ -41,6 +41,7 @@
 
 # PHPUnit (Non-Dist)
 /phpunit.xml
+/.phpunit.result.cache
 
 # Build data
 /build/*
@@ -61,7 +62,8 @@
 LICENSE
 README
 
-# PHP-CS-Fixer
+# phpcsfixer cache
 .php_cs.cache
+.php-cs-fixer.cache
 
 # EOF

@@ -66,9 +66,7 @@ class Markup implements MarkupColors, MarkupOptions
     private $emptyMarkupAllowed = false;
 
     /**
-     * @param string|null $foregroundColour
-     * @param string|null $backgroundColour
-     * @param string[]    ...$options
+     * @param string[] ...$options
      */
     public function __construct(string $foregroundColour = null, string $backgroundColour = null, string ...$options)
     {
@@ -77,20 +75,13 @@ class Markup implements MarkupColors, MarkupOptions
         $this->setOptions(...$options);
     }
 
-    /**
-     * @param string|null $value
-     *
-     * @return string
-     */
     public function __invoke(string $value = null): string
     {
         return $this->markupValue($value);
     }
 
     /**
-     * @param string|null $foregroundColour
-     * @param string|null $backgroundColour
-     * @param string[]    ...$options
+     * @param string[] ...$options
      *
      * @return static
      */
@@ -100,39 +91,27 @@ class Markup implements MarkupColors, MarkupOptions
     }
 
     /**
-     * @param string|null $foregroundColour
-     * @param string|null $backgroundColour
-     * @param string[]    ...$options
+     * @param string[] ...$options
      *
      * @return static
      */
     public static function createExplicit(string $foregroundColour = null, string $backgroundColour = null, string ...$options): self
     {
         return self::create($foregroundColour, $backgroundColour, ...$options)
-            ->setColourExplicit(true);
+            ->setColourExplicit(true)
+        ;
     }
 
-    /**
-     * @return string|null
-     */
     public function foreground(): ?string
     {
         return $this->foregroundColour;
     }
 
-    /**
-     * @return bool
-     */
     public function hasForeground(): bool
     {
         return null !== $this->foregroundColour;
     }
 
-    /**
-     * @param string|null $colour
-     *
-     * @return self
-     */
     public function setForeground(string $colour = null): self
     {
         $this->foregroundColour = $this->sanitizeInputColour($colour);
@@ -140,27 +119,16 @@ class Markup implements MarkupColors, MarkupOptions
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function background(): ?string
     {
         return $this->backgroundColour;
     }
 
-    /**
-     * @return bool
-     */
     public function hasBackground(): bool
     {
         return null !== $this->backgroundColour;
     }
 
-    /**
-     * @param string|null $colour
-     *
-     * @return self
-     */
     public function setBackground(string $colour = null): self
     {
         $this->backgroundColour = $this->sanitizeInputColour($colour);
@@ -176,9 +144,6 @@ class Markup implements MarkupColors, MarkupOptions
         return $this->options;
     }
 
-    /**
-     * @return bool
-     */
     public function hasOptions(): bool
     {
         return 0 !== count($this->options);
@@ -186,8 +151,6 @@ class Markup implements MarkupColors, MarkupOptions
 
     /**
      * @param string[] ...$options
-     *
-     * @return Markup
      */
     public function setOptions(string ...$options): self
     {
@@ -199,27 +162,17 @@ class Markup implements MarkupColors, MarkupOptions
 
     /**
      * @param string[] ...$options
-     *
-     * @return self
      */
     public function addOptions(string ...$options): self
     {
         return $this->setOptions(...array_merge($this->options, $options));
     }
 
-    /**
-     * @return bool
-     */
     public function isColourExplicit(): bool
     {
         return $this->colourExplicit;
     }
 
-    /**
-     * @param bool $colourExplicit
-     *
-     * @return self
-     */
     public function setColourExplicit(bool $colourExplicit): self
     {
         $this->colourExplicit = $colourExplicit;
@@ -227,19 +180,11 @@ class Markup implements MarkupColors, MarkupOptions
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isEmptyMarkupAllowed(): bool
     {
         return $this->emptyMarkupAllowed;
     }
 
-    /**
-     * @param bool $allowEmptyMarkup
-     *
-     * @return self
-     */
     public function setEmptyMarkupAllowed(bool $allowEmptyMarkup): self
     {
         $this->emptyMarkupAllowed = $allowEmptyMarkup;
@@ -247,11 +192,6 @@ class Markup implements MarkupColors, MarkupOptions
         return $this;
     }
 
-    /**
-     * @param string|null $value
-     *
-     * @return string
-     */
     public function markupValue(string $value = null): string
     {
         if (!empty($markup = $this->attributesString()) || $this->isEmptyMarkupAllowed()) {
@@ -295,9 +235,6 @@ class Markup implements MarkupColors, MarkupOptions
         return $attributes;
     }
 
-    /**
-     * @return string
-     */
     public function attributesString(): string
     {
         $attributes = $this->attributes();
@@ -309,21 +246,11 @@ class Markup implements MarkupColors, MarkupOptions
         return implode(';', $attributes);
     }
 
-    /**
-     * @param string|null $colour
-     *
-     * @return string|null
-     */
     private function sanitizeInputColour(string $colour = null): ?string
     {
         return $this->sanitizeInput('colour', $colour);
     }
 
-    /**
-     * @param string $option
-     *
-     * @return string
-     */
     private function sanitizeInputOption(string $option): string
     {
         return $this->sanitizeInput('option', $option, false);
@@ -341,13 +268,6 @@ class Markup implements MarkupColors, MarkupOptions
         }, $options);
     }
 
-    /**
-     * @param string      $context
-     * @param string|null $input
-     * @param bool        $nullable
-     *
-     * @return string|null
-     */
     private function sanitizeInput(string $context, string $input = null, bool $nullable = true): ?string
     {
         $normalized = null === $input ? null : preg_replace('{[^a-z]}', '', mb_strtolower($input));
@@ -365,7 +285,6 @@ class Markup implements MarkupColors, MarkupOptions
     }
 
     /**
-     * @param string   $context
      * @param string[] $available
      *
      * @return mixed[]
@@ -380,9 +299,7 @@ class Markup implements MarkupColors, MarkupOptions
     }
 
     /**
-     * @param string   $context
      * @param string[] $available
-     * @param string   $normalized
      *
      * @return mixed[]
      */
@@ -398,8 +315,6 @@ class Markup implements MarkupColors, MarkupOptions
 
     /**
      * @param string[] $available
-     *
-     * @return string
      */
     private static function getAvailableValuesAsString(array $available): string
     {

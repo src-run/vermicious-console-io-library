@@ -21,15 +21,18 @@ return function (InputInterface $input, OutputInterface $output) {
 
     $s
         ->action('default action with "custom" result')
-        ->result('custom', null, new Markup(Markup::C_WHITE, Markup::C_MAGENTA, Markup::O_BOLD, Markup::O_REVERSE));
+        ->result('custom', null, new Markup(Markup::C_WHITE, Markup::C_MAGENTA, Markup::O_BOLD, Markup::O_REVERSE))
+    ;
 
     $s
         ->action('default action with "warn" result')
-        ->resultWarn();
+        ->resultWarn()
+    ;
 
     $s
         ->action('default action with "warn" result', ' --> ')
-        ->resultWarn();
+        ->resultWarn()
+    ;
 
     $s
         ->action('default action with "warn" result', ' --> ')
@@ -43,23 +46,28 @@ return function (InputInterface $input, OutputInterface $output) {
             ->text('bar')
             ->text('baz')
             ->finish()
-        ->complete();
+        ->complete()
+    ;
 
     $s
         ->action('default action with "done" result')
-        ->resultDone();
+        ->resultDone()
+    ;
 
     $s
         ->action('default action with "okay" result')
-        ->resultOkay();
+        ->resultOkay()
+    ;
 
     $s
         ->action('default action with "stop" result')
-        ->resultStop();
+        ->resultStop()
+    ;
 
     $s
         ->action('default action with "fail" result')
-        ->resultFail();
+        ->resultFail()
+    ;
 
     $s
         ->action()
@@ -69,7 +77,8 @@ return function (InputInterface $input, OutputInterface $output) {
         ->result('result')
         ->extras('an extra')
             ->finish()
-        ->complete();
+        ->complete()
+    ;
 
     $s
         ->action()
@@ -80,7 +89,8 @@ return function (InputInterface $input, OutputInterface $output) {
         ->extras('an extra')
             ->text('a second extras')
             ->finish()
-        ->complete();
+        ->complete()
+    ;
 
     $s
         ->action('custom action with no result and extras')
@@ -88,26 +98,31 @@ return function (InputInterface $input, OutputInterface $output) {
         ->extras('one', 'two')
             ->text('three')
             ->finish()
-        ->complete();
+        ->complete()
+    ;
 
     $s
         ->action('custom action with no result and no extras and early complete')
         ->setNewlinesCount(2)
-        ->complete();
+        ->complete()
+    ;
 
     $s
         ->action('custom action with no result and no extras and early complete', null, 'simple')
         ->setNewlinesCount(3)
-        ->resultOkay();
+        ->resultOkay()
+    ;
 
     $s
         ->action('bracketed action with "complete" result', null, 'bracketed')
-        ->resultOkay('complete');
+        ->resultOkay('complete')
+    ;
 
     $s
         ->action('bracketed action with no newlines and "error" result', null, 'bracketed')
         ->setNewlinesCount(0)
-        ->resultFail('error');
+        ->resultFail('error')
+    ;
 
     $s
         ->action('bracketed action with 5 newlines and extras and "warning" result', null, 'bracketed')
@@ -116,23 +131,27 @@ return function (InputInterface $input, OutputInterface $output) {
         ->resultFail('warning')
         ->extras('one', 'two', 'three')
             ->finish()
-        ->complete();
+        ->complete()
+    ;
 
     $s
         ->action('bracketed action with "foobar" result', null, 'bracketed')
-        ->result('foobar');
+        ->result('foobar')
+    ;
 
     $a = $s->action('bracketed action with "done" result', null, 'bracketed');
     $a->resultDone(null, true);
     $t = $a->extras()
             ->text('foo')
-            ->text('bar');
+            ->text('bar')
+    ;
 
     TestCase::assertFalse($t->isInactive());
 
     $t
         ->finish()
-        ->complete();
+        ->complete()
+    ;
 
     TestCase::assertTrue($t->isInactive());
 
@@ -141,25 +160,30 @@ return function (InputInterface $input, OutputInterface $output) {
         ->resultStop(null, true)
         ->extras('foo')
             ->finish()
-        ->complete();
+        ->complete()
+    ;
 
     $s
         ->action('bracketed action with "foobar" result and prefix', null, 'bracketed')
-        ->result('foobar');
+        ->result('foobar')
+    ;
 
     $s
         ->action('bracketed action with "foobar" result and prefix', '>', 'bracketed')
-        ->result('foobar');
+        ->result('foobar')
+    ;
 
-    $t = ($s
+    $t = $s
         ->action('bracketed action with "foobar" result and prefix', '>', 'bracketed')
-        ->statusText('some status text'));
+        ->statusText('some status text')
+    ;
 
     TestCase::assertFalse($t->isInactive());
 
     $t
         ->finish()
-        ->result('foobar');
+        ->result('foobar')
+    ;
 
     TestCase::assertTrue($t->isInactive());
 
@@ -173,12 +197,15 @@ return function (InputInterface $input, OutputInterface $output) {
         ->resultWarn()
         ->extras('foo', 'bar', 'baz')
             ->finish()
-        ->complete();
+        ->complete()
+    ;
 
     $a = $s
-        ->action('downloading remote resource');
+        ->action('downloading remote resource')
+    ;
     $p = $a
-        ->statusProgress(100, 10);
+        ->statusProgress(100, 10)
+    ;
 
     TestCase::assertFalse($p->isCompleted());
 
@@ -200,9 +227,11 @@ return function (InputInterface $input, OutputInterface $output) {
     $a->resultStop();
 
     $a = $s
-        ->action('downloading remote resource');
+        ->action('downloading remote resource')
+    ;
     $p = $a
-        ->statusProgress(100, 10);
+        ->statusProgress(100, 10)
+    ;
 
     $p->setAutoFinish(false);
 
@@ -247,5 +276,6 @@ return function (InputInterface $input, OutputInterface $output) {
         }, null, function (Markup $markup): string {
             return $markup(')');
         }])
-        ->result('result');
+        ->result('result')
+    ;
 };

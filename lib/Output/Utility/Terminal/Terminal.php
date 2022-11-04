@@ -32,10 +32,6 @@ final class Terminal
 
     /**
      * Get the terminal width or return the default if unresolvable.
-     *
-     * @param int|null $default
-     *
-     * @return int|null
      */
     public static function x(int $default = null): ?int
     {
@@ -44,10 +40,6 @@ final class Terminal
 
     /**
      * Get the terminal height or return the default if unresolvable.
-     *
-     * @param int|null $default
-     *
-     * @return int|null
      */
     public static function y(int $default = null): ?int
     {
@@ -56,10 +48,6 @@ final class Terminal
 
     /**
      * Get the terminal width or return the default if unresolvable.
-     *
-     * @param int|null $default
-     *
-     * @return int|null
      */
     public static function width(int $default = null): ?int
     {
@@ -68,10 +56,6 @@ final class Terminal
 
     /**
      * Get the terminal height or return the default if unresolvable.
-     *
-     * @param int|null $default
-     *
-     * @return int|null
      */
     public static function height(int $default = null): ?int
     {
@@ -80,8 +64,6 @@ final class Terminal
 
     /**
      * Determines whether set teletype (stty) is available.
-     *
-     * @return bool
      */
     public static function stty(): bool
     {
@@ -94,8 +76,6 @@ final class Terminal
 
     /**
      * Determines the shell type available.
-     *
-     * @return string|null
      */
     public static function shell(): ?string
     {
@@ -108,8 +88,6 @@ final class Terminal
 
     /**
      * Checks if passed shell is active.
-     *
-     * @return bool
      */
     public static function isShell(string $name): bool
     {
@@ -118,10 +96,6 @@ final class Terminal
 
     /**
      * Attempts to locate an absolute command path from name.
-     *
-     * @param string $executable
-     *
-     * @return null|string
      */
     public static function locate(string $executable): ?string
     {
@@ -131,9 +105,7 @@ final class Terminal
     /**
      * Attempts to locate all absolute command paths from name.
      *
-     * @param string $executable
-     *
-     * @return null|string[]
+     * @return string[]|null
      */
     public static function locateAll(string $executable): ?array
     {
@@ -144,8 +116,6 @@ final class Terminal
 
     /**
      * @param string $env
-     *
-     * @return null|string
      */
     private static function resolveShellFromEnvVariable(): ?string
     {
@@ -168,9 +138,6 @@ final class Terminal
         return $s;
     }
 
-    /**
-     * @return null|string
-     */
     private static function resolveShellFromEnvGuessing(): ?string
     {
         $s = null;
@@ -187,9 +154,6 @@ final class Terminal
         return $s;
     }
 
-    /**
-     * @return null|string
-     */
     private static function locateEnv(): ?string
     {
         $env = '/usr/bin/env';
@@ -197,9 +161,6 @@ final class Terminal
         return (file_exists($env) || null !== $env = self::locate('env')) ? $env : null;
     }
 
-    /**
-     * @return bool
-     */
     private static function resolveStty(): bool
     {
         exec('stty 2>&1', $output, $return);
@@ -209,8 +170,6 @@ final class Terminal
 
     /**
      * @param string|string[] $output
-     *
-     * @return null|string
      */
     private static function shiftAndSanitizeOutput($output): ?string
     {
@@ -231,9 +190,6 @@ final class Terminal
         return is_array($output) ? $sanitize : array_shift($sanitize);
     }
 
-    /**
-     * @return SymfonyTerminal
-     */
     private static function terminal(): SymfonyTerminal
     {
         if (null === self::$terminal) {

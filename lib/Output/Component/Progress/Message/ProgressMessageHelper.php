@@ -15,22 +15,13 @@ use SR\Console\Output\Component\Progress\AbstractProgressHelper;
 
 class ProgressMessageHelper
 {
-    /**
-     * @var AbstractProgressHelper
-     */
-    private $progress;
+    private AbstractProgressHelper $progress;
 
-    /**
-     * @param AbstractProgressHelper $progress
-     */
     public function __construct(AbstractProgressHelper $progress)
     {
         $this->progress = $progress;
     }
 
-    /**
-     * @return self
-     */
     public function render(): self
     {
         $this->progress->progressBar()->display();
@@ -38,61 +29,33 @@ class ProgressMessageHelper
         return $this;
     }
 
-    /**
-     * @param string  $name
-     * @param string  $message
-     * @param mixed[] ...$replacements
-     *
-     * @return self
-     */
-    public function message(string $name, string $message, ...$replacements): self
+    public function message(string $name, string $message, mixed ...$replacements): self
     {
         $this->progress->progressBar()->setMessage($this->compileMessage($message, $replacements), $name);
 
         return $this;
     }
 
-    /**
-     * @param string  $message
-     * @param mixed[] ...$replacements
-     *
-     * @return self
-     */
-    public function context(string $message, ...$replacements): self
+    public function context(string $message, mixed ...$replacements): self
     {
         $this->message('context', $message, ...$replacements);
 
         return $this;
     }
 
-    /**
-     * @param string  $message
-     * @param mixed[] ...$replacements
-     *
-     * @return self
-     */
-    public function action(string $message, ...$replacements): self
+    public function action(string $message, mixed ...$replacements): self
     {
         $this->message('action', $message, ...$replacements);
 
         return $this;
     }
 
-    /**
-     * @return AbstractProgressHelper
-     */
     public function progressHelper(): AbstractProgressHelper
     {
         return $this->progress;
     }
 
-    /**
-     * @param string  $message
-     * @param mixed[] $replacements
-     *
-     * @return string
-     */
-    private function compileMessage(string $message, $replacements): string
+    private function compileMessage(string $message, array $replacements): string
     {
         if (0 === count($replacements)) {
             return $message;

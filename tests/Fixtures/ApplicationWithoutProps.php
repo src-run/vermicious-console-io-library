@@ -15,10 +15,6 @@ use Symfony\Component\Console\Application;
 
 class ApplicationWithoutProps extends Application
 {
-    /**
-     * @param string|null $name
-     * @param string|null $version
-     */
     public function __construct(string $name = null, string $version = null)
     {
         parent::__construct($name ?? 'Test Application', $version ?? '0.0.0');

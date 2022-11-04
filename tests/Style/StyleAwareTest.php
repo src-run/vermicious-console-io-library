@@ -26,16 +26,16 @@ class StyleAwareTest extends TestCase
     {
         $s = new StyleAwareInternalClass();
 
-        $this->assertNotInternalType('callable', [$s, 'setStyle']);
-        $this->assertNotInternalType('callable', [$s, 'style']);
+        $this->assertIsNotCallable([$s, 'setStyle']);
+        $this->assertIsNotCallable([$s, 'style']);
     }
 
     public function testStyleAwareExternal()
     {
         $s = new StyleAwareExternalClass();
 
-        $this->assertInternalType('callable', [$s, 'setStyle']);
-        $this->assertInternalType('callable', [$s, 'style']);
+        $this->assertIsCallable([$s, 'setStyle']);
+        $this->assertIsCallable([$s, 'style']);
         $this->assertNull($s->style());
 
         $s->setStyle(StyleTest::createStyleInstance());

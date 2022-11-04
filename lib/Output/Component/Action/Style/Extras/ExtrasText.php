@@ -16,17 +16,12 @@ use SR\Console\Output\Markup\Markup;
 
 final class ExtrasText extends AbstractExtras
 {
-    /**
-     * @return bool
-     */
     public function isInactive(): bool
     {
         return false === $this->getAction()->getState()->isState(AbstractAction::STATE_EXTRAS_TEXT_ACTIVE);
     }
 
     /**
-     * @param Markup|null $markup
-     *
      * @return self|AbstractExtras
      */
     public function start(Markup $markup = null): AbstractExtras
@@ -34,12 +29,6 @@ final class ExtrasText extends AbstractExtras
         return $this;
     }
 
-    /**
-     * @param string      $text
-     * @param Markup|null $markup
-     *
-     * @return self
-     */
     public function text(string $text, Markup $markup = null): self
     {
         if ($this->getAction()->getState()->isState(AbstractAction::STATE_EXTRAS_TEXT_ACTIVE)) {
@@ -67,7 +56,8 @@ final class ExtrasText extends AbstractExtras
                 $this->style()
                     ->write(($this->beginFormatter)($markup ?? $this->beginDefMarkup))
                     ->write(($this->innerFormatter)($markup ?? $this->innerDefMarkup, $text))
-                    ->write(($this->afterFormatter)($markup ?? $this->afterDefMarkup));
+                    ->write(($this->afterFormatter)($markup ?? $this->afterDefMarkup))
+                ;
             },
             AbstractAction::STATE_EXTRAS_TEXT_ACTIVE
         );
@@ -75,16 +65,11 @@ final class ExtrasText extends AbstractExtras
         return $this;
     }
 
-    /**
-     * @param Markup|null $markup
-     *
-     * @return AbstractAction
-     */
     public function finish(Markup $markup = null): AbstractAction
     {
         $this->getAction()->getState()->stateConditionalSetRunAction(
             __METHOD__,
-            function () use ($markup) {},
+            function () {},
             AbstractAction::STATE_EXTRAS_TEXT_ACTIVE,
             AbstractAction::STATE_EXTRAS_TEXT_INACTIVE
         );

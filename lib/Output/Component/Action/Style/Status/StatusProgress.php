@@ -38,16 +38,7 @@ final class StatusProgress extends AbstractStatus
     private $autoFinish = true;
 
     /**
-     * @param StyleInterface $style
-     * @param AbstractAction $action
-     * @param int|null       $steps
-     * @param string         $character
-     * @param Markup         $beginDefMarkup
-     * @param \Closure       $beginFormatter
-     * @param Markup         $innerDefMarkup
-     * @param \Closure       $innerFormatter
-     * @param Markup         $afterDefMarkup
-     * @param \Closure       $afterFormatter
+     * @param string $character
      */
     public function __construct(
         StyleInterface $style,
@@ -74,22 +65,15 @@ final class StatusProgress extends AbstractStatus
 
         $this
             ->setCharacter($character ?? '.')
-            ->setStepsCount($steps);
+            ->setStepsCount($steps)
+        ;
     }
 
-    /**
-     * @return bool
-     */
     public function isInactive(): bool
     {
         return false === $this->getAction()->getState()->isState(AbstractAction::STATE_STATUS_PROGRESS_ACTIVE);
     }
 
-    /**
-     * @param string $character
-     *
-     * @return self
-     */
     public function setCharacter(string $character): self
     {
         $this->getAction()->getState()->stateInverseRequireRunAndSetAction(
@@ -103,11 +87,6 @@ final class StatusProgress extends AbstractStatus
         return $this;
     }
 
-    /**
-     * @param int|null $steps
-     *
-     * @return self
-     */
     public function setStepsCount(int $steps = null): self
     {
         $this->getAction()->getState()->stateInverseRequireRunAndSetAction(
@@ -121,11 +100,6 @@ final class StatusProgress extends AbstractStatus
         return $this;
     }
 
-    /**
-     * @param bool $autoFinish
-     *
-     * @return self
-     */
     public function setAutoFinish(bool $autoFinish): self
     {
         $this->autoFinish = $autoFinish;
@@ -133,17 +107,12 @@ final class StatusProgress extends AbstractStatus
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isCompleted(): bool
     {
         return null !== $this->stepsCount && $this->stepActive >= $this->stepsCount;
     }
 
     /**
-     * @param Markup|null $markup
-     *
      * @return self|AbstractStatus
      */
     public function start(Markup $markup = null): AbstractStatus
@@ -164,13 +133,6 @@ final class StatusProgress extends AbstractStatus
         return $this;
     }
 
-    /**
-     * @param int         $count
-     * @param string|null $character
-     * @param Markup|null $markup
-     *
-     * @return self
-     */
     public function progress(int $count = 1, string $character = null, Markup $markup = null): self
     {
         $this->getAction()->getState()->stateConditionalSetRunAction(
@@ -206,11 +168,6 @@ final class StatusProgress extends AbstractStatus
         return $this;
     }
 
-    /**
-     * @param Markup|null $markup
-     *
-     * @return AbstractAction
-     */
     public function finish(Markup $markup = null): AbstractAction
     {
         $this->getAction()->getState()->stateConditionalSetRunAction(
@@ -218,7 +175,8 @@ final class StatusProgress extends AbstractStatus
             function () use ($markup) {
                 $this->style()
                     ->write(($this->afterFormatter)($markup ?? $this->afterDefMarkup))
-                    ->write(' ');
+                    ->write(' ')
+                ;
             },
             AbstractAction::STATE_STATUS_PROGRESS_ACTIVE,
             AbstractAction::STATE_STATUS_PROGRESS_INACTIVE

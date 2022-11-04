@@ -20,16 +20,6 @@ abstract class AbstractExtras
 {
     use ActionStyleTrait;
 
-    /**
-     * @param StyleInterface $style
-     * @param AbstractAction $action
-     * @param Markup         $beginDefMarkup
-     * @param \Closure       $beginFormatter
-     * @param Markup         $innerDefMarkup
-     * @param \Closure       $innerFormatter
-     * @param Markup         $afterDefMarkup
-     * @param \Closure       $afterFormatter
-     */
     public function __construct(
         StyleInterface $style,
         AbstractAction $action,
@@ -48,20 +38,17 @@ abstract class AbstractExtras
             ->setInnerDefMarkup($innerDefMarkup)
             ->setInnerFormatter($innerFormatter)
             ->setAfterDefMarkup($afterDefMarkup)
-            ->setAfterFormatter($afterFormatter);
+            ->setAfterFormatter($afterFormatter)
+        ;
     }
 
     /**
-     * @param Markup|null $markup
-     *
      * @return self|ExtrasText
      */
     abstract public function start(Markup $markup = null): self;
 
     /**
      * @param Markup|null $markup
-     *
-     * @return AbstractAction
      */
     abstract public function finish(Markup $markup): AbstractAction;
 }

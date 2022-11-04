@@ -21,61 +21,62 @@ abstract class AbstractProgressHelper
 {
     use StyleAwareInternalTrait;
 
-    /**
-     * @var int
-     */
-    private $newlinesAtCreate = 3;
+    private int $newlinesAtCreate = 3;
 
-    /**
-     * @var int
-     */
-    private $newlinesAtFinish = 2;
+    private int $newlinesAtFinish = 2;
 
-    /**
-     * @var string|null
-     */
-    private $barCharacter = '<fg=cyan>=</>';
+    private ?string $barCharacter = '<fg=cyan>=</>';
 
-    /**
-     * @var string|null
-     */
-    private $emptyBarCharacter = '<fg=blue;options=bold>-</>';
+    private ?string $emptyBarCharacter = '<fg=blue;options=bold>-</>';
 
-    /**
-     * @var string|null
-     */
-    private $progressCharacter = '<fg=cyan;options=bold>></>';
+    private ?string $progressCharacter = '<fg=cyan;options=bold>></>';
 
     /**
      * @var string[]
      */
-    private $formatLines = [
+    private array $formatLines = [
         ' [%bar%] (%current%/%max%)',
     ];
 
-    /**
-     * @var ProgressBar|null
-     */
-    private $progress;
+    private ?int $redrawsFreq;
 
-    /**
-     * @var ProgressMessageHelper|null
-     */
-    private $messages;
+    private ?float $redrawsMinSecsBetween;
 
-    /**
-     * @param StyleInterface $io
-     */
-    public function __construct(StyleInterface $io)
+    private ?float $redrawsMaxSecsBetween;
+
+    private ?ProgressBar $progress = null;
+
+    private ?ProgressMessageHelper $messages;
+
+    public function __construct(StyleInterface $io, ?int $redrawsFreq = null, ?float $redrawsMinSecsBetween = 0.0000001, ?float $redrawsMaxSecsBetween = 1.0)
     {
         $this->setStyle($io);
+        $this->setRedrawsFreq($redrawsFreq);
+        $this->setRedrawsMinSecsBetween($redrawsMinSecsBetween);
+        $this->setRedrawsMaxSecsBetween($redrawsMaxSecsBetween);
     }
 
-    /**
-     * @param int $newlines
-     *
-     * @return self
-     */
+    public function setRedrawsFreq(?int $redrawsFreq = null): self
+    {
+        $this->redrawsFreq = $redrawsFreq;
+
+        return $this;
+    }
+
+    public function setRedrawsMinSecsBetween(?float $redrawsMinSecsBetween = 0.0000001): self
+    {
+        $this->redrawsMinSecsBetween = $redrawsMinSecsBetween;
+
+        return $this;
+    }
+
+    public function setRedrawsMaxSecsBetween(?float $redrawsMaxSecsBetween = 0.0000001): self
+    {
+        $this->redrawsMaxSecsBetween = $redrawsMaxSecsBetween;
+
+        return $this;
+    }
+
     public function setNewlinesAtCreate(int $newlines): self
     {
         $this->newlinesAtCreate = $newlines;
@@ -83,11 +84,6 @@ abstract class AbstractProgressHelper
         return $this;
     }
 
-    /**
-     * @param int $newlines
-     *
-     * @return self
-     */
     public function setNewlinesAtFinish(int $newlines): self
     {
         $this->newlinesAtFinish = $newlines;
@@ -95,11 +91,6 @@ abstract class AbstractProgressHelper
         return $this;
     }
 
-    /**
-     * @param string $character|null
-     *
-     * @return self
-     */
     public function setBarCharacter(string $character = null): self
     {
         $this->barCharacter = $character;
@@ -107,11 +98,6 @@ abstract class AbstractProgressHelper
         return $this;
     }
 
-    /**
-     * @param string $character|null
-     *
-     * @return self
-     */
     public function setEmptyBarCharacter(string $character = null): self
     {
         $this->emptyBarCharacter = $character;
@@ -119,11 +105,6 @@ abstract class AbstractProgressHelper
         return $this;
     }
 
-    /**
-     * @param string $character|null
-     *
-     * @return self
-     */
     public function setProgressCharacter(string $character = null): self
     {
         $this->progressCharacter = $character;
@@ -133,8 +114,6 @@ abstract class AbstractProgressHelper
 
     /**
      * @param string[] $formatLines
-     *
-     * @return self
      */
     public function setFormatLines(array $formatLines): self
     {
@@ -143,12 +122,6 @@ abstract class AbstractProgressHelper
         return $this;
     }
 
-    /**
-     * @param int|null    $steps
-     * @param string|null $context
-     *
-     * @return self
-     */
     public function create(int $steps = null, string $context = null): self
     {
         $this->ensureProgressStopped();
@@ -157,11 +130,6 @@ abstract class AbstractProgressHelper
         return $this;
     }
 
-    /**
-     * @param int $count
-     *
-     * @return self
-     */
     public function step(int $count = 1): self
     {
         $this->ensureProgressStarted();
@@ -170,9 +138,6 @@ abstract class AbstractProgressHelper
         return $this;
     }
 
-    /**
-     * @return self
-     */
     public function finish(): self
     {
         $this->ensureProgressStarted();
@@ -183,9 +148,6 @@ abstract class AbstractProgressHelper
         return $this;
     }
 
-    /**
-     * @return self
-     */
     public function display(): self
     {
         $this->progressBar()->display();
@@ -193,9 +155,6 @@ abstract class AbstractProgressHelper
         return $this;
     }
 
-    /**
-     * @return ProgressMessageHelper
-     */
     public function messages(): ProgressMessageHelper
     {
         $this->ensureProgressStarted();
@@ -203,9 +162,6 @@ abstract class AbstractProgressHelper
         return $this->messages;
     }
 
-    /**
-     * @return ProgressBar
-     */
     public function progressBar(): ProgressBar
     {
         $this->ensureProgressStarted();
@@ -231,10 +187,6 @@ abstract class AbstractProgressHelper
         throw new RuntimeException('You must stop an active progress bar before starting a new one!');
     }
 
-    /**
-     * @param ProgressBar $progress
-     * @param string|null $context
-     */
     private function initProgress(ProgressBar $progress, string $context = null): void
     {
         if (null !== $this->barCharacter) {
@@ -250,7 +202,17 @@ abstract class AbstractProgressHelper
         }
 
         if (0 !== count($this->formatLines)) {
-            $progress->setFormat(implode(PHP_EOL, $this->formatLines).PHP_EOL);
+            $progress->setFormat(implode(PHP_EOL, $this->formatLines) . PHP_EOL);
+        }
+
+        $progress->setRedrawFrequency($this->redrawsFreq);
+
+        if (null !== $this->redrawsMinSecsBetween) {
+            $progress->minSecondsBetweenRedraws($this->redrawsMinSecsBetween);
+        }
+
+        if (null !== $this->redrawsMaxSecsBetween) {
+            $progress->maxSecondsBetweenRedraws($this->redrawsMaxSecsBetween);
         }
 
         $progress->start();

@@ -16,41 +16,25 @@ use SR\Console\Output\Exception\StateException;
 final class State
 {
     /**
-     * @var null|string
+     * @var string|null
      */
     private $state;
 
-    /**
-     * @param string|null $state
-     */
     public function __construct(string $state = null)
     {
         $this->state = $state;
     }
 
-    /**
-     * @param string $state
-     *
-     * @return bool
-     */
     public function isState(string $state): bool
     {
         return $this->getState() === $state;
     }
 
-    /**
-     * @return null|string
-     */
     public function getState(): ?string
     {
         return $this->state;
     }
 
-    /**
-     * @param string $state
-     *
-     * @return self
-     */
     public function setState(string $state): self
     {
         $this->state = $state;
@@ -58,12 +42,6 @@ final class State
         return $this;
     }
 
-    /**
-     * @param string $context
-     * @param string ...$stateConstraints
-     *
-     * @return self
-     */
     public function stateRequirements(string $context, string ...$stateConstraints): self
     {
         $matched = array_filter($stateConstraints, function (string $state): bool {
@@ -71,21 +49,14 @@ final class State
         });
 
         if (0 === count($matched)) {
-            throw new StateException(
-                'Cannot call %s() method in state "%s" (acceptable states: %s).', $context, $this->getState(), implode(', ', $stateConstraints)
-            );
+            throw new StateException('Cannot call %s() method in state "%s" (acceptable states: %s).', $context, $this->getState(), implode(', ', $stateConstraints));
         }
 
         return $this;
     }
 
     /**
-     * @param string          $context
-     * @param \Closure        $closure
      * @param string|string[] $stateConstraints
-     * @param string|null     $stateAssignment
-     *
-     * @return self
      */
     public function stateRequireRunAndSetAction(string $context, \Closure $closure, $stateConstraints, string $stateAssignment = null): self
     {
@@ -101,11 +72,7 @@ final class State
     }
 
     /**
-     * @param string          $context
-     * @param \Closure        $closure
      * @param string|string[] $stateConstraints
-     *
-     * @return self
      */
     public function stateInverseRequireRunAndSetAction(string $context, \Closure $closure, $stateConstraints): self
     {
@@ -119,12 +86,7 @@ final class State
     }
 
     /**
-     * @param string          $context
-     * @param \Closure        $closure
      * @param string|string[] $stateConstraints
-     * @param string|null     $stateAssignment
-     *
-     * @return self
      */
     public function stateConditionalSetRunAction(string $context, \Closure $closure, $stateConstraints, string $stateAssignment = null): self
     {

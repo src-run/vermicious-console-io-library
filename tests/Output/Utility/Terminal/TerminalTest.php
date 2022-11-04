@@ -23,7 +23,7 @@ class TerminalTest extends TestCase
     {
         $y = Terminal::y();
 
-        $this->assertInternalType('int', $y);
+        $this->assertIsInt($y);
         $this->assertGreaterThan(0, $y);
         $this->assertSame($y, Terminal::height());
     }
@@ -32,7 +32,7 @@ class TerminalTest extends TestCase
     {
         $x = Terminal::x();
 
-        $this->assertInternalType('int', $x);
+        $this->assertIsInt($x);
         $this->assertGreaterThan(0, $x);
         $this->assertSame($x, Terminal::width());
     }
@@ -68,8 +68,7 @@ class TerminalTest extends TestCase
             $this->fail(sprintf('Failed to create reflection for "%s"', Terminal::class));
         }
 
-        $m = $r->getMethod('resolveShellFromEnvGuessing');
-        $m->setAccessible(true);
+        ($m = $r->getMethod('resolveShellFromEnvGuessing'))->setAccessible(true);
         $s = $m->invoke(null);
 
         $this->assertNotNull($s);
@@ -170,12 +169,9 @@ class TerminalTest extends TestCase
 
     /**
      * @dataProvider provideLocateData
-     *
-     * @param string $name
-     * @param string $path
      */
     public function testLocate(string $name, string $path): void
     {
-        $this->assertContains($path, Terminal::locateAll($name));
+        $this->assertContains($path, Terminal::locateAll($name) ?? []);
     }
 }

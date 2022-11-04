@@ -18,10 +18,7 @@ class BooleanAnswer implements AnswerInterface
     use AnswerTrait;
 
     /**
-     * @param Question   $question
      * @param mixed|null $answer
-     * @param bool       $default
-     * @param bool       $interactive
      */
     public function __construct(Question $question, $answer = null, bool $default = false, bool $interactive = true)
     {
@@ -31,33 +28,21 @@ class BooleanAnswer implements AnswerInterface
         $this->interactive = $interactive;
     }
 
-    /**
-     * @return null|bool
-     */
     public function getAnswer(): ?bool
     {
         return $this->result;
     }
 
-    /**
-     * @return string
-     */
     public function stringifyAnswer(): string
     {
         return $this->getAnswer() ? 'true' : 'false';
     }
 
-    /**
-     * @return bool
-     */
     public function isTrue(): bool
     {
         return true === $this->getAnswer();
     }
 
-    /**
-     * @return bool
-     */
     public function isFalse(): bool
     {
         return false === $this->getAnswer();

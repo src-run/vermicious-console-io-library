@@ -15,9 +15,6 @@ use SR\Console\Output\Style\StyleInterface;
 
 final class VerbosePercentageProgress extends AbstractPercentageProgress
 {
-    /**
-     * @param StyleInterface $io
-     */
     public function __construct(StyleInterface $io)
     {
         parent::__construct($io);

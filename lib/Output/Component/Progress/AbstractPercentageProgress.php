@@ -15,18 +15,9 @@ use SR\Exception\Logic\InvalidArgumentException;
 
 abstract class AbstractPercentageProgress extends AbstractProgressHelper
 {
-    /**
-     * @var int
-     */
-    private $percent = 0;
+    private int $percent = 0;
 
-    /**
-     * @param int|null    $steps
-     * @param string|null $context
-     *
-     * @return AbstractProgressHelper|self
-     */
-    public function create(int $steps = null, string $context = null): AbstractProgressHelper
+    public function create(int $steps = null, string $context = null): AbstractProgressHelper|self
     {
         $this->ensureProgressStopped();
 
@@ -34,18 +25,10 @@ abstract class AbstractPercentageProgress extends AbstractProgressHelper
             return parent::create(100, $context);
         }
 
-        throw new InvalidArgumentException(
-            'Percent based progress helper is hard-coded to use 100 steps; do not pass step count to "%s"!',
-            __METHOD__
-        );
+        throw new InvalidArgumentException('Percent based progress helper is hard-coded to use 100 steps; do not pass step count to "%s"!', __METHOD__);
     }
 
-    /**
-     * @param int $count
-     *
-     * @return AbstractProgressHelper|self
-     */
-    public function step(int $count = 1): AbstractProgressHelper
+    public function step(int $count = 1): AbstractProgressHelper|self
     {
         $this->ensureProgressStarted();
         $this->percent += $count;
@@ -53,11 +36,6 @@ abstract class AbstractPercentageProgress extends AbstractProgressHelper
         return parent::step($count);
     }
 
-    /**
-     * @param int $percent
-     *
-     * @return self
-     */
     public function percent(int $percent): self
     {
         return $this->step($percent - $this->percent);

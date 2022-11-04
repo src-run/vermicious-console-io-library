@@ -30,9 +30,6 @@ use SR\Console\Tests\Style\StyleTest;
  */
 class ActionTest extends TestCase
 {
-    /**
-     * @return \Generator
-     */
     public static function provideActionTypeData(): \Generator
     {
         yield ['bracketed', BracketedAction::class];
@@ -50,18 +47,12 @@ class ActionTest extends TestCase
 
     /**
      * @dataProvider provideActionTypeData
-     *
-     * @param null|string $type
-     * @param string      $class
      */
     public function testActionFactoryCreate(?string $type, string $class)
     {
         $this->assertInstanceOf($class, ActionFactory::create($type));
     }
 
-    /**
-     * @return \Generator
-     */
     public static function provideInvalidActionTypeData(): \Generator
     {
         yield ['foo'];
@@ -72,21 +63,17 @@ class ActionTest extends TestCase
 
     /**
      * @dataProvider provideInvalidActionTypeData
-     *
-     * @param string $type
      */
     public function testInvalidActionFactoryCreate(string $type)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('{Unable to find action of type class \(none of .+ are valid action types\)\.}');
+        $this->expectExceptionMessageMatches('{Unable to find action of type class \(none of .+ are valid action types\)\.}');
 
         ActionFactory::create($type);
     }
 
     /**
      * @dataProvider provideActionTypeData
-     *
-     * @param null|string $type
      */
     public function testThrowsExceptionWhenExtrasDisabled(string $type = null)
     {
@@ -104,9 +91,6 @@ class ActionTest extends TestCase
         $action->extras('one', 'two', 'three');
     }
 
-    /**
-     * @return \Generator
-     */
     public function provideMethodCalledFromInvalidStateData(): \Generator
     {
         foreach (self::provideActionTypeData()  as [$type, $class]) {
@@ -163,15 +147,11 @@ class ActionTest extends TestCase
 
     /**
      * @dataProvider provideMethodCalledFromInvalidStateData
-     *
-     * @param string      $method
-     * @param \Closure    $closure
-     * @param null|string $type
      */
     public function testThrowsExceptionWhenMethodCalledFromInvalidState(string $method, \Closure $closure, string $type = null)
     {
         $this->expectException(StateException::class);
-        $this->expectExceptionMessageRegExp(sprintf(
+        $this->expectExceptionMessageMatches(sprintf(
             '{Cannot call SR\\\Console\\\Output\\\Component\\\Action[a-zA-Z\\\]+::%s\(\) method in state "[^"]+" \(acceptable states: [a-z, -]+\)\.}', $method
         ));
 
@@ -180,8 +160,6 @@ class ActionTest extends TestCase
 
     /**
      * @dataProvider provideActionTypeData
-     *
-     * @param null|string $type
      */
     public function testActionStyleAllowsMultipleEndCalls(string $type = null): void
     {
@@ -216,12 +194,6 @@ class ActionTest extends TestCase
         $this->assertInstanceOf(AbstractAction::class, $s->finish());
     }
 
-    /**
-     * @param string|null         $type
-     * @param StyleInterface|null $style
-     *
-     * @return AbstractAction
-     */
     private static function createAction(string $type = null, StyleInterface $style = null): AbstractAction
     {
         return ActionFactory::create($type, $style ?? StyleTest::createStyleInstance());

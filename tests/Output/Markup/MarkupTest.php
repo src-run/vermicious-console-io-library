@@ -32,9 +32,6 @@ class MarkupTest extends TestCase
         $this->assertSame('<>inner</>', $m('inner'));
     }
 
-    /**
-     * @return \Generator
-     */
     public static function provideColorsData(): \Generator
     {
         $colors = Markup::ACCEPTED_COLOURS;
@@ -51,9 +48,6 @@ class MarkupTest extends TestCase
 
     /**
      * @dataProvider provideColorsData
-     *
-     * @param null|string $fg
-     * @param null|string $bg
      */
     public function testColors(?string $fg, ?string $bg): void
     {
@@ -64,9 +58,6 @@ class MarkupTest extends TestCase
         $this->assertMarkupColors($m, $fg, $bg, true);
     }
 
-    /**
-     * @return \Generator
-     */
     public static function provideOptionsData(): \Generator
     {
         yield [Markup::O_BOLD];
@@ -78,21 +69,16 @@ class MarkupTest extends TestCase
 
     /**
      * @dataProvider provideOptionsData
-     *
-     * @param null|string ...$options
      */
     public function testOptions(?string ...$options): void
     {
         ($m = new Markup())->setOptions(...$options);
 
         foreach ($options as $opt) {
-            $this->assertRegExp(sprintf('{options=([a-z,]+)?%s([a-z,]+)?}', preg_quote($opt)), $m('inner'));
+            $this->assertMatchesRegularExpression(sprintf('{options=([a-z,]+)?%s([a-z,]+)?}', preg_quote($opt)), $m('inner'));
         }
     }
 
-    /**
-     * @return \Generator
-     */
     public static function provideInvalidOptionsData(): \Generator
     {
         yield [''];
@@ -105,8 +91,6 @@ class MarkupTest extends TestCase
 
     /**
      * @dataProvider provideInvalidOptionsData
-     *
-     * @param null|string ...$options
      */
     public function testInvalidOptions(?string ...$options): void
     {
@@ -116,24 +100,18 @@ class MarkupTest extends TestCase
         (new Markup())->setOptions(...$options);
     }
 
-    /**
-     * @param Markup      $markup
-     * @param null|string $fg
-     * @param null|string $bg
-     * @param bool        $explicit
-     */
     private function assertMarkupColors(Markup $markup, ?string $fg, ?string $bg, bool $explicit = false): void
     {
         if (null === $fg && false === $explicit) {
-            $this->assertNotContains(sprintf('fg=%s', $fg), $markup('inner'));
+            $this->assertStringNotContainsString(sprintf('fg=%s', $fg), $markup('inner'));
         } else {
-            $this->assertContains(sprintf('fg=%s', $fg ?? Markup::C_DEFAULT), $markup('inner'));
+            $this->assertStringContainsString(sprintf('fg=%s', $fg ?? Markup::C_DEFAULT), $markup('inner'));
         }
 
         if (null === $bg && false === $explicit) {
-            $this->assertNotContains(sprintf('bg=%s', $bg), $markup('inner'));
+            $this->assertStringNotContainsString(sprintf('bg=%s', $bg), $markup('inner'));
         } else {
-            $this->assertContains(sprintf('bg=%s', $bg ?? Markup::C_DEFAULT), $markup('inner'));
+            $this->assertStringContainsString(sprintf('bg=%s', $bg ?? Markup::C_DEFAULT), $markup('inner'));
         }
     }
 }

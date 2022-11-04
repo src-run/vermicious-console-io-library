@@ -134,49 +134,27 @@ abstract class AbstractAction implements ActionStates
      */
     private $finalNewlines;
 
-    /**
-     * @param StyleInterface|null $style
-     * @param Markup|null         $prefixDefMarkup
-     * @param \Closure|null       $prefixFormatter
-     * @param Markup|null         $actionDefMarkup
-     * @param \Closure|null       $actionFormatter
-     * @param Markup|null         $statusBeginDefMarkup
-     * @param \Closure|null       $statusBeginFormatter
-     * @param Markup|null         $statusInnerDefMarkup
-     * @param \Closure|null       $statusInnerFormatter
-     * @param string|null         $statusProgressCharacter
-     * @param Markup|null         $statusCloseDefMarkup
-     * @param \Closure|null       $statusCloseFormatter
-     * @param Markup|null         $resultDefMarkup
-     * @param \Closure|null       $resultFormatter
-     * @param Markup|null         $extrasBeginDefMarkup
-     * @param \Closure|null       $extrasBeginFormatter
-     * @param Markup|null         $extrasInnerDefMarkup
-     * @param \Closure|null       $extrasInnerFormatter
-     * @param Markup|null         $extrasCloseDefMarkup
-     * @param \Closure|null       $extrasCloseFormatter
-     */
     public function __construct(
         ?StyleInterface $style = null,
-        ?Markup         $prefixDefMarkup = null,
-        ?\Closure       $prefixFormatter = null,
-        ?Markup         $actionDefMarkup = null,
-        ?\Closure       $actionFormatter = null,
-        ?Markup         $statusBeginDefMarkup = null,
-        ?\Closure       $statusBeginFormatter = null,
-        ?Markup         $statusInnerDefMarkup = null,
-        ?\Closure       $statusInnerFormatter = null,
-        ?string         $statusProgressCharacter = null,
-        ?Markup         $statusCloseDefMarkup = null,
-        ?\Closure       $statusCloseFormatter = null,
-        ?Markup         $resultDefMarkup = null,
-        ?\Closure       $resultFormatter = null,
-        ?Markup         $extrasBeginDefMarkup = null,
-        ?\Closure       $extrasBeginFormatter = null,
-        ?Markup         $extrasInnerDefMarkup = null,
-        ?\Closure       $extrasInnerFormatter = null,
-        ?Markup         $extrasCloseDefMarkup = null,
-        ?\Closure       $extrasCloseFormatter = null
+        ?Markup $prefixDefMarkup = null,
+        ?\Closure $prefixFormatter = null,
+        ?Markup $actionDefMarkup = null,
+        ?\Closure $actionFormatter = null,
+        ?Markup $statusBeginDefMarkup = null,
+        ?\Closure $statusBeginFormatter = null,
+        ?Markup $statusInnerDefMarkup = null,
+        ?\Closure $statusInnerFormatter = null,
+        ?string $statusProgressCharacter = null,
+        ?Markup $statusCloseDefMarkup = null,
+        ?\Closure $statusCloseFormatter = null,
+        ?Markup $resultDefMarkup = null,
+        ?\Closure $resultFormatter = null,
+        ?Markup $extrasBeginDefMarkup = null,
+        ?\Closure $extrasBeginFormatter = null,
+        ?Markup $extrasInnerDefMarkup = null,
+        ?\Closure $extrasInnerFormatter = null,
+        ?Markup $extrasCloseDefMarkup = null,
+        ?\Closure $extrasCloseFormatter = null
     ) {
         $this->state = new State(self::STATE_INACTIVE);
         $this->prefixDefMarkup = $prefixDefMarkup ?? Markup::createExplicit();
@@ -202,22 +180,15 @@ abstract class AbstractAction implements ActionStates
         $this
             ->setNewlinesCount()
             ->setSupportExtras()
-            ->setStyle($style);
+            ->setStyle($style)
+        ;
     }
 
-    /**
-     * @return State
-     */
     public function getState(): State
     {
         return $this->state;
     }
 
-    /**
-     * @param int|null $newlinesCount
-     *
-     * @return self
-     */
     public function setNewlinesCount(int $newlinesCount = null): self
     {
         $this->state->stateRequireRunAndSetAction(
@@ -239,11 +210,6 @@ abstract class AbstractAction implements ActionStates
         return $this;
     }
 
-    /**
-     * @param bool|null $supportExtras
-     *
-     * @return self
-     */
     public function setSupportExtras(bool $supportExtras = null): self
     {
         $this->state->stateRequireRunAndSetAction(
@@ -265,11 +231,6 @@ abstract class AbstractAction implements ActionStates
         return $this;
     }
 
-    /**
-     * @param string $character
-     *
-     * @return self
-     */
     public function setStatusProgressCharacter(string $character): self
     {
         $this->state->stateRequireRunAndSetAction(
@@ -291,10 +252,7 @@ abstract class AbstractAction implements ActionStates
     }
 
     /**
-     * @param string|null $prefix
-     * @param Markup      $markup
-     *
-     * @return self
+     * @param Markup $markup
      */
     public function prefix(string $prefix = null, Markup $markup = null): self
     {
@@ -313,10 +271,7 @@ abstract class AbstractAction implements ActionStates
     }
 
     /**
-     * @param string $action
      * @param Markup $markup
-     *
-     * @return self
      */
     public function action(string $action, Markup $markup = null): self
     {
@@ -338,12 +293,6 @@ abstract class AbstractAction implements ActionStates
         return $this;
     }
 
-    /**
-     * @param string|null $status
-     * @param bool        $end
-     *
-     * @return StatusText
-     */
     public function statusText(string $status = null, bool $end = false): StatusText
     {
         $this->state->stateRequirements(__METHOD__, self::STATE_ACTION, self::STATE_STATUS_TEXT_ACTIVE);
@@ -366,13 +315,6 @@ abstract class AbstractAction implements ActionStates
         return $s;
     }
 
-    /**
-     * @param int|null    $steps
-     * @param int         $progress
-     * @param string|null $character
-     *
-     * @return StatusProgress
-     */
     public function statusProgress(int $steps = null, int $progress = 0, string $character = null): StatusProgress
     {
         $p = new StatusProgress(
@@ -392,11 +334,7 @@ abstract class AbstractAction implements ActionStates
     }
 
     /**
-     * @param string    $result
-     * @param bool|null $supportExtras
-     * @param Markup    $markup
-     *
-     * @return self
+     * @param Markup $markup
      */
     public function result(string $result, bool $supportExtras = null, Markup $markup = null): self
     {
@@ -426,51 +364,16 @@ abstract class AbstractAction implements ActionStates
         return $this;
     }
 
-    /**
-     * @param string|null $result
-     * @param bool|null   $supportExtras
-     *
-     * @return self
-     */
     abstract public function resultDone(string $result = null, bool $supportExtras = null): self;
 
-    /**
-     * @param string|null $result
-     * @param bool|null   $supportExtras
-     *
-     * @return self
-     */
     abstract public function resultOkay(string $result = null, bool $supportExtras = null): self;
 
-    /**
-     * @param string|null $result
-     * @param bool|null   $supportExtras
-     *
-     * @return self
-     */
     abstract public function resultWarn(string $result = null, bool $supportExtras = null): self;
 
-    /**
-     * @param string|null $result
-     * @param bool|null   $supportExtras
-     *
-     * @return self
-     */
     abstract public function resultStop(string $result = null, bool $supportExtras = null): self;
 
-    /**
-     * @param string|null $result
-     * @param bool|null   $supportExtras
-     *
-     * @return self
-     */
     abstract public function resultFail(string $result = null, bool $supportExtras = null): self;
 
-    /**
-     * @param string ...$extras
-     *
-     * @return ExtrasText
-     */
     public function extras(string ...$extras): ExtrasText
     {
         if (false === $this->supportExtras) {
@@ -499,9 +402,6 @@ abstract class AbstractAction implements ActionStates
         return $e;
     }
 
-    /**
-     * @return self
-     */
     public function complete(): self
     {
         $this->state->stateRequireRunAndSetAction(

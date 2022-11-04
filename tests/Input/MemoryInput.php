@@ -16,17 +16,11 @@ use Symfony\Component\Console\Input\StreamableInputInterface;
 
 class MemoryInput extends ArrayInput implements StreamableInputInterface
 {
-    /**
-     * @param array $parameters
-     */
     public function __construct(array $parameters = [])
     {
         parent::__construct($parameters);
     }
 
-    /**
-     * @param array $inputs
-     */
     public function setInput(array $inputs)
     {
         $stream = fopen('php://memory', 'r+', false);

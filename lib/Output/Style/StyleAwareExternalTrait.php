@@ -18,17 +18,11 @@ trait StyleAwareExternalTrait
      */
     protected $style;
 
-    /**
-     * @param StyleInterface|null $style
-     */
     public function setStyle(StyleInterface $style = null)
     {
         $this->style = $style;
     }
 
-    /**
-     * @return StyleInterface|null
-     */
     public function style(): ?StyleInterface
     {
         return $this->style;

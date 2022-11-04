@@ -33,21 +33,12 @@ final class SimpleList
      */
     private $listingAppended = false;
 
-    /**
-     * @param StyleInterface $style
-     * @param \Closure|null  $lineFormatter
-     */
     public function __construct(StyleInterface $style, \Closure $lineFormatter = null)
     {
         $this->setStyle($style);
         $this->setLineFormatter($lineFormatter);
     }
 
-    /**
-     * @param \Closure|null $lineFormatter
-     *
-     * @return self
-     */
     public function setLineFormatter(\Closure $lineFormatter = null): self
     {
         $this->lineFormatter = $lineFormatter ?? function ($line) {
@@ -57,9 +48,6 @@ final class SimpleList
         return $this;
     }
 
-    /**
-     * @return self
-     */
     public function listingStart(): self
     {
         $this->style()->prependText();
@@ -69,9 +57,6 @@ final class SimpleList
         return $this;
     }
 
-    /**
-     * @return self
-     */
     public function listingClose(): self
     {
         $this->style()->newline();
@@ -81,12 +66,6 @@ final class SimpleList
         return $this;
     }
 
-    /**
-     * @param string $line
-     * @param bool   $close
-     *
-     * @return self
-     */
     public function line(string $line, bool $close = false): self
     {
         if (false === $this->listingPrepended) {
@@ -104,8 +83,6 @@ final class SimpleList
 
     /**
      * @param string[] $listing
-     *
-     * @return self
      */
     public function listing(array $listing): self
     {
@@ -118,8 +95,6 @@ final class SimpleList
 
     /**
      * @param string[] $lines
-     *
-     * @return self
      */
     private function writeListLines(array $lines): self
     {

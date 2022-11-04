@@ -21,9 +21,6 @@ abstract class AbstractTable
 {
     use StyleAwareInternalTrait;
 
-    /**
-     * @param StyleInterface $style
-     */
     public function __construct(StyleInterface $style)
     {
         $this->setStyle($style);
@@ -32,8 +29,6 @@ abstract class AbstractTable
     /**
      * @param string[] $headers
      * @param array[]  ...$rows
-     *
-     * @return self
      */
     public function write(array $headers, ...$rows): self
     {
@@ -66,10 +61,7 @@ abstract class AbstractTable
     abstract protected function formatInputData(array $h, array $r): array;
 
     /**
-     * @param array   $h
      * @param array[] $r
-     *
-     * @return Table
      */
     private function createTable(array $h, array $r): Table
     {

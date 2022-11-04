@@ -31,11 +31,6 @@ abstract class AbstractStringInterpolator
      */
     private $normalizer;
 
-    /**
-     * @param string        $format
-     * @param array         $replacements
-     * @param \Closure|null $normalizer
-     */
     public function __construct(string $format, array $replacements = [], ?\Closure $normalizer = null)
     {
         $this->setFormat($format);
@@ -43,11 +38,6 @@ abstract class AbstractStringInterpolator
         $this->setNormalizer($normalizer);
     }
 
-    /**
-     * @param string $format
-     *
-     * @return self
-     */
     public function setFormat(string $format): self
     {
         $this->format = $format;
@@ -55,11 +45,6 @@ abstract class AbstractStringInterpolator
         return $this;
     }
 
-    /**
-     * @param array $replacements
-     *
-     * @return self
-     */
     public function setReplacements(array $replacements): self
     {
         $this->replacements = $replacements;
@@ -67,12 +52,6 @@ abstract class AbstractStringInterpolator
         return $this;
     }
 
-    /**
-     * @param array $replacements
-     * @param bool  $overwrite
-     *
-     * @return self
-     */
     public function addReplacements(array $replacements, bool $overwrite = false): self
     {
         foreach ($replacements as $index => $value) {
@@ -83,11 +62,7 @@ abstract class AbstractStringInterpolator
     }
 
     /**
-     * @param string     $value
      * @param mixed|null $index
-     * @param bool       $overwrite
-     *
-     * @return self
      */
     public function addOneReplacement(string $value, $index = null, bool $overwrite = false): self
     {
@@ -106,11 +81,6 @@ abstract class AbstractStringInterpolator
         return $this;
     }
 
-    /**
-     * @param \Closure|null $normalizer
-     *
-     * @return self
-     */
     public function setNormalizer(?\Closure $normalizer = null): self
     {
         $this->normalizer = $normalizer ?? function (string $string): string {
@@ -120,11 +90,6 @@ abstract class AbstractStringInterpolator
         return $this;
     }
 
-    /**
-     * @param bool $throwOnFailure
-     *
-     * @return string
-     */
     public function compile(bool $throwOnFailure = false): string
     {
         try {
@@ -148,9 +113,6 @@ abstract class AbstractStringInterpolator
         }, $this->replacements);
     }
 
-    /**
-     * @return string
-     */
     abstract protected function interpolate(): string;
 
     /**

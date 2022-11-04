@@ -19,10 +19,7 @@ class MultipleChoiceAnswer implements AnswerInterface, \Countable
     use AnswerTrait;
 
     /**
-     * @param Question   $question
      * @param mixed|null $choices
-     * @param bool       $default
-     * @param bool       $interactive
      */
     public function __construct(Question $question, array $choices = [], bool $default = false, bool $interactive = true)
     {
@@ -34,9 +31,6 @@ class MultipleChoiceAnswer implements AnswerInterface, \Countable
         }, array_keys($choices));
     }
 
-    /**
-     * @return string
-     */
     public function stringifyAnswer(): string
     {
         return implode(',', array_map(function (ChoiceAnswer $a): string {
@@ -52,9 +46,6 @@ class MultipleChoiceAnswer implements AnswerInterface, \Countable
         return $this->result ?? [];
     }
 
-    /**
-     * @return null|AnswerInterface
-     */
     public function firstAnswer(): ?AnswerInterface
     {
         $answers = $this->getAnswer();
@@ -65,7 +56,7 @@ class MultipleChoiceAnswer implements AnswerInterface, \Countable
     /**
      * @param string|\Closure $search
      *
-     * @return null|AnswerInterface|ChoiceAnswer
+     * @return AnswerInterface|ChoiceAnswer|null
      */
     public function findAnswer($search): ?ChoiceAnswer
     {
@@ -88,9 +79,6 @@ class MultipleChoiceAnswer implements AnswerInterface, \Countable
         });
     }
 
-    /**
-     * @return int
-     */
     public function count(): int
     {
         return count($this->getAnswer());

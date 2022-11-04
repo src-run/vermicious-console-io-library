@@ -56,17 +56,12 @@ trait ActionStyleTrait
      */
     protected $action;
 
-    /**
-     * @return AbstractAction
-     */
     public function getAction(): AbstractAction
     {
         return $this->action;
     }
 
     /**
-     * @param Markup $beginDefMarkup
-     *
      * @return self|ExtrasText|StatusText
      */
     public function setBeginDefMarkup(Markup $beginDefMarkup): self
@@ -77,8 +72,6 @@ trait ActionStyleTrait
     }
 
     /**
-     * @param \Closure $beginFormatter
-     *
      * @return self|ExtrasText|StatusText
      */
     public function setBeginFormatter(\Closure $beginFormatter): self
@@ -89,8 +82,6 @@ trait ActionStyleTrait
     }
 
     /**
-     * @param Markup $innerDefMarkup
-     *
      * @return self|ExtrasText|StatusText
      */
     public function setInnerDefMarkup(Markup $innerDefMarkup): self
@@ -101,8 +92,6 @@ trait ActionStyleTrait
     }
 
     /**
-     * @param \Closure $innerFormatter
-     *
      * @return self|ExtrasText|StatusText
      */
     public function setInnerFormatter(\Closure $innerFormatter): self
@@ -113,8 +102,6 @@ trait ActionStyleTrait
     }
 
     /**
-     * @param Markup $afterDefMarkup
-     *
      * @return self|ExtrasText|StatusText
      */
     public function setAfterDefMarkup(Markup $afterDefMarkup): self
@@ -125,8 +112,6 @@ trait ActionStyleTrait
     }
 
     /**
-     * @param \Closure $afterFormatter
-     *
      * @return self|ExtrasText|StatusText
      */
     public function setAfterFormatter(\Closure $afterFormatter): self
@@ -137,8 +122,6 @@ trait ActionStyleTrait
     }
 
     /**
-     * @param AbstractAction $action
-     *
      * @return self||ExtrasText
      */
     protected function setAction(AbstractAction $action): self

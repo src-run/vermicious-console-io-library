@@ -13,9 +13,6 @@ namespace SR\Console\Output\Utility\Interpolate;
 
 final class PsrStringInterpolator extends AbstractStringInterpolator
 {
-    /**
-     * @return string
-     */
     protected function interpolate(): string
     {
         $message = $this->format;

@@ -21,9 +21,6 @@ class Text
     use PsrStringInterpolatorTrait;
     use StyleAwareInternalTrait;
 
-    /**
-     * @param StyleInterface $style
-     */
     public function __construct(StyleInterface $style)
     {
         $this->setStyle($style);
@@ -32,8 +29,6 @@ class Text
     /**
      * @param string|string[] $lines
      * @param mixed[]         $replacements
-     *
-     * @return self
      */
     public function text($lines, array $replacements = []): self
     {
@@ -48,8 +43,6 @@ class Text
     /**
      * @param string|string[] $lines
      * @param mixed[]         $replacements
-     *
-     * @return self
      */
     public function comment($lines, array $replacements = []): self
     {
@@ -64,8 +57,6 @@ class Text
     /**
      * @param string|string[] $lines
      * @param mixed[]         $replacements
-     *
-     * @return self
      */
     public function muted($lines, array $replacements = []): self
     {
@@ -77,10 +68,7 @@ class Text
     }
 
     /**
-     * @param int    $length
-     * @param string $character
-     *
-     * @return self
+     * @param int $length
      */
     public function separator(int $length = null, string $character = '-'): self
     {

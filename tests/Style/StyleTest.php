@@ -84,7 +84,7 @@ class StyleTest extends AbstractTestCase
     /**
      * @var string
      */
-    private static $fixtureRootPath = __DIR__.'/../Fixtures/Style/';
+    private static $fixtureRootPath = __DIR__ . '/../Fixtures/Style/';
 
     public function testInputOutputAccessorMethods(): void
     {
@@ -94,9 +94,6 @@ class StyleTest extends AbstractTestCase
         $this->assertSame($o, $s->getOutput());
     }
 
-    /**
-     * @return array
-     */
     public static function provideVerbosityAccessorMethodData(): array
     {
         return [
@@ -109,8 +106,6 @@ class StyleTest extends AbstractTestCase
     }
 
     /**
-     * @param int $verbosity
-     *
      * @dataProvider provideVerbosityAccessorMethodData
      */
     public function testVerbosityAccessorMethods(int $verbosity)
@@ -225,9 +220,6 @@ class StyleTest extends AbstractTestCase
         $this->assertNull($c->getAnswer());
     }
 
-    /**
-     * @return \Generator
-     */
     public static function provideChoiceData(): \Generator
     {
         $choices = self::getCandies();
@@ -239,13 +231,11 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @dataProvider provideChoiceData
-     *
-     * @param array  $choices
-     * @param string $value
-     * @param string $index
      */
-    public function testAssociativeChoiceDefault(array $choices, string $value, string $index): void
+    public function testAssociativeChoiceDefault(array $choices, string $value, mixed $index): void
     {
+        $index = (string) $index;
+
         $style = static::createStyleInstance($input = new MemoryInput());
         $input->setInteractive(false);
 
@@ -266,13 +256,11 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @dataProvider provideChoiceData
-     *
-     * @param array $choices
      */
     public function testInvalidChoiceDefault(array $choices): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageRegExp('{Configured default "[^"]+" is not an available choice\.}');
+        $this->expectExceptionMessageMatches('{Configured default "[^"]+" is not an available choice\.}');
 
         $i = static::createInputInstance();
         $i->setInteractive(false);
@@ -282,9 +270,6 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @dataProvider provideChoiceData
-     *
-     * @param array  $choices
-     * @param string $input
      */
     public function testHiddenChoice(array $choices, string $input): void
     {
@@ -303,9 +288,6 @@ class StyleTest extends AbstractTestCase
         $this->assertSame(array_search($c->getAnswer(), $choices, true), $c->getIndex());
     }
 
-    /**
-     * @return \Generator
-     */
     public static function provideMultipleChoiceData(): \Generator
     {
         $candies = self::getCandies();
@@ -320,9 +302,6 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @dataProvider provideMultipleChoiceData
-     *
-     * @param array $choices
-     * @param array $inputs
      */
     public function testMultipleChoice(array $choices, array $inputs): void
     {
@@ -340,9 +319,6 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @dataProvider provideMultipleChoiceData
-     *
-     * @param array $choices
-     * @param array $inputs
      */
     public function testDefaultMultipleChoiceInteractive(array $choices, array $inputs): void
     {
@@ -360,9 +336,6 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @dataProvider provideMultipleChoiceData
-     *
-     * @param array $choices
-     * @param array $inputs
      */
     public function testDefaultMultipleChoiceNonInteractive(array $choices, array $inputs): void
     {
@@ -378,9 +351,6 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @dataProvider provideMultipleChoiceData
-     *
-     * @param array $choices
-     * @param array $inputs
      */
     public function testMultipleChoiceInvalidAndValid(array $choices, array $inputs): void
     {
@@ -401,8 +371,8 @@ class StyleTest extends AbstractTestCase
 
         $stream = $o->getStream();
         rewind($stream);
-        $this->assertRegExp('{Invalid.+\n?.*empty.+\n?.*choice.+\n?.*answer.+\n?.*provided\..+\n?.*Available.+\n?.*choices:}', $contents = stream_get_contents($stream));
-        $this->assertRegExp('{Invalid.+\n?.*choice.+\n?.*answer.+\n?.*"foo".+\n?.*provided\..+\n?.*Available.+\n?.*choices:}', $contents);
+        $this->assertMatchesRegularExpression('{Invalid.+\n?.*empty.+\n?.*choice.+\n?.*answer.+\n?.*provided\..+\n?.*Available.+\n?.*choices:}', $contents = stream_get_contents($stream));
+        $this->assertMatchesRegularExpression('{Invalid.+\n?.*choice.+\n?.*answer.+\n?.*"foo".+\n?.*provided\..+\n?.*Available.+\n?.*choices:}', $contents);
     }
 
     public function testAmbiguouisChoice(): void
@@ -429,7 +399,7 @@ class StyleTest extends AbstractTestCase
 
         $stream = $o->getStream();
         rewind($stream);
-        $this->assertRegExp('{The.+\n?.*provided.+\n?.*answer.+\n?.*is.+\n?.*ambiguous\..+\n?.*Value.+\n?.*should.+\n?.*be.+\n?.*one.+\n?.*of}', stream_get_contents($stream));
+        $this->assertMatchesRegularExpression('{The.+\n?.*provided.+\n?.*answer.+\n?.*is.+\n?.*ambiguous\..+\n?.*Value.+\n?.*should.+\n?.*be.+\n?.*one.+\n?.*of}', stream_get_contents($stream));
     }
 
     public function testAutoCompletion(): void
@@ -465,13 +435,10 @@ class StyleTest extends AbstractTestCase
         $stream = $o->getStream();
         rewind($stream);
         $content = stream_get_contents($stream);
-        $this->assertRegExp('{Invalid.+\n?.*choice.+\n?.*answer.+\n?.*"z".+\n?.*provided}', $content);
-        $this->assertRegExp('{Invalid.+\n?.*choice.+\n?.*answer.+\n?.*"bb".+\n?.*provided}', $content);
+        $this->assertMatchesRegularExpression('{Invalid.+\n?.*choice.+\n?.*answer.+\n?.*"z".+\n?.*provided}', $content);
+        $this->assertMatchesRegularExpression('{Invalid.+\n?.*choice.+\n?.*answer.+\n?.*"bb".+\n?.*provided}', $content);
     }
 
-    /**
-     * @return \Generator
-     */
     public static function provideAmbiguousMultipleChoiceAnswerSearchData(): \Generator
     {
         foreach (self::provideMultipleChoiceData() as [$choices, $inputs]) {
@@ -483,9 +450,6 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @dataProvider provideAmbiguousMultipleChoiceAnswerSearchData
-     *
-     * @param array $choices
-     * @param array $inputs
      */
     public function testAmbiguousMultipleChoiceAnswerSearch(array $choices, array $inputs): void
     {
@@ -501,28 +465,22 @@ class StyleTest extends AbstractTestCase
         $this->assertCount($c->count(), $inputs);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('{Search was ambiguous and returned [0-9]+ results\.}');
+        $this->expectExceptionMessageMatches('{Search was ambiguous and returned [0-9]+ results\.}');
 
         $this->assertNull($c->findAnswer(function ($a) {
             return true;
         }));
     }
 
-    /**
-     * @return array
-     */
     public static function provideStyleTestResourcesData(): array
     {
-        $closurePaths = glob(static::$fixtureRootPath.'/*/closure.php');
-        $consolePaths = glob(static::$fixtureRootPath.'/*/console.txt');
+        $closurePaths = glob(static::$fixtureRootPath . '/*/*.php');
+        $consolePaths = glob(static::$fixtureRootPath . '/*/*.txt');
 
         return array_map(null, $closurePaths, $consolePaths);
     }
 
     /**
-     * @param string $commandFile
-     * @param string $expectedFile
-     *
      * @dataProvider provideStyleTestResourcesData
      */
     public function testCommandOutputBuffer(string $commandFile, string $expectedFile)
@@ -538,13 +496,15 @@ class StyleTest extends AbstractTestCase
             $this->assertSame(
                 $expectedLinesCount = count($expectedLines),
                 $providedLinesCount = count($providedLines),
-                vsprintf("Output lines (%d) do not match expected lines (%d).\n%s\n%s\n", [
+                vsprintf("Output lines from (%s:%d) do not match expected lines from (%s:%d).\n%s\n%s\n", [
+                    $commandFile,
                     $providedLinesCount,
+                    $expectedFile,
                     $expectedLinesCount,
                     self::numberFileLines($expectedLines, 'EXPECTED OUTPUT', $expectedFile),
                     self::numberFileLines($providedLines, 'PROVIDED OUTPUT', $commandFile),
-                ]
-            ));
+                ])
+            );
 
             for ($i = 0; $i < count($expectedLines); ++$i) {
                 static::assertLineFuzzyEqualsLine($expectedLines[$i] ?? null, $providedLines[$i] ?? null, $i + 1, $expectedFile);
@@ -581,10 +541,6 @@ class StyleTest extends AbstractTestCase
     }
 
     /**
-     * @param string $inputString
-     * @param int    $blockType
-     * @param int    $lineAdjustment
-     *
      * @dataProvider dataBlockWordWrappingProvider
      */
     public function testBlockWordWrapping(string $inputString, int $blockType, int $lineAdjustment)
@@ -600,22 +556,11 @@ class StyleTest extends AbstractTestCase
         $this->assertSame($needleLines, mb_substr_count($result, $needleChars));
     }
 
-    /**
-     * @param InputInterface|null  $i
-     * @param OutputInterface|null $o
-     *
-     * @return StyleInterface
-     */
     public static function createStyleInstance(InputInterface $i = null, OutputInterface $o = null): StyleInterface
     {
         return new Style($i ?: static::createInputInstance(), $o ?: static::createOutputInstance());
     }
 
-    /**
-     * @param array $array
-     *
-     * @return array
-     */
     private static function shuffleArrayPreserveKeys(array $array): array
     {
         $keys = array_keys($array);
@@ -627,11 +572,7 @@ class StyleTest extends AbstractTestCase
     }
 
     /**
-     * @param ChoiceAnswer $answer
-     * @param string       $question
-     * @param array        $choices
-     * @param string       $value
-     * @param mixed        $index
+     * @param mixed $index
      */
     private function assertValidSingleChoiceAnswer(ChoiceAnswer $answer, string $question, array $choices, string $value, $index): void
     {
@@ -651,11 +592,6 @@ class StyleTest extends AbstractTestCase
         $this->assertSame(mb_strlen($value), $answer->length());
     }
 
-    /**
-     * @param MultipleChoiceAnswer $c
-     * @param array                $choices
-     * @param array                $inputs
-     */
     private function assertMultipleChoiceAnswerAccessors(MultipleChoiceAnswer $c, array $choices, array $inputs): void
     {
         $this->assertCount($c->count(), $inputs);
@@ -665,7 +601,7 @@ class StyleTest extends AbstractTestCase
         }
 
         foreach ($inputs as $i) {
-            $this->assertContains($i, $c->stringifyAnswer());
+            $this->assertStringContainsString($i, $c->stringifyAnswer());
             $this->assertInstanceOf(AnswerInterface::class, $c->findAnswer($i));
 
             foreach ($c->filterAnswers($i) as $f) {
@@ -692,10 +628,6 @@ class StyleTest extends AbstractTestCase
         }));
     }
 
-    /**
-     * @param BooleanAnswer $answer
-     * @param bool          $expected
-     */
     private function assertNonInteractiveBooleanAnswerAccessors(BooleanAnswer $answer, bool $expected): void
     {
         $this->assertSame($expected, $answer->getAnswer());
@@ -742,11 +674,7 @@ class StyleTest extends AbstractTestCase
     }
 
     /**
-     * @param \Closure $code
-     * @param bool     $normalize
-     * @param array    $options
-     *
-     * @return string
+     * @param array $options
      */
     private function setAndExecuteCommandTest(\Closure $code, bool $normalize = true, array $options = null): string
     {
@@ -766,17 +694,11 @@ class StyleTest extends AbstractTestCase
         return $tester->getDisplay($normalize);
     }
 
-    /**
-     * @return InputInterface
-     */
     private static function createInputInstance(): InputInterface
     {
         return new MemoryInput();
     }
 
-    /**
-     * @return OutputInterface
-     */
     private static function createOutputInstance(): OutputInterface
     {
         return new TestOutput();
@@ -784,10 +706,6 @@ class StyleTest extends AbstractTestCase
 
     /**
      * @param string|string[] $contents
-     * @param string|null     $fileHead
-     * @param string|null     $fileName
-     *
-     * @return string
      */
     private static function numberFileLines($contents, string $fileHead = null, string $fileName = null): string
     {
@@ -818,8 +736,6 @@ class StyleTest extends AbstractTestCase
     /**
      * @param string $expectedText
      * @param string $providedText
-     * @param int    $fileLine
-     * @param string $fileName
      */
     private static function assertLineFuzzyEqualsLine($expectedText, $providedText, int $fileLine, string $fileName)
     {
@@ -833,8 +749,6 @@ class StyleTest extends AbstractTestCase
     /**
      * @param string $expectedOutput
      * @param string $providedOutput
-     * @param int    $fileLine
-     * @param string $fileName
      */
     private static function assertGeneratedOutputEqualsExpectedOutput($expectedOutput, $providedOutput, int $fileLine, string $fileName)
     {
@@ -852,12 +766,10 @@ class StyleTest extends AbstractTestCase
     /**
      * @param string $expectedRegExp
      * @param string $providedOutput
-     * @param int    $fileLine
-     * @param string $fileName
      */
     private static function assertGeneratedOutputEqualsExpectedRegExp($expectedRegExp, $providedOutput, int $fileLine, string $fileName)
     {
-        static::assertRegExp($expectedRegExp, $providedOutput, vsprintf(
+        static::assertMatchesRegularExpression($expectedRegExp, $providedOutput, vsprintf(
             '%sExpectation from line "%d" of file "%s" (as regular expression) does not match generated text.%1$s  [expected regexp] => "%s"%1$s  [provided output] => "%s"%1$s', [
                 PHP_EOL,
                 $fileLine,

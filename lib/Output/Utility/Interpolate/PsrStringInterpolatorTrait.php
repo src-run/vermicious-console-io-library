@@ -23,17 +23,11 @@ trait PsrStringInterpolatorTrait
      */
     private static $interpolateNormalizer;
 
-    /**
-     * @param bool $interpolateThrows
-     */
     public static function setInterpolateThrows(bool $interpolateThrows): void
     {
         static::$interpolateThrows = $interpolateThrows;
     }
 
-    /**
-     * @param null|\Closure $interpolateNormalizer
-     */
     public static function setInterpolateNormalizer(?\Closure $interpolateNormalizer): void
     {
         static::$interpolateNormalizer = $interpolateNormalizer;
@@ -57,10 +51,7 @@ trait PsrStringInterpolatorTrait
     }
 
     /**
-     * @param string  $line
      * @param mixed[] $replacements
-     *
-     * @return string
      */
     private static function interpolateLine(string $line, array $replacements = []): string
     {
@@ -68,10 +59,7 @@ trait PsrStringInterpolatorTrait
     }
 
     /**
-     * @param string  $format
      * @param mixed[] $replacements
-     *
-     * @return AbstractStringInterpolator
      */
     private static function createInterpolator(string $format, array $replacements): AbstractStringInterpolator
     {

@@ -20,19 +20,11 @@ class TitleHeader
 {
     use StyleAwareInternalTrait;
 
-    /**
-     * @param StyleInterface $style
-     */
     public function __construct(StyleInterface $style)
     {
         $this->setStyle($style);
     }
 
-    /**
-     * @param string $title
-     *
-     * @return self
-     */
     public function title(string $title): self
     {
         $lines = [vsprintf('%s <em>%s</em>', [
@@ -50,10 +42,7 @@ class TitleHeader
     }
 
     /**
-     * @param Application $application
-     * @param array       ...$properties
-     *
-     * @return self
+     * @param array ...$properties
      */
     public function applicationTitle(Application $application, ...$properties): self
     {
@@ -80,9 +69,6 @@ class TitleHeader
     }
 
     /**
-     * @param Application $application
-     * @param array       $properties
-     *
      * @return string[]
      */
     private function compileApplicationProps(Application $application, array $properties): array
@@ -95,7 +81,7 @@ class TitleHeader
             array_walk($properties, function (&$prop, $name) use ($len) {
                 $prop = vsprintf('%s %s %s', [
                     (new Markup('black', null, 'bold'))->markupValue('-'),
-                    $this->style()->pad('@'.$name, $len + 1, ' ', STR_PAD_RIGHT),
+                    $this->style()->pad('@' . $name, $len + 1, ' ', STR_PAD_RIGHT),
                     $prop,
                 ]);
             });
@@ -104,12 +90,6 @@ class TitleHeader
         return $properties;
     }
 
-    /**
-     * @param Application $application
-     * @param array       $properties
-     *
-     * @return array
-     */
     private function prependAutoApplicationProps(Application $application, array $properties): array
     {
         if (!isset($properties['author']) && null !== $author = $this->getApplicationAuthor($application)) {
@@ -124,8 +104,6 @@ class TitleHeader
     }
 
     /**
-     * @param Application $application
-     *
      * @return string
      */
     private function getApplicationLicense(Application $application): ?string
@@ -144,8 +122,6 @@ class TitleHeader
     }
 
     /**
-     * @param Application $application
-     *
      * @return string
      */
     private function getApplicationAuthor(Application $application): ?string
@@ -163,11 +139,6 @@ class TitleHeader
         return $author;
     }
 
-    /**
-     * @param Application $application
-     *
-     * @return string
-     */
     private function getApplicationGitHash(Application $application): string
     {
         if (method_exists($application, 'getGitHash') && $application->getGitHash()) {
@@ -177,11 +148,6 @@ class TitleHeader
         return '';
     }
 
-    /**
-     * @param Application $application
-     *
-     * @return string
-     */
     private function getApplicationVersion(Application $application): string
     {
         return null !== ($version = $application->getVersion())

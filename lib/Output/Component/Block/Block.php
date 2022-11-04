@@ -26,38 +26,29 @@ class Block
     /**
      * @var int
      */
-    const TYPE_SM = 1024;
+    public const TYPE_SM = 1024;
 
     /**
      * @var int
      */
-    const TYPE_MD = 2048;
+    public const TYPE_MD = 2048;
 
     /**
      * @var int
      */
-    const TYPE_LG = 4096;
+    public const TYPE_LG = 4096;
 
     /**
      * @var int
      */
     private $type;
 
-    /**
-     * @param StyleInterface $style
-     * @param int            $type
-     */
     public function __construct(StyleInterface $style, int $type = self::TYPE_MD)
     {
         $this->setStyle($style);
         $this->setType($type);
     }
 
-    /**
-     * @param int $type
-     *
-     * @return self
-     */
     public function setType(int $type): self
     {
         $this->type = $type;
@@ -66,13 +57,8 @@ class Block
     }
 
     /**
-     * @param array       $text
-     * @param string|null $head
-     * @param mixed[]     $replacements
-     * @param string|null $prefix
-     * @param Markup      $markup
-     *
-     * @return self
+     * @param mixed[] $replacements
+     * @param Markup  $markup
      */
     public function write(array $text, string $head = null, array $replacements = [], string $prefix = null, Markup $markup = null): self
     {
@@ -90,20 +76,13 @@ class Block
         return $this;
     }
 
-    /**
-     * @param array       $lines
-     * @param string|null $prefix
-     * @param int         $length
-     *
-     * @return array
-     */
     public static function wordwrap(array $lines, string $prefix = null, int $length = 80): array
     {
         $wrapped = [];
         foreach ($lines as $l) {
             $wrapped = array_merge($wrapped, explode(PHP_EOL, wordwrap(
                 OutputFormatter::escape($l),
-                $length - Helper::strlen($prefix) - 3,
+                $length - Helper::width($prefix) - 3,
                 PHP_EOL,
                 true
             )));
@@ -112,11 +91,6 @@ class Block
         return $wrapped;
     }
 
-    /**
-     * @param array $lines
-     *
-     * @return array
-     */
     private function padHeight(array $lines): array
     {
         if (self::TYPE_SM === $this->type) {
@@ -126,12 +100,6 @@ class Block
         return array_merge([''], $lines, ['']);
     }
 
-    /**
-     * @param array       $lines
-     * @param string|null $header
-     *
-     * @return array
-     */
     private function prependHeader(array $lines, string $header = null): array
     {
         if (null !== $header) {
@@ -156,11 +124,6 @@ class Block
         return $lines;
     }
 
-    /**
-     * @param array $lines
-     *
-     * @return array
-     */
     private function padLength(array $lines): array
     {
         return array_map(function ($line) {
@@ -169,9 +132,6 @@ class Block
     }
 
     /**
-     * @param array       $lines
-     * @param string|null $prefix
-     *
      * @return array
      */
     private function prefix(array $lines, string $prefix = null)

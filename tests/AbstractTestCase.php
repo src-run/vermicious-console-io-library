@@ -19,8 +19,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 abstract class AbstractTestCase extends TestCase
 {
     /**
-     * @param null|resource|string[] $stream
-     * @param bool                   $interactive
+     * @param resource|string[]|null $stream
      *
      * @return StreamableInputInterface|MockObject
      */
@@ -36,26 +35,27 @@ abstract class AbstractTestCase extends TestCase
 
         $input = $this
             ->getMockBuilder(StreamableInputInterface::class)
-            ->getMock();
+            ->getMock()
+        ;
 
         $input
             ->expects($this->any())
             ->method('isInteractive')
-            ->will($this->returnValue($interactive));
+            ->willReturn($interactive)
+        ;
 
         if ($stream) {
             $input
                 ->expects($this->any())
                 ->method('getStream')
-                ->willReturn($stream);
+                ->willReturn($stream)
+            ;
         }
 
         return $input;
     }
 
     /**
-     * @param string ...$lines
-     *
      * @return resource
      */
     protected function createInputStreamResource(string ...$lines)
@@ -63,7 +63,7 @@ abstract class AbstractTestCase extends TestCase
         $stream = fopen('php://memory', 'r+', false);
 
         foreach ($lines as $l) {
-            fwrite($stream, $l.PHP_EOL);
+            fwrite($stream, $l . PHP_EOL);
         }
 
         rewind($stream);
@@ -77,9 +77,6 @@ abstract class AbstractTestCase extends TestCase
         return $stream;
     }
 
-    /**
-     * @return StreamOutput
-     */
     protected function createOutputStream(): StreamOutput
     {
         return new StreamOutput(fopen('php://memory', 'r+', false));

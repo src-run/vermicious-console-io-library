@@ -20,9 +20,6 @@ trait OutputAwareTrait
      */
     protected $output;
 
-    /**
-     * @param OutputInterface $output
-     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;

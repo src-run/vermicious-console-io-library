@@ -18,10 +18,7 @@ class StringAnswer implements AnswerInterface
     use AnswerTrait;
 
     /**
-     * @param Question   $question
      * @param mixed|null $answer
-     * @param bool       $default
-     * @param bool       $interactive
      */
     public function __construct(Question $question, $answer = null, bool $default = false, bool $interactive = true)
     {
@@ -31,25 +28,16 @@ class StringAnswer implements AnswerInterface
         $this->interactive = $interactive;
     }
 
-    /**
-     * @return null|string
-     */
     public function getAnswer(): ?string
     {
         return $this->result;
     }
 
-    /**
-     * @return string
-     */
     public function stringifyAnswer(): string
     {
         return (string) ($this->getAnswer() ?? '');
     }
 
-    /**
-     * @return int
-     */
     public function length(): int
     {
         return mb_strlen($this->getAnswer());

@@ -20,9 +20,6 @@ trait InputAwareTrait
      */
     protected $input;
 
-    /**
-     * @param InputInterface $input
-     */
     public function setInput(InputInterface $input)
     {
         $this->input = $input;

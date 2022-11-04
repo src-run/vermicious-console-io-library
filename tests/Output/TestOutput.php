@@ -26,6 +26,6 @@ class TestOutput extends Output
      */
     public function doWrite($message, $newline = false)
     {
-        $this->buffer .= $message.($newline ? "\n" : '');
+        $this->buffer .= $message . ($newline ? "\n" : '');
     }
 }

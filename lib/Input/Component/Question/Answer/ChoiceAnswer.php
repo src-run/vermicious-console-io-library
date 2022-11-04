@@ -21,11 +21,8 @@ class ChoiceAnswer extends StringAnswer
     private $index;
 
     /**
-     * @param Question   $question
      * @param mixed|null $answer
      * @param mixed|null $index
-     * @param bool       $default
-     * @param bool       $interactive
      */
     public function __construct(Question $question, $answer = null, $index = null, bool $default = false, bool $interactive = true)
     {
@@ -34,9 +31,6 @@ class ChoiceAnswer extends StringAnswer
         $this->index = $index;
     }
 
-    /**
-     * @return bool
-     */
     public function hasIndex(): bool
     {
         return null !== $this->index;
